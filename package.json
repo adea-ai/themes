@@ -84,6 +84,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "bun run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "oxlint",
     "test": "bun test tests",
