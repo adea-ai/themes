@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 
 import { getTheme, themes } from '../src'
-import { oklchToHex, parseColor } from '../src/oklch'
+import { contrastRatio, oklchToHex, parseColor } from '../src/oklch'
 
 /**
  * The catalogue claims to hold *other people's palettes*, and this file is what
@@ -96,12 +96,17 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Monokai's olive ground.
   { id: 'monokai', background: '#272822', signature: { role: 'accent', hue: [285, 310] } },
 
-  // Adea's own two, which are authored here rather than imported. Asserted so that a
-  // change to the authored ramp is a deliberate edit to this file rather than a
-  // silent shift in the product's appearance.
+  // Adea's own two. The light one is authored here; the dark one is *composed*, so
+  // its entries here are the half that comes from its structure donor and the
+  // dedicated suite below asserts the other half.
   { id: 'adea-light', background: '#ffffff', foreground: '#252525' },
-  { id: 'adea-dark', background: '#252525', foreground: '#fcfcfc' },
+  { id: 'adea-dark', background: '#0f141f', foreground: '#b4bcca' },
 ])
+
+/** A theme role as hex, which is how upstream palettes are published. */
+function hex(value: string): string {
+  return oklchToHex(parseColor(value)!)
+}
 
 function resolve(theme: ReturnType<typeof getTheme>, role: Fidelity['signature'] extends never ? never : string): string | undefined {
   if (!theme) return undefined
@@ -165,6 +170,84 @@ describe('upstream fidelity', () => {
       })
     }
   }
+})
+
+/**
+ * Adea's dark theme is composed rather than copied, so "does it match upstream" has
+ * two answers and the interesting failure is a composition that quietly stops
+ * honouring one of its donors. These assert each half against the palette it came
+ * from: the canvas and greyscale against Aardvark Ink, the sixteen hues against
+ * GitHub Dark Default.
+ */
+describe('adea-dark composition', () => {
+  const AARDVARK = {
+    background: '#0f141f',
+    foreground: '#b4bcca',
+    black: '#222734',
+    brightBlack: '#3a4152',
+    white: '#5a6377',
+    brightWhite: '#dfe5ee',
+    cursor: '#b4bcca',
+    selection: '#2a3645',
+  } as const
+
+  const GITHUB = {
+    red: '#ff7b72',
+    green: '#3fb950',
+    yellow: '#d29922',
+    blue: '#58a6ff',
+    magenta: '#bc8cff',
+    cyan: '#39c5cf',
+    brightRed: '#ffa198',
+    brightGreen: '#56d364',
+    brightYellow: '#e3b341',
+    brightBlue: '#79c0ff',
+    brightMagenta: '#d2a8ff',
+    brightCyan: '#56d4dd',
+  } as const
+
+  test('the structure comes from Aardvark Ink', () => {
+    const theme = getTheme('adea-dark')!
+
+    expect(hex(theme.colors.background), 'canvas').toBe(AARDVARK.background)
+    expect(hex(theme.colors.foreground), 'foreground').toBe(AARDVARK.foreground)
+    expect(hex(theme.cursor), 'cursor').toBe(AARDVARK.cursor)
+    expect(hex(theme.selection), 'selection').toBe(AARDVARK.selection)
+    expect(hex(theme.ansi.black), 'ansi black').toBe(AARDVARK.black)
+    expect(hex(theme.ansi.brightBlack), 'ansi bright black').toBe(AARDVARK.brightBlack)
+    expect(hex(theme.ansi.white), 'ansi white').toBe(AARDVARK.white)
+    expect(hex(theme.ansi.brightWhite), 'ansi bright white').toBe(AARDVARK.brightWhite)
+  })
+
+  test('the hues come from GitHub Dark Default, unmodified', () => {
+    const theme = getTheme('adea-dark')!
+
+    // Unmodified is the assertion, not merely "close". These are the colours the
+    // composition exists to get; a contrast repair that moved one would mean the
+    // canvas could not carry it, and the answer to that would be a different canvas,
+    // not a duller hue.
+    for (const [role, expected] of Object.entries(GITHUB)) {
+      expect(hex(theme.ansi[role as keyof typeof GITHUB]), `ansi.${role}`).toBe(expected)
+    }
+  })
+
+  test('the vibrant hues clear the floor on the borrowed canvas', () => {
+    // The premise of the composition: Aardvark Ink's canvas is darker and less
+    // saturated than GitHub's, so GitHub's hues have *more* contrast here, not less.
+    const theme = getTheme('adea-dark')!
+    const background = parseColor(theme.colors.background)!
+    for (const role of ['success', 'warning', 'error', 'info', 'accent'] as const) {
+      const ratio = contrastRatio(parseColor(theme.colors[role])!, background)
+      expect(ratio, `${role} measures ${ratio.toFixed(2)}:1 on the canvas`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  test('the composition names both donors', () => {
+    const theme = getTheme('adea-dark')!
+    const sources = theme.provenance.bootstrappedFrom ?? []
+    expect(sources.join(' ')).toContain('Aardvark Ink')
+    expect(sources.join(' ')).toContain('GitHub Dark Default')
+  })
 })
 
 describe('provenance', () => {

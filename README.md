@@ -24,7 +24,10 @@ bun add @adea-ai/themes
 | **Monokai** | Classic |
 | **Nord**, **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each |
 
-`adea-light` and `adea-dark` are the defaults. Everything else is somebody else's
+`adea-light` and `adea-dark` are the defaults. The light one is authored here; the
+**dark one is composed** from two upstream palettes — Aardvark Ink's canvas and
+greyscale, GitHub Dark Default's sixteen hues — so the default dark theme is derived
+from named projects rather than chosen by hand. Everything else is somebody else's
 palette, reproduced from a named revision and credited in [NOTICE](NOTICE).
 
 ## Using it
@@ -61,6 +64,11 @@ satisfy it, and no palette is hand-authored here: `palettes/` holds Base24 schem
 reproduced from a pinned revision, and `src/normalize.ts` is the single place a
 terminal palette becomes an application theme. Adding a theme is a line in
 `src/sources.ts` plus a rebuild.
+
+A theme may also be **composed from two donors** — one supplying the structure, another
+the hues — which is how Adea's own dark theme is built. The composition is a slot map in
+`COMPOSED_SOURCES`, so both parents stay named and freshening either one is a one-line
+diff rather than a re-transcription.
 
 **OKLCH is the representation.** Perceptually uniform lightness is what makes a
 surface ladder buildable by adding fixed steps, a contrast failure repairable by
@@ -134,6 +142,14 @@ invisible drift.
 a revision pinned in `src/sources.ts`. To adopt a newer upstream, change
 `CATALOGUE_REVISION`, run `vendor`, then `catalogue:build` and read the diff — the
 build prints every value it repaired and why.
+
+### Composing a theme from two palettes
+
+Add an entry to `COMPOSED_SOURCES` in `src/sources.ts` naming both donor slugs, the
+slot map, and the slots to synthesise; list the greyscale roles to pin to the structure
+donor; then `bun run vendor && bun run catalogue:build`. The vendor step asserts the two
+maps cover every Base24 slot, so a composition cannot be half-specified. Assert each
+half against its donor in `tests/provenance.test.ts`.
 
 ### Adding a theme
 

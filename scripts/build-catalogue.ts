@@ -28,7 +28,12 @@ import { BASE24_SLOTS, parseBase24Scheme } from '../src/adapters/base24'
 import type { Base24Scheme } from '../src/adapters/base24'
 import { normalizeTheme } from '../src/normalize'
 import type { NormalizationFinding, ThemeSourceSpec } from '../src/normalize'
-import { FAMILY_PROVENANCE, VENDORED_SOURCES, AUTHORED_SOURCES } from '../src/sources'
+import {
+  AUTHORED_SOURCES,
+  COMPOSED_SOURCES,
+  FAMILY_PROVENANCE,
+  VENDORED_SOURCES,
+} from '../src/sources'
 import type { AdeaThemeRecord } from '../src/schema'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -36,6 +41,25 @@ const GENERATED_DIR = join(ROOT, 'src', 'generated')
 const PALETTE_DIR = join(ROOT, 'palettes')
 
 const check = process.argv.includes('--check')
+
+/**
+ * Reads a composed theme's vendored file.
+ *
+ * A composition carries three things a plain scheme does not: the ANSI roles pinned to
+ * its structure donor, the donor's cursor and selection, and the names of both
+ * donors. They travel in the file rather than being restated as hex in
+ * `src/sources.ts`, so the composition's decisions live with the data they describe.
+ */
+async function readComposed(id: string) {
+  const source = await readFile(join(PALETTE_DIR, `${id}.json`), 'utf8')
+  const parsed = JSON.parse(source) as {
+    palette: Record<string, string>
+    ansi: Record<string, string>
+    cursor: string
+    selection: string
+  }
+  return parsed
+}
 
 /** Reads a vendored scheme, matching the id to its file. */
 async function readScheme(id: string): Promise<Base24Scheme> {
@@ -83,6 +107,29 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
       scheme: await readScheme(theme.id),
       ...(theme.palette ? { palette: theme.palette } : {}),
       ...(theme.accentSlot ? { accentSlot: theme.accentSlot } : {}),
+    })
+  }
+
+  for (const theme of COMPOSED_SOURCES) {
+    const composed = await readComposed(theme.id)
+    sources.push({
+      id: theme.id,
+      name: theme.name,
+      family: theme.family,
+      familyLabel: theme.familyLabel,
+      label: theme.label,
+      description: theme.description,
+      appearance: theme.appearance,
+      tags: theme.tags,
+      scheme: await readScheme(theme.id),
+      // The greyscale, cursor and selection the structure donor published, kept
+      // verbatim rather than re-derived. See `ansiFromStructure`.
+      ansi: composed.ansi as never,
+      cursor: composed.cursor,
+      selection: composed.selection,
+      ...(theme.palette ? { palette: theme.palette } : {}),
+      ...(theme.accentSlot ? { accentSlot: theme.accentSlot } : {}),
+      provenance: theme.provenance,
     })
   }
 
@@ -176,11 +223,12 @@ async function generate(): Promise<Generated> {
     findings.push(...normalized.findings)
     records.push({
       ...normalized.record,
-      provenance: FAMILY_PROVENANCE[source.family] ?? {
-        project: source.familyLabel,
-        url: '',
-        license: 'MIT',
-      },
+      provenance: source.provenance ??
+        FAMILY_PROVENANCE[source.family] ?? {
+          project: source.familyLabel,
+          url: '',
+          license: 'MIT',
+        },
     })
     schemes[source.id] = source.scheme
   }

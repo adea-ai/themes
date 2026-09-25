@@ -59,6 +59,155 @@ export const ADEA_PROVENANCE: ThemeProvenance = Object.freeze({
 })
 
 /**
+ * A theme composed from **two** upstream palettes.
+ *
+ * Adea's own dark theme is not a copy of any published palette, and it is not
+ * hand-authored either. It is a deliberate composition: the canvas, the greys, the
+ * cursor and the selection come from a palette chosen for exactly those — Aardvark
+ * Ink, whose near-black navy and muted blue-grey foreground are why it was picked —
+ * and the sixteen ANSI hues come from a second palette chosen for its saturation,
+ * GitHub's dark scheme.
+ *
+ * The split exists because the two properties are in tension inside one palette. A
+ * palette tuned for a comfortable canvas mutes its hues to agree with it; a palette
+ * tuned for vivid syntax colours tends to sit on a canvas that is very dark or very
+ * flat. Taking one of each yields a calm ground with legible colour on it.
+ *
+ * ## Why it is composed rather than merged by hand
+ *
+ * The alternative was to read both palettes and paste the merged hex into
+ * `palettes/adea-dark.json`. That works once and is wrong afterwards: nothing then
+ * records which donor each value came from, so neither donor could ever be
+ * refreshed. Composing in the vendor step keeps both parents named, keeps the values
+ * upstream's own bytes rather than a transcription, and makes "GitHub changed its
+ * blue" a one-line diff plus a rebuild.
+ */
+export interface ComposedSource {
+  id: string
+  name: string
+  family: 'adea'
+  familyLabel: string
+  label: string
+  description: string
+  appearance: ThemeAppearance
+  tags: readonly string[]
+  /** The two donors' slugs in the dataset, and which half each supplies. */
+  donors: Readonly<Record<'structure' | 'hues', string>>
+  /**
+   * The Base24 slot map.
+   *
+   * Each entry is `[donor, key]`, where the donor is `structure` or `hues` and the
+   * key is a role name in that donor's published palette — the dataset's own names,
+   * so `purple` is Base24's magenta slot and `brightPurple` its bright magenta.
+   */
+  slots: Readonly<Partial<Record<Base24Slot, readonly ['structure' | 'hues', string]>>>
+  /**
+   * Slots neither donor supplies, derived from one of them.
+   *
+   * `slots` and `synthesise` are jointly total: between them they must cover every
+   * Base24 slot, and the vendor step asserts that rather than trusting it. The two
+   * are separate maps rather than one so that "this value came from a donor" and
+   * "this value was computed" stay distinguishable in review.
+   */
+  synthesise: Readonly<
+    Partial<
+      Record<
+        Base24Slot,
+        readonly ['structure' | 'hues', string, { rotate?: number; lighten?: number }]
+      >
+    >
+  >
+  /**
+   * ANSI roles pinned to the structure donor's own values.
+   *
+   * The greyscale ramp is normally *derived* by ranking a scheme's grey slots by
+   * measured contrast, because Base24 does not name `black`, `white` or
+   * `brightBlack` and light schemes invert them. That derivation is right for an
+   * imported palette and wrong here: Aardvark Ink publishes a greyscale it chose,
+   * the greyscale is the reason it was chosen as the structure donor, and
+   * re-deriving it gives back something close but not equal. So the four roles are
+   * pinned to the donor's own values instead.
+   */
+  ansiFromStructure: readonly ('black' | 'brightBlack' | 'white' | 'brightWhite')[]
+  /** The role supplying the accent, when the family's identity demands one. */
+  accentSlot?: 'blue' | 'magenta' | 'cyan' | 'green'
+  palette?: Partial<Record<Base24Slot, string>>
+  provenance: ThemeProvenance
+}
+
+/**
+ * Adea's composed dark theme.
+ *
+ * This was previously authored here as a neutral grey ramp with a monochrome accent.
+ * It is now a composition, so the default dark theme is derived from named upstream
+ * palettes and re-derivable, and it gains the saturated hues the earlier ramp did not
+ * have.
+ */
+export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
+  {
+    id: 'adea-dark',
+    name: 'Adea Dark',
+    family: 'adea',
+    familyLabel: 'Adea',
+    label: 'Dark',
+    description:
+      "The default dark theme. Aardvark Ink's quiet canvas, with GitHub's vivid hues on it.",
+    appearance: 'dark',
+    tags: ['dark', 'default', 'vivid'],
+    donors: { structure: 'aardvark-ink', hues: 'github-dark-default' },
+    slots: {
+      // The structure donor. `base01` receives its `black` rather than a background
+      // step: an ANSI black equal to the background is invisible as foreground text,
+      // which is the defect the normalizer's ramp notes describe.
+      base00: ['structure', 'background'],
+      base01: ['structure', 'black'],
+      base02: ['structure', 'selection'],
+      base03: ['structure', 'brightBlack'],
+      base04: ['structure', 'white'],
+      base05: ['structure', 'foreground'],
+      base06: ['structure', 'brightWhite'],
+      base07: ['structure', 'brightWhite'],
+      // The hue donor. Base24's bright slots run red, yellow, green, cyan, blue,
+      // magenta — not the ANSI order of yellow before green.
+      base08: ['hues', 'red'],
+      base0A: ['hues', 'yellow'],
+      base0B: ['hues', 'green'],
+      base0C: ['hues', 'cyan'],
+      base0D: ['hues', 'blue'],
+      base0E: ['hues', 'purple'],
+      base12: ['hues', 'brightRed'],
+      base13: ['hues', 'brightYellow'],
+      base14: ['hues', 'brightGreen'],
+      base15: ['hues', 'brightCyan'],
+      base16: ['hues', 'brightBlue'],
+      base17: ['hues', 'brightPurple'],
+    },
+    synthesise: {
+      // Neither donor's ANSI set has an orange or a brown, and Base24 defines both.
+      // A hue rotation off red and yellow is how the export adapter fills them too,
+      // so a composed scheme and an exported one are synthesised identically.
+      base09: ['hues', 'red', { rotate: 26 }],
+      base0F: ['hues', 'yellow', { rotate: -34 }],
+      // The two rungs below the canvas, which the specification defines as "dark
+      // black" and "darker than that". Lightness slices of the structure donor's own
+      // canvas, so the theme keeps its hue as it darkens.
+      base10: ['structure', 'background', { lighten: -0.03 }],
+      base11: ['structure', 'background', { lighten: -0.06 }],
+    },
+    ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    provenance: {
+      project: 'Adea',
+      url: 'https://github.com/adea-ai/themes',
+      license: 'Apache-2.0',
+      bootstrappedFrom: [
+        'Aardvark Ink (iTerm2-Color-Schemes)',
+        'GitHub Dark Default (iTerm2-Color-Schemes)',
+      ],
+    },
+  },
+])
+
+/**
  * Per-family provenance.
  *
  * `url` is the project's own repository — the place its palette is defined — while
@@ -505,9 +654,9 @@ export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
  * accent — the design system's default has to work as a default for everyone, which
  * means it cannot be anybody's favourite colour.
  *
- * Both appearances are generated from the accent-and-grey ramp below, so the two
- * variants cannot drift apart: a change to the ramp changes both, and the contrast
- * suite measures both.
+ * Only the light variant is authored here. Its dark counterpart was previously the
+ * second entry in this list and is now a {@link ComposedSource} built from two
+ * upstream palettes, which is where the default dark theme gets its saturated hues.
  */
 export interface AuthoredSource {
   id: string
@@ -625,58 +774,5 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     },
     cursor: '#24292f',
     selection: '#b6c7ff',
-  },
-  {
-    id: 'adea-dark',
-    family: 'adea',
-    familyLabel: 'Adea',
-    label: 'Dark',
-    name: 'Adea Dark',
-    description: "The default dark theme. A soft grey, never a near-black.",
-    appearance: 'dark',
-    tags: ['dark', 'neutral', 'default'],
-    ramp: {
-      background: '#252525',
-      foreground: '#fcfcfc',
-      surface: '#2d2d2d',
-      surfaceElevated: '#343434',
-      surfaceHover: '#444444',
-      surfaceActive: '#4d4d4d',
-      border: '#3d3d3d',
-      borderMuted: '#333333',
-      textMuted: '#a3a3a3',
-      textSubtle: '#8a8a8a',
-    },
-    accent: '#ebebeb',
-    accentForeground: '#343434',
-    status: {
-      success: '#3fb950',
-      warning: '#e3b341',
-      // Lighter than the value the product shipped: `#e07060` measures 4.37:1 on
-      // this theme's raised surface and 4.09:1 on a popover, which is where an
-      // alert is most likely to sit. Same hue, same chroma, four steps up.
-      error: '#ee7c6c',
-      info: '#39c5cf',
-    },
-    ansi: {
-      black: '#2f3742',
-      red: '#ff8183',
-      green: '#56d364',
-      yellow: '#e3b341',
-      blue: '#6ca4f8',
-      magenta: '#db61a2',
-      cyan: '#39c5cf',
-      white: '#d5dde5',
-      brightBlack: '#57606a',
-      brightRed: '#ff9494',
-      brightGreen: '#79dd8a',
-      brightYellow: '#f0c264',
-      brightBlue: '#8db9ff',
-      brightMagenta: '#e87cb4',
-      brightCyan: '#66d3dc',
-      brightWhite: '#eef2f6',
-    },
-    cursor: '#e6edf3',
-    selection: '#264f78',
   },
 ])

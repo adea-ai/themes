@@ -49,7 +49,7 @@ palette.
 
 | Family | Project | Licence | Vendored values |
 | --- | --- | --- | --- |
-| Adea | this package | Apache-2.0 | authored here |
+| Adea | this package | Apache-2.0 | authored (Light) and composed (Dark) |
 | Catppuccin | https://github.com/catppuccin/catppuccin | MIT | via the chain above |
 | Tokyo Night | https://github.com/folke/tokyonight.nvim | Apache-2.0 | via the chain above |
 | Rosé Pine | https://github.com/rose-pine/rose-pine-theme | MIT | via the chain above |
@@ -63,6 +63,29 @@ palette.
 | Kanagawa | https://github.com/rebelot/kanagawa.nvim | MIT | via the chain above |
 | Vesper | https://github.com/raunofreiberg/vesper | MIT | via the chain above |
 | Monokai | https://monokai.pro (design origin) | MIT | via the chain above |
+
+### Adea Dark is composed from two of these
+
+`adea-dark` is not a copy of any published palette, and it is not hand-authored. It is
+built in the vendor step from two donors, each named in
+`palettes/adea-dark.json`'s `source.composedFrom`:
+
+- **Aardvark Ink** supplies the structure — canvas, foreground, the greyscale ANSI
+  roles, the cursor and the selection. That palette was chosen for exactly those.
+- **GitHub Dark Default** supplies all sixteen hues — red, green, yellow, blue,
+  magenta, cyan and their bright variants.
+
+Both donors are MIT-licensed through the same iTerm2-Color-Schemes chain as the rest of
+the catalogue, so the composed result is used under MIT as well as under this package's
+Apache-2.0. The composition exists because the two properties are in tension in a single
+palette: a palette tuned for a comfortable canvas mutes its hues to agree with it, and
+one tuned for vivid syntax colours tends to sit on a canvas that is very dark or very
+flat. Taking one of each gives a calm ground with legible colour on it.
+
+No hue was adjusted to make the composition work. GitHub's hues measure between 7.2:1
+and 8.8:1 against Aardvark Ink's canvas, which is *more* contrast than they have against
+GitHub's own — so the vibrant set arrives intact, and that is asserted rather than
+assumed.
 
 ### Two entries that need a note
 

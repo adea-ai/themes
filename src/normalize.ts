@@ -51,6 +51,7 @@ import type {
   AdeaThemeRecord,
   AnsiKey,
   ThemeAppearance,
+  ThemeProvenance,
 } from './schema'
 import type { Base24Scheme, Base24Slot } from './adapters/base24'
 import { parseBase24Palette } from './adapters/base24'
@@ -182,6 +183,13 @@ export interface ThemeSourceSpec {
   ansi?: Partial<AdeaAnsi>
   cursor?: string
   selection?: string
+  /**
+   * A provenance that overrides the family's.
+   *
+   * For a theme that is not simply a member of a family — Adea's composed dark theme
+   * belongs to the `adea` family but has two upstream parents to name.
+   */
+  provenance?: ThemeProvenance
 }
 
 /** Something the normalizer did that a reviewer should know about. */
@@ -951,11 +959,7 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
       familyLabel: source.familyLabel,
       label: source.label,
       description: source.description,
-      provenance: {
-        project: '',
-        url: '',
-        license: '',
-      },
+      provenance: source.provenance ?? { project: '', url: '', license: '' },
       tags: source.tags,
     },
     findings,
