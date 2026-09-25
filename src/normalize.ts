@@ -150,6 +150,15 @@ const REPAIR_BUDGET = Object.freeze({
 /** The accent preference order, best first. */
 const ACCENT_PREFERENCE = ['blue', 'magenta', 'cyan', 'green'] as const satisfies readonly AnsiKey[]
 
+/**
+ * How much stronger body text must be than the secondary rung.
+ *
+ * Small on purpose. The requirement is that the two are *distinguishable*, not that
+ * there is a wide gulf — 0.4 of a contrast ratio is a visible difference without
+ * making secondary text unnecessarily faint.
+ */
+const MINIMUM_LADDER_GAP = 0.4
+
 /** The smallest chroma a colour needs before it reads as "a colour" rather than grey. */
 const MINIMUM_ACCENT_CHROMA = 0.035
 
@@ -176,6 +185,14 @@ export interface ThemeSourceSpec {
    * on the entry that makes it.
    */
   palette?: Partial<Record<Base24Slot, string>>
+  /**
+   * Transpose the palette's hues onto the canvas.
+   *
+   * Set when a composition borrows one palette's hues for another palette's canvas.
+   * See {@link transposeHues} for why the move is common to every hue rather than
+   * applied per hue.
+   */
+  hueTranspose?: { floor: number }
   /** Which ANSI role supplies the accent, when the family's identity demands one. */
   accentSlot?: AnsiKey
   /** Explicit roles for authored themes, applied after derivation. */
@@ -666,6 +683,108 @@ function repairRole(
   return { repair: lightness, blended: false }
 }
 
+
+/**
+ * The Base24 slots that carry a hue rather than a grey.
+ *
+ * `base09` and `base0F` are included even though neither donor publishes them: they
+ * are synthesised from red and yellow, and leaving them behind would put an
+ * untransposed orange next to a transposed red.
+ */
+const CHROMATIC_SLOTS = [
+  'base08',
+  'base09',
+  'base0A',
+  'base0B',
+  'base0C',
+  'base0D',
+  'base0E',
+  'base0F',
+  'base12',
+  'base13',
+  'base14',
+  'base15',
+  'base16',
+  'base17',
+] as const satisfies readonly Base24Slot[]
+
+/** The six slots whose bright siblings make a normal/bright pair. */
+const NORMAL_HUE_SLOTS = ['base08', 'base0A', 'base0B', 'base0C', 'base0D', 'base0E'] as const
+
+/**
+ * Moves every hue in a palette by one common lightness step, so a hue set authored
+ * against one canvas becomes legible on another.
+ *
+ * This exists because a composition can put a palette's hues on somebody else's
+ * background. GitHub's dark hues measure between 2.5:1 and 4.1:1 on a light canvas —
+ * fine as accents, unusable as terminal text — and repairing each hue *independently*
+ * to the floor destroys the thing that makes an ANSI palette an ANSI palette: the
+ * bright variants would converge onto their normal siblings, because a bright variant
+ * differs from its normal one mainly in lightness and the repair would land them all
+ * on the same lightness.
+ *
+ * Moving the group by one step instead transposes the whole set: every hue keeps its
+ * angle and chroma exactly, every relative lightness is preserved, and the palette
+ * stays internally consistent. The step is the smallest one that brings every *normal*
+ * hue to the floor, measured in the canonical form the catalogue commits so that
+ * rounding cannot push one back under.
+ */
+function transposeHues(
+  themeId: string,
+  palette: Record<Base24Slot, Oklch>,
+  floor: number,
+  findings: NormalizationFinding[]
+): Partial<Record<Base24Slot, Oklch>> {
+  const background = palette.base00
+  const worst = (step: number): number =>
+    Math.min(
+      ...NORMAL_HUE_SLOTS.map((slot) =>
+        contrastRatio(canonical(shiftLightness(palette[slot], step)), background)
+      )
+    )
+
+  const initial = worst(0)
+  if (initial >= floor) return {}
+
+  // Both directions are tried, nearest first, as in `repairContrast`: a dark canvas
+  // needs its hues lightened and a light canvas needs them darkened, and a palette
+  // moved to the other kind of canvas is the whole point of the operation.
+  const step = 0.002
+  let chosen: number | undefined
+  for (let index = 1; index <= Math.floor(0.45 / step) && chosen === undefined; index += 1) {
+    for (const direction of [1, -1] as const) {
+      const candidate = step * index * direction
+      const probe = shiftLightness(palette[NORMAL_HUE_SLOTS[0]], candidate)
+      if (probe.l <= 0.02 || probe.l >= 0.98) continue
+      if (worst(candidate) >= floor) {
+        chosen = candidate
+        break
+      }
+    }
+  }
+
+  if (chosen === undefined) {
+    findings.push({
+      themeId,
+      role: 'hues',
+      kind: 'budget-exceeded',
+      message: `no single lightness step brings every hue to ${floor}:1 against the canvas`,
+    })
+    return {}
+  }
+
+  findings.push({
+    themeId,
+    role: 'hues',
+    kind: 'repaired',
+    message: `transposed all ${CHROMATIC_SLOTS.length} hue slots by ${chosen.toFixed(3)} in lightness to reach ${floor}:1 on the borrowed canvas; hue and chroma unchanged`,
+  })
+
+  return Object.fromEntries(
+    CHROMATIC_SLOTS.map((slot) => [slot, shiftLightness(palette[slot], chosen as number)])
+  ) as Partial<Record<Base24Slot, Oklch>>
+}
+
 /** The catalogued result of normalizing one source. */
 export interface NormalizedTheme {
   record: AdeaThemeRecord
@@ -697,6 +816,16 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
       kind: 'substituted',
       message: `replaced the vendored ${slot} with the upstream project's own value`,
     })
+  }
+
+  // The hue transpose, applied at the same stage as the corrections and for the same
+  // reason: the semantic roles derive from these slots, so transposing afterwards
+  // would leave `error` built from the untransposed red and the two disagreeing.
+  if (source.hueTranspose) {
+    const transposed = transposeHues(source.id, palette, source.hueTranspose.floor, findings)
+    for (const [slot, value] of Object.entries(transposed)) {
+      palette[slot as Base24Slot] = value
+    }
   }
 
   const background = palette.base00
@@ -770,7 +899,7 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
   // OKLCH rather than alpha-compositing keeps the result a real colour that CSS can
   // use without a backdrop.
   const mutedRepair = repairAcrossSurfaces(
-    mix(palette.base05, background, 0.32),
+    mix(textRepair.color, background, 0.32),
     surfaces,
     CONTRAST_FLOORS.textMuted,
     0.3
@@ -779,15 +908,50 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
   colors.textMuted = muted.value
   if (muted.finding) findings.push(muted.finding)
 
-  const subtleRepair = repairAcrossSurfaces(
+  /*
+   * The ladder is derived in order — body, secondary, tertiary — and each rung is
+   * held to being dimmer than the one above it.
+   *
+   * Sourcing the tertiary rung from `base03` is faithful to Base24, which defines that
+   * slot as comments and invisibles, and for most palettes it is exactly right: the
+   * value the author chose for dim text. But a few publish a `base03` that is not a dim
+   * grey at all — Solarized's light scheme carries its near-black `base03`, Nord Light's
+   * is a mid slate — and taking it on trust produced a *tertiary* role that was the
+   * most prominent text on the screen, at 13.9:1 against a canvas whose body text
+   * measures 5.5:1. So the slot is used when it cooperates and a blend replaces it when
+   * it does not, and either way the rung is reported.
+   */
+  const mutedContrast = contrastRatio(mutedRepair.color, background)
+  const fromPalette = repairAcrossSurfaces(
     palette.base03,
     surfaces,
     CONTRAST_FLOORS.textSubtle,
     0.3
   )
+  const paletteSubtleContrast = contrastRatio(fromPalette.color, background)
+
+  const subtleFromPalette = paletteSubtleContrast < mutedContrast
+  const subtleRepair =
+    subtleFromPalette
+      ? fromPalette
+      : repairAcrossSurfaces(
+          mix(textRepair.color, background, 0.55),
+          surfaces,
+          CONTRAST_FLOORS.textSubtle,
+          0.3
+        )
+
   const subtle = emit(source.id, 'textSubtle', subtleRepair, CONTRAST_FLOORS.textSubtle)
   colors.textSubtle = subtle.value
   if (subtle.finding) findings.push(subtle.finding)
+  if (!subtleFromPalette) {
+    findings.push({
+      themeId: source.id,
+      role: 'textSubtle',
+      kind: 'substituted',
+      message: `base03 measures ${paletteSubtleContrast.toFixed(1)}:1, no dimmer than textMuted's ${mutedContrast.toFixed(1)}:1, so the tertiary rung is a blend rather than the palette's comment colour`,
+    })
+  }
 
   /**
    * The status roles, each with fallback candidates.
@@ -803,6 +967,39 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
    * The order is not "brightest first" — on a light canvas the bright variants are
    * worse, so the declared ANSI colour is always tried before its bright sibling.
    */
+  /*
+   * Body text gets enough headroom above the secondary rung to stay the stronger of the
+   * two.
+   *
+   * The secondary rung is repaired against the *raised* surfaces, which is the binding
+   * constraint, so on a palette whose foreground is itself only a little above the floor
+   * the repair can push secondary text past the body text — Tokyo Night Day came out
+   * with 5.6:1 for a caption and 5.5:1 for the paragraph, which collapses the two roles
+   * into one. The fix is to give the body text room rather than to weaken the secondary
+   * floor, and it is a small move: the foreground is already above its own floor, so this
+   * only ever fires on a palette that was already tight.
+   */
+  const bodyContrast = contrastRatio(textRepair.color, background)
+  const mutedAgainstCanvas = contrastRatio(mutedRepair.color, background)
+  if (mutedAgainstCanvas + MINIMUM_LADDER_GAP > bodyContrast) {
+    const lifted = repairAcrossSurfaces(
+      textRepair.color,
+      surfaces,
+      mutedAgainstCanvas + MINIMUM_LADDER_GAP,
+      REPAIR_BUDGET.text
+    )
+    if (lifted.satisfied) {
+      colors.text = formatOklch(lifted.color)
+      colors.foreground = colors.text
+      findings.push({
+        themeId: source.id,
+        role: 'text',
+        kind: 'repaired',
+        message: `lightness moved a further ${lifted.delta.toFixed(3)} so body text (${lifted.ratio.toFixed(1)}:1) stays clear of the secondary rung (${mutedAgainstCanvas.toFixed(1)}:1)`,
+      })
+    }
+  }
+
   const statusCandidates = {
     error: [palette.base08, palette.base12],
     success: [palette.base0B, palette.base14],
@@ -913,13 +1110,25 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
   colors.accentForeground = formatOklch(accentForeground.value)
   findings.push(...accentForeground.findings)
 
-  // The selection is the palette's own, repaired only if it is invisible against
-  // the canvas. Adapters handle making text legible on top of it.
-  const selectionSource = source.selection
-    ? (palette.base02 as Oklch)
-    : (palette.base02 as Oklch)
+  /*
+   * The selection is the palette's own where the source declares one, and the floor
+   * applies to it either way.
+   *
+   * A composition can carry its structure donor's selection explicitly, and taking that
+   * on trust is how Adea Light shipped a selection measuring 1.11:1 against its own
+   * canvas — Nord's is deliberately subtle, and subtle is not the same as invisible. An
+   * invisible selection is a functional defect rather than a matter of taste: the user
+   * cannot see what they have selected. So the declared value is used as given and still
+   * measured, and moving it is reported.
+   *
+   * The cursor is deliberately *not* treated this way. It has no floor — a cursor is an
+   * affordance rather than text, and several palettes in the catalogue give it a colour
+   * of its own — so the adapters derive a legible glyph for it instead
+   * (see `adapters/xterm.ts`).
+   */
+  const declaredSelection = source.selection ? parseColor(source.selection) : undefined
   const selectionRepair = repairContrast(
-    selectionSource,
+    declaredSelection ?? (palette.base02 as Oklch),
     background,
     CONTRAST_FLOORS.selection,
     0.5
@@ -952,9 +1161,9 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
       cursor: source.cursor
         ? authoredColor(source.id, 'cursor', source.cursor)
         : formatOklch(palette.base05),
-      selection: source.selection
-        ? authoredColor(source.id, 'selection', source.selection)
-        : selection.value,
+      // The repaired value, not the declared one: `selectionRepair` above started from
+      // whatever the source declared.
+      selection: selection.value,
       family: source.family,
       familyLabel: source.familyLabel,
       label: source.label,

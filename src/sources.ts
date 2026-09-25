@@ -37,6 +37,7 @@
  */
 
 import type { Base24Slot } from './adapters/base24'
+import { CONTRAST_FLOORS } from './normalize'
 import type { ThemeAppearance, ThemeProvenance } from './schema'
 
 /** The dataset the Base24 schemes are reproduced from. */
@@ -132,16 +133,48 @@ export interface ComposedSource {
   /** The role supplying the accent, when the family's identity demands one. */
   accentSlot?: 'blue' | 'magenta' | 'cyan' | 'green'
   palette?: Partial<Record<Base24Slot, string>>
+  /**
+   * Transpose this composition's hues onto the borrowed canvas.
+   *
+   * Set when a composition takes its hues from a palette authored against a different
+   * kind of canvas — which is what borrowing a *dark* palette's hues for a *light*
+   * canvas is. See `transposeHues` in `src/normalize.ts` for why the whole hue set
+   * moves by one common step rather than each hue being repaired on its own.
+   */
+  hueTranspose?: { floor: number }
   provenance: ThemeProvenance
 }
 
 /**
- * Adea's composed dark theme.
+ * Adea's two default themes.
  *
- * This was previously authored here as a neutral grey ramp with a monochrome accent.
- * It is now a composition, so the default dark theme is derived from named upstream
- * palettes and re-derivable, and it gains the saturated hues the earlier ramp did not
- * have.
+ * Both are compositions and both were previously authored here — the light one as a
+ * neutral grey ramp on white with a monochrome accent, the dark one as a neutral grey
+ * ramp on `#252525`. They replaced those entirely while keeping their names, because
+ * they are the defaults: the system's own appearance, not a pair of options beside it.
+ *
+ * ## Why they are a *pair* rather than two themes
+ *
+ * They share one hue donor, so a red is the same red and a blue the same blue in both,
+ * and each borrows its canvas from a palette chosen for the *canvas* rather than for
+ * its colours:
+ *
+ * | | canvas | canvas hue | hues |
+ * | --- | --- | --- | --- |
+ * | Adea Dark | Aardvark Ink `#0f141f` | 265° | GitHub Dark Default |
+ * | Adea Light | Nord Light `#e3e9f4` | 262° | GitHub Dark Default |
+ *
+ * Three degrees apart, and both canvases are *tinted* rather than neutral — 0.024 and
+ * 0.016 of chroma — which is the property that makes the pair feel like one theme seen
+ * at two exposures instead of two themes that happen to ship together. Switching
+ * appearance changes lightness and nothing else about the theme's identity; that claim
+ * is asserted in `tests/provenance.test.ts` rather than left as intent.
+ *
+ * The light theme is the reason `hueTranspose` exists: GitHub's dark hues measure
+ * between 2.5:1 and 4.1:1 on a light canvas, so the whole hue set is transposed down in
+ * lightness by one common step — hue and chroma intact, relative brightness ordering
+ * intact — rather than repaired hue by hue, which would have collapsed every bright
+ * variant onto its normal sibling.
  */
 export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
   {
@@ -201,6 +234,77 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       license: 'Apache-2.0',
       bootstrappedFrom: [
         'Aardvark Ink (iTerm2-Color-Schemes)',
+        'GitHub Dark Default (iTerm2-Color-Schemes)',
+      ],
+    },
+  },
+  {
+    id: 'adea-light',
+    name: 'Adea Light',
+    family: 'adea',
+    familyLabel: 'Adea',
+    label: 'Light',
+    description:
+      "The default light theme. Nord Light's cool canvas, with the same hues as Adea Dark.",
+    appearance: 'light',
+    tags: ['light', 'default', 'cool'],
+    donors: { structure: 'nord-light', hues: 'github-dark-default' },
+    slots: {
+      // The structure donor. Same shape as the dark theme's, with one difference worth
+      // noting: Nord Light's `black` (`#3b4252`) is *darker* than its foreground, which
+      // is what an ANSI black should be on a light canvas — the text colour and the
+      // darkest neutral are the same role there, and Base24's `base01` is where Nord
+      // keeps it.
+      base00: ['structure', 'background'],
+      base01: ['structure', 'black'],
+      base02: ['structure', 'selection'],
+      base03: ['structure', 'brightBlack'],
+      base04: ['structure', 'white'],
+      base05: ['structure', 'foreground'],
+      base06: ['structure', 'brightWhite'],
+      base07: ['structure', 'brightWhite'],
+      base08: ['hues', 'red'],
+      base0A: ['hues', 'yellow'],
+      base0B: ['hues', 'green'],
+      base0C: ['hues', 'cyan'],
+      base0D: ['hues', 'blue'],
+      base0E: ['hues', 'purple'],
+      base12: ['hues', 'brightRed'],
+      base13: ['hues', 'brightYellow'],
+      base14: ['hues', 'brightGreen'],
+      base15: ['hues', 'brightCyan'],
+      base16: ['hues', 'brightBlue'],
+      base17: ['hues', 'brightPurple'],
+    },
+    synthesise: {
+      base09: ['hues', 'red', { rotate: 26 }],
+      base0F: ['hues', 'yellow', { rotate: -34 }],
+      // Beyond the canvas rather than below it, which is the convention for a light
+      // scheme: these two slots are the light end of the ramp.
+      base10: ['structure', 'background', { lighten: 0.03 }],
+      base11: ['structure', 'background', { lighten: 0.06 }],
+    },
+    /**
+     * The one deliberate deviation from the donor, and it is aesthetic rather than
+     * factual — unlike the One Dark correction above, nothing here is wrong.
+     *
+     * Nord Light's canvas carries 0.010 of chroma against Aardvark Ink's 0.024, so
+     * rendering the same hue at half the tint makes the light theme read as neutral grey
+     * beside a partner that is clearly navy. Deepening it to 0.016 — two thirds of the
+     * dark theme's — is what makes the pair look like siblings. Lightness and hue are
+     * untouched, so no contrast pairing moves: body text measures 7.5:1 either way.
+     */
+    palette: { base00: 'oklch(0.933 0.016 261.79)' },
+    ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    // GitHub's hues were drawn for a `#0d1117` canvas. On Nord Light's they measure
+    // between 2.5:1 and 4.1:1, which is legible as an accent and not as terminal text.
+    hueTranspose: { floor: CONTRAST_FLOORS.status },
+    provenance: {
+      project: 'Adea',
+      url: 'https://github.com/adea-ai/themes',
+      license: 'Apache-2.0',
+      bootstrappedFrom: [
+        'Nord Light (iTerm2-Color-Schemes)',
         'GitHub Dark Default (iTerm2-Color-Schemes)',
       ],
     },
@@ -654,9 +758,17 @@ export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
  * accent — the design system's default has to work as a default for everyone, which
  * means it cannot be anybody's favourite colour.
  *
- * Only the light variant is authored here. Its dark counterpart was previously the
- * second entry in this list and is now a {@link ComposedSource} built from two
- * upstream palettes, which is where the default dark theme gets its saturated hues.
+ * Intentionally empty, and worth leaving that way until something needs it.
+ *
+ * This was where both default themes lived. They are now
+ * {@link COMPOSED_SOURCES} entries instead, which is a better home for them: a
+ * composition names the upstream palettes it came from and can be rebuilt when either
+ * moves, while an authored entry is a table of values nobody can refresh.
+ *
+ * The route stays because it is the only way to specify *semantic* roles directly
+ * rather than deriving them through Base24 slots — which is what a brand theme with
+ * values handed over by a designer would need. Nothing uses it today; if nothing has by
+ * the time someone reads this, delete it.
  */
 export interface AuthoredSource {
   id: string
@@ -724,55 +836,4 @@ export interface AuthoredSource {
   selection: string
 }
 
-export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
-  {
-    id: 'adea-light',
-    family: 'adea',
-    familyLabel: 'Adea',
-    label: 'Light',
-    name: 'Adea Light',
-    description: "The default light theme. A neutral ladder with a monochrome accent.",
-    appearance: 'light',
-    tags: ['light', 'neutral', 'default'],
-    ramp: {
-      background: '#ffffff',
-      foreground: '#252525',
-      surface: '#ffffff',
-      surfaceElevated: '#ffffff',
-      surfaceHover: '#f7f7f7',
-      surfaceActive: '#f0f0f0',
-      border: '#ebebeb',
-      borderMuted: '#f2f2f2',
-      textMuted: '#6f6f6f',
-      textSubtle: '#767676',
-    },
-    accent: '#343434',
-    accentForeground: '#fcfcfc',
-    status: {
-      success: '#1a7f37',
-      warning: '#a16207',
-      error: '#c53c2b',
-      info: '#0e7490',
-    },
-    ansi: {
-      black: '#1b1f24',
-      red: '#b91c1c',
-      green: '#116a2e',
-      yellow: '#8a5a1b',
-      blue: '#0b57d0',
-      magenta: '#a0186f',
-      cyan: '#0e7490',
-      white: '#57606a',
-      brightBlack: '#57606a',
-      brightRed: '#c94d4d',
-      brightGreen: '#1f9d4f',
-      brightYellow: '#a9752c',
-      brightBlue: '#3b82f6',
-      brightMagenta: '#c04a92',
-      brightCyan: '#0891b2',
-      brightWhite: '#24292f',
-    },
-    cursor: '#24292f',
-    selection: '#b6c7ff',
-  },
-])
+export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([])

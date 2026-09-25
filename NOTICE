@@ -49,7 +49,8 @@ palette.
 
 | Family | Project | Licence | Vendored values |
 | --- | --- | --- | --- |
-| Adea | this package | Apache-2.0 | authored (Light) and composed (Dark) |
+| Adea | this package | Apache-2.0 | composed from the two donors below |
+| Nord | https://github.com/nordtheme/nord | MIT | via the chain above |
 | Catppuccin | https://github.com/catppuccin/catppuccin | MIT | via the chain above |
 | Tokyo Night | https://github.com/folke/tokyonight.nvim | Apache-2.0 | via the chain above |
 | Rosé Pine | https://github.com/rose-pine/rose-pine-theme | MIT | via the chain above |
@@ -64,28 +65,43 @@ palette.
 | Vesper | https://github.com/raunofreiberg/vesper | MIT | via the chain above |
 | Monokai | https://monokai.pro (design origin) | MIT | via the chain above |
 
-### Adea Dark is composed from two of these
+### Adea's two defaults are composed from three of these
 
-`adea-dark` is not a copy of any published palette, and it is not hand-authored. It is
-built in the vendor step from two donors, each named in
-`palettes/adea-dark.json`'s `source.composedFrom`:
+Neither default is a copy of a published palette and neither is hand-authored. Each is
+built in the vendor step from two donors, named in its `palettes/*.json` under
+`source.composedFrom`:
 
-- **Aardvark Ink** supplies the structure — canvas, foreground, the greyscale ANSI
-  roles, the cursor and the selection. That palette was chosen for exactly those.
-- **GitHub Dark Default** supplies all sixteen hues — red, green, yellow, blue,
-  magenta, cyan and their bright variants.
+| | canvas | canvas hue | hues |
+| --- | --- | --- | --- |
+| **Adea Dark** | Aardvark Ink `#0f141f` | 265° | GitHub Dark Default |
+| **Adea Light** | Nord Light `#e3e9f4` | 262° | GitHub Dark Default |
 
-Both donors are MIT-licensed through the same iTerm2-Color-Schemes chain as the rest of
-the catalogue, so the composed result is used under MIT as well as under this package's
-Apache-2.0. The composition exists because the two properties are in tension in a single
-palette: a palette tuned for a comfortable canvas mutes its hues to agree with it, and
-one tuned for vivid syntax colours tends to sit on a canvas that is very dark or very
-flat. Taking one of each gives a calm ground with legible colour on it.
+Both take their hues from the same palette, so a red is the same red and a blue the same
+blue in each; only their canvases come from different projects, each chosen for the
+canvas rather than for its colours. The composition exists because those two properties
+are in tension inside a single palette: one tuned for a comfortable canvas mutes its hues
+to agree with it, and one tuned for vivid syntax colours tends to sit on a canvas that is
+very dark or very flat.
 
-No hue was adjusted to make the composition work. GitHub's hues measure between 7.2:1
-and 8.8:1 against Aardvark Ink's canvas, which is *more* contrast than they have against
-GitHub's own — so the vibrant set arrives intact, and that is asserted rather than
-assumed.
+All three donors are MIT-licensed through the same iTerm2-Color-Schemes chain as the rest
+of the catalogue, so the composed results are used under MIT as well as under this
+package's Apache-2.0.
+
+**Neither canvas was adjusted to make the composition work, and no hue was either.**
+GitHub's hues measure between 7.2:1 and 8.8:1 against Aardvark Ink's canvas — *more*
+contrast than they have against GitHub's own — so the dark theme's vibrant set arrives
+intact. On Nord Light's canvas the same hues measure between 2.5:1 and 4.1:1, which is
+legible as an accent and not as terminal text, so the whole set is **transposed down by
+one common step of 0.244 in lightness**; hue and chroma are untouched, and the relative
+brightness ordering that makes an ANSI palette an ANSI palette is preserved. Both facts
+are asserted rather than assumed.
+
+One value *is* a deliberate deviation, and it is aesthetic rather than a correction:
+Nord Light's canvas carries 0.010 of chroma against Aardvark Ink's 0.024, so rendering
+the same hue at half the tint made the light theme read as neutral grey beside a partner
+that is plainly navy. The light canvas is deepened to 0.016 — two thirds of the dark
+theme's — at the same lightness and hue, so no contrast pairing moves. It is recorded in
+`COMPOSED_SOURCES` and can be reverted by deleting one line.
 
 ### Two entries that need a note
 

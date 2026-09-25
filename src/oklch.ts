@@ -200,20 +200,6 @@ export function formatOklch(color: Oklch): string {
 }
 
 /**
- * The colour as it will actually be written.
- *
- * Repairs must be measured against this rather than against their own working
- * value. {@link formatOklch} rounds lightness to four decimals, and rounding can
- * move a pairing from 4.5001:1 to 4.4998:1 — so a repair that converges on the
- * exact floor and is then rounded ships a value that fails the floor it was
- * computed to satisfy. Measuring the canonical form closes that gap by making the
- * thing measured and the thing committed the same thing.
- */
-export function canonical(color: Oklch): Oklch {
-  return parseColor(formatOklch(color)) ?? color
-}
-
-/**
  * Relative luminance of an sRGB colour, per WCAG 2.1.
  *
  * Computed from linear-light channels, which is why this goes through OKLab
@@ -242,6 +228,20 @@ function unit(value: number): number {
 /** The direction in which a colour's lightness must move to gain contrast. */
 export function contrastDirection(foreground: Oklch, background: Oklch): 1 | -1 {
   return foreground.l >= background.l ? 1 : -1
+}
+
+/**
+ * The colour as it will actually be written.
+ *
+ * Repairs must be measured against this rather than against their own working
+ * value. {@link formatOklch} rounds lightness to four decimals, and rounding can
+ * move a pairing from 4.5001:1 to 4.4998:1 — so a repair that converges on the
+ * exact floor and is then rounded ships a value that fails the floor it was
+ * computed to satisfy. Measuring the canonical form closes that gap by making the
+ * thing measured and the thing committed the same thing.
+ */
+export function canonical(color: Oklch): Oklch {
+  return parseColor(formatOklch(color)) ?? color
 }
 
 export type ContrastRepair = {
@@ -274,7 +274,12 @@ export function repairContrast(
   minimum: number,
   budget = 0.22
 ): ContrastRepair {
-  const initial = contrastRatio(foreground, background)
+  // Measured in the canonical form, for the reason {@link canonical} gives: the caller
+  // commits `formatOklch`'s rounded output, and a repair that converges on the exact
+  // floor of an unrounded value ships a value that fails it. The lower a floor is, the
+  // more this matters, and the scale starts at 1.2:1 — so a selection colour's whole
+  // range is a few rounding steps wide.
+  const initial = contrastRatio(canonical(foreground), background)
   if (initial >= minimum) {
     return { color: foreground, ratio: initial, delta: 0, satisfied: true }
   }
@@ -292,10 +297,10 @@ export function repairContrast(
     for (const direction of [preferred, -preferred] as const) {
       const candidate: Oklch = { ...foreground, l: foreground.l + direction * step * index }
       if (candidate.l <= 0 || candidate.l >= 1) continue
-      const ratio = contrastRatio(candidate, background)
+      const ratio = contrastRatio(canonical(candidate), background)
       if (ratio >= minimum) {
         return {
-          color: candidate,
+          color: canonical(candidate),
           ratio,
           delta: Number((step * index).toFixed(4)),
           satisfied: true,

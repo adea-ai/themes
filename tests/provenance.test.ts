@@ -96,10 +96,10 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Monokai's olive ground.
   { id: 'monokai', background: '#272822', signature: { role: 'accent', hue: [285, 310] } },
 
-  // Adea's own two. The light one is authored here; the dark one is *composed*, so
-  // its entries here are the half that comes from its structure donor and the
-  // dedicated suite below asserts the other half.
-  { id: 'adea-light', background: '#ffffff', foreground: '#252525' },
+  // Adea's own two. Both are *composed*, so the entries here are the half that comes
+  // from each one's structure donor; the suites below assert the other half, and the
+  // light one's canvas carries a recorded chroma correction (see `COMPOSED_SOURCES`).
+  { id: 'adea-light', background: '#e3e9f4', foreground: '#414858' },
   { id: 'adea-dark', background: '#0f141f', foreground: '#b4bcca' },
 ])
 
@@ -247,6 +247,143 @@ describe('adea-dark composition', () => {
     const sources = theme.provenance.bootstrappedFrom ?? []
     expect(sources.join(' ')).toContain('Aardvark Ink')
     expect(sources.join(' ')).toContain('GitHub Dark Default')
+  })
+})
+
+/**
+ * The two defaults are a *pair*, and these are the properties that make them one.
+ *
+ * Adea Dark and Adea Light are separate compositions from separate structure donors, so
+ * nothing structural stops either from drifting away from the other — and the failure
+ * mode is quiet: each new version is still a good theme on its own, and only someone
+ * switching appearance at dusk notices that the application changed character rather
+ * than exposure. So the partnership is asserted.
+ *
+ * The shared hue donor is what makes the strongest of these cheap to check: because
+ * both themes take their hues from GitHub Dark Default and only the dark one uses them
+ * untransposed, every chromatic role should come out at the *same hue and the same
+ * chroma* in both, differing only in lightness. That is the definition of a pair I'd
+ * defend — switching appearance changes how bright the interface is and nothing else
+ * about which colour is which.
+ */
+describe('the adea pair', () => {
+  const light = getTheme('adea-light')!
+  const dark = getTheme('adea-dark')!
+
+  const CHROMATIC = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'] as const
+  const BRIGHT = [
+    'brightRed',
+    'brightGreen',
+    'brightYellow',
+    'brightBlue',
+    'brightMagenta',
+    'brightCyan',
+  ] as const
+
+  test('they are one light theme and one dark theme', () => {
+    expect(light.appearance).toBe('light')
+    expect(dark.appearance).toBe('dark')
+  })
+
+  test('their canvases are in the same hue family', () => {
+    const lightHue = parseColor(light.colors.background)!.h
+    const darkHue = parseColor(dark.colors.background)!.h
+    const delta = Math.abs(lightHue - darkHue)
+
+    expect(
+      delta,
+      `the canvases are ${delta.toFixed(1)}° apart in hue, so switching appearance shifts the theme's colour rather than its exposure`
+    ).toBeLessThanOrEqual(8)
+  })
+
+  test('both canvases are tinted rather than neutral', () => {
+    // A neutral grey beside a tinted one reads as two different design systems — the
+    // light theme was exactly that before this composition, and it is why the light
+    // canvas carries a recorded chroma correction.
+    for (const theme of [light, dark]) {
+      const chroma = parseColor(theme.colors.background)!.c
+      expect(
+        chroma,
+        `${theme.id}'s canvas carries ${chroma.toFixed(3)} of chroma, which is too close to neutral to read as tinted`
+      ).toBeGreaterThanOrEqual(0.012)
+    }
+  })
+
+  test('a red is the same red in both, and so is every other hue', () => {
+    for (const role of [...CHROMATIC, ...BRIGHT]) {
+      const a = parseColor(light.ansi[role])!
+      const b = parseColor(dark.ansi[role])!
+
+      expect(
+        Math.abs(a.h - b.h),
+        `ansi.${role} is ${a.h.toFixed(1)}° in the light theme and ${b.h.toFixed(1)}° in the dark one`
+      ).toBeLessThanOrEqual(0.5)
+
+      expect(
+        Math.abs(a.c - b.c),
+        `ansi.${role} carries ${a.c.toFixed(3)} of chroma in the light theme and ${b.c.toFixed(3)} in the dark one, so the hue sets have diverged`
+      ).toBeLessThanOrEqual(0.005)
+    }
+  })
+
+  test('the interactive colour is the same hue in both', () => {
+    const a = parseColor(light.colors.accent)!
+    const b = parseColor(dark.colors.accent)!
+
+    expect(
+      Math.abs(a.h - b.h),
+      `the accent is ${a.h.toFixed(1)}° in the light theme and ${b.h.toFixed(1)}° in the dark one, so a primary button changes hue with the appearance`
+    ).toBeLessThanOrEqual(1)
+  })
+
+  test('the text ladder is monotonic in both', () => {
+    // The defect this guards shipped in three themes: a tertiary rung that was stronger
+    // than the secondary one, and in one case the most prominent text on the screen.
+    for (const theme of [light, dark]) {
+      const background = parseColor(theme.colors.background)!
+      const contrast = (role: 'text' | 'textMuted' | 'textSubtle') =>
+        contrastRatio(parseColor(theme.colors[role])!, background)
+
+      expect(
+        contrast('text'),
+        `${theme.id}'s body text (${contrast('text').toFixed(1)}:1) is not stronger than its secondary text (${contrast('textMuted').toFixed(1)}:1)`
+      ).toBeGreaterThan(contrast('textMuted'))
+      expect(
+        contrast('textMuted'),
+        `${theme.id}'s secondary text (${contrast('textMuted').toFixed(1)}:1) is not stronger than its tertiary text (${contrast('textSubtle').toFixed(1)}:1)`
+      ).toBeGreaterThan(contrast('textSubtle'))
+    }
+  })
+
+  test('both name the donor each half came from', () => {
+    const lightSources = (light.provenance.bootstrappedFrom ?? []).join(' ')
+    const darkSources = (dark.provenance.bootstrappedFrom ?? []).join(' ')
+
+    expect(lightSources).toContain('Nord Light')
+    expect(lightSources).toContain('GitHub Dark Default')
+    expect(darkSources).toContain('Aardvark Ink')
+    expect(darkSources).toContain('GitHub Dark Default')
+  })
+})
+
+describe('the text ladder', () => {
+  test('is monotonic in every theme in the catalogue', () => {
+    // Catalogue-wide, because the cause was a palette's `base03` not being a dim grey —
+    // which is not a property of the defaults, so the defaults' suite cannot catch it.
+    for (const theme of themes) {
+      const background = parseColor(theme.colors.background)!
+      const contrast = (role: 'text' | 'textMuted' | 'textSubtle') =>
+        contrastRatio(parseColor(theme.colors[role])!, background)
+
+      expect(
+        contrast('text'),
+        `${theme.id}: text ${contrast('text').toFixed(1)}:1 is not above textMuted ${contrast('textMuted').toFixed(1)}:1`
+      ).toBeGreaterThan(contrast('textMuted'))
+      expect(
+        contrast('textMuted'),
+        `${theme.id}: textMuted ${contrast('textMuted').toFixed(1)}:1 is not above textSubtle ${contrast('textSubtle').toFixed(1)}:1`
+      ).toBeGreaterThan(contrast('textSubtle'))
+    }
   })
 })
 

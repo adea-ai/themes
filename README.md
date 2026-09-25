@@ -24,11 +24,24 @@ bun add @adea-ai/themes
 | **Monokai** | Classic |
 | **Nord**, **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each |
 
-`adea-light` and `adea-dark` are the defaults. The light one is authored here; the
-**dark one is composed** from two upstream palettes — Aardvark Ink's canvas and
-greyscale, GitHub Dark Default's sixteen hues — so the default dark theme is derived
-from named projects rather than chosen by hand. Everything else is somebody else's
-palette, reproduced from a named revision and credited in [NOTICE](NOTICE).
+`adea-light` and `adea-dark` are the defaults, and both are **composed** from two
+upstream palettes rather than authored or copied:
+
+| | canvas | canvas hue | hues |
+| --- | --- | --- | --- |
+| Adea Dark | Aardvark Ink `#0f141f` | 265° | GitHub Dark Default |
+| Adea Light | Nord Light `#e3e9f4` | 262° | GitHub Dark Default |
+
+They share a hue donor, so a red is the same red in both and only the canvas changes;
+the canvases are three degrees apart in hue and both are tinted rather than neutral,
+which is what makes them one theme seen at two exposures instead of two themes that
+happen to ship together. `tests/provenance.test.ts` asserts that partnership — identical
+hue and chroma for every chromatic role, canvases in one hue family — because the two
+halves are built from different donors and could otherwise drift apart without either
+becoming wrong on its own.
+
+Everything else is somebody else's palette, reproduced from a named revision and
+credited in [NOTICE](NOTICE).
 
 ## Using it
 
@@ -66,9 +79,11 @@ terminal palette becomes an application theme. Adding a theme is a line in
 `src/sources.ts` plus a rebuild.
 
 A theme may also be **composed from two donors** — one supplying the structure, another
-the hues — which is how Adea's own dark theme is built. The composition is a slot map in
-`COMPOSED_SOURCES`, so both parents stay named and freshening either one is a one-line
-diff rather than a re-transcription.
+the hues — which is how both of Adea's own themes are built. The composition is a slot
+map in `COMPOSED_SOURCES`, so both parents stay named and freshening either one is a
+one-line diff rather than a re-transcription. A composition can also declare
+`hueTranspose`, which moves a borrowed hue set onto a different kind of canvas as a
+group: hue and chroma intact, every relative brightness preserved.
 
 **OKLCH is the representation.** Perceptually uniform lightness is what makes a
 surface ladder buildable by adding fixed steps, a contrast failure repairable by
@@ -147,9 +162,10 @@ build prints every value it repaired and why.
 
 Add an entry to `COMPOSED_SOURCES` in `src/sources.ts` naming both donor slugs, the
 slot map, and the slots to synthesise; list the greyscale roles to pin to the structure
-donor; then `bun run vendor && bun run catalogue:build`. The vendor step asserts the two
-maps cover every Base24 slot, so a composition cannot be half-specified. Assert each
-half against its donor in `tests/provenance.test.ts`.
+donor; set `hueTranspose` if the hues are being borrowed for a different kind of canvas;
+then `bun run vendor && bun run catalogue:build`. The vendor step asserts the two maps
+cover every Base24 slot, so a composition cannot be half-specified. Assert each half
+against its donor in `tests/provenance.test.ts`.
 
 ### Adding a theme
 

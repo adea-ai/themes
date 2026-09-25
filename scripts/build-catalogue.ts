@@ -129,6 +129,7 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
       selection: composed.selection,
       ...(theme.palette ? { palette: theme.palette } : {}),
       ...(theme.accentSlot ? { accentSlot: theme.accentSlot } : {}),
+      ...(theme.hueTranspose ? { hueTranspose: theme.hueTranspose } : {}),
       provenance: theme.provenance,
     })
   }

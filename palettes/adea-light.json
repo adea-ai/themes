@@ -1,0 +1,56 @@
+{
+  "system": "base24",
+  "name": "Adea Light",
+  "author": "Adea, composed from Nord Light and GitHub Dark Default",
+  "variant": "light",
+  "palette": {
+    "base00": "#e5e9f0",
+    "base01": "#3b4252",
+    "base02": "#d8dee9",
+    "base03": "#4c566a",
+    "base04": "#a5abb6",
+    "base05": "#414858",
+    "base06": "#eceff4",
+    "base07": "#eceff4",
+    "base08": "#ff7b72",
+    "base0A": "#d29922",
+    "base0B": "#3fb950",
+    "base0C": "#39c5cf",
+    "base0D": "#58a6ff",
+    "base0E": "#bc8cff",
+    "base12": "#ffa198",
+    "base13": "#e3b341",
+    "base14": "#56d364",
+    "base15": "#56d4dd",
+    "base16": "#79c0ff",
+    "base17": "#d2a8ff",
+    "base09": "oklch(0.7345 0.1626 51.78)",
+    "base0F": "oklch(0.7196 0.1401 45.91)",
+    "base10": "oklch(0.963 0.0031 261.79)",
+    "base11": "oklch(0.993 0.0018 261.79)"
+  },
+  "ansi": {
+    "black": "#3b4252",
+    "brightBlack": "#4c566a",
+    "white": "#a5abb6",
+    "brightWhite": "#eceff4"
+  },
+  "cursor": "#7bb3c3",
+  "selection": "#d8dee9",
+  "source": {
+    "composedFrom": [
+      {
+        "role": "structure",
+        "slug": "nord-light",
+        "name": "Nord Light"
+      },
+      {
+        "role": "hues",
+        "slug": "github-dark-default",
+        "name": "GitHub Dark Default"
+      }
+    ],
+    "repository": "https://github.com/williamzujkowski/oklch-terminal-themes",
+    "revision": "9e800e7fe760081d4c10317498038ed4227341d6"
+  }
+}
