@@ -45,6 +45,12 @@
   ],
   "pull-request-title-pattern": "chore(main): release ${version}",
   "group-pull-request-title-pattern": "chore(main): release ${version}",
-  "release-type": "node",
+  "include-component-in-tag": false,
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "@adea-ai/themes"
+    }
+  },
   "extra-files": []
 }
