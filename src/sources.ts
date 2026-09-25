@@ -300,9 +300,19 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
      */
     palette: { base00: 'oklch(0.933 0.016 261.79)' },
     ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
-    // GitHub's hues were drawn for a `#0d1117` canvas. On Nord Light's they measure
-    // between 2.5:1 and 4.1:1, which is legible as an accent and not as terminal text.
-    hueTranspose: { floor: CONTRAST_FLOORS.status },
+    /*
+     * GitHub's hues were drawn for a `#0d1117` canvas. On Nord Light's they measure
+     * between 2.5:1 and 4.1:1, which is legible as an accent and not as terminal text.
+     *
+     * The target carries a margin over the floor, and the reason is specific: the step is
+     * set by the worst hue, so without a margin that hue lands exactly *on* the floor —
+     * and cyan, the hue that needs the largest step, is also the one whose conversion to
+     * sRGB sits furthest outside the gamut. A renderer that gamut-maps it by reducing
+     * chroma and one that clamps its channels disagree by about 0.3 of a ratio point
+     * there, so a value on the floor measures under it in the clamping case. The margin
+     * is what makes the guarantee hold for either.
+     */
+    hueTranspose: { floor: CONTRAST_FLOORS.status + 0.4 },
     // AAA rather than AA; see `textFloor`. The binding pair is text on a popover, since
     // a light ladder descends away from its canvas.
     textFloor: 7,
