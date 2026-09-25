@@ -1,0 +1,38 @@
+{
+  "system": "base24",
+  "name": "Vesper",
+  "author": "iTerm2-Color-Schemes (via oklch-terminal-themes)",
+  "variant": "dark",
+  "palette": {
+    "base00": "#101010",
+    "base01": "#4f442c",
+    "base02": "#988049",
+    "base03": "#7e7e7e",
+    "base04": "#bcbcbc",
+    "base05": "#ffffff",
+    "base06": "#ffffff",
+    "base07": "#ffffff",
+    "base08": "#f5a191",
+    "base09": "#eead94",
+    "base0A": "#e6b99d",
+    "base0B": "#90b99f",
+    "base0C": "#ea83a5",
+    "base0D": "#aca1cf",
+    "base0E": "#e29eca",
+    "base0F": "#947366",
+    "base10": "#060606",
+    "base11": "#010101",
+    "base12": "#ff8080",
+    "base13": "#ffc799",
+    "base14": "#99ffe4",
+    "base15": "#f591b2",
+    "base16": "#b9aeda",
+    "base17": "#ecaad6"
+  },
+  "source": {
+    "slug": "vesper",
+    "repository": "https://github.com/williamzujkowski/oklch-terminal-themes",
+    "revision": "9e800e7fe760081d4c10317498038ed4227341d6",
+    "path": "data/schemes/base24/vesper.yaml"
+  }
+}

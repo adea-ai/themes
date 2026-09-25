@@ -1,0 +1,106 @@
+{
+  "name": "@adea-ai/themes",
+  "version": "0.1.0",
+  "description": "The Adea theme catalogue: semantic OKLCH themes normalized from upstream palettes, with Base24, terminal, CSS and syntax adapters.",
+  "keywords": [
+    "adea",
+    "theme",
+    "themes",
+    "oklch",
+    "base24",
+    "base16",
+    "palette",
+    "design-tokens",
+    "terminal",
+    "shiki",
+    "xterm"
+  ],
+  "homepage": "https://github.com/adea-ai/themes#readme",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adea-ai/themes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adea-ai/themes/issues"
+  },
+  "files": [
+    "dist",
+    "src",
+    "palettes",
+    "NOTICE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    },
+    "./oklch": {
+      "types": "./dist/oklch.d.ts",
+      "import": "./dist/oklch.js"
+    },
+    "./catalogue": {
+      "types": "./dist/catalogue.d.ts",
+      "import": "./dist/catalogue.js"
+    },
+    "./sources": {
+      "types": "./dist/sources.d.ts",
+      "import": "./dist/sources.js"
+    },
+    "./adapters/base24": {
+      "types": "./dist/adapters/base24.d.ts",
+      "import": "./dist/adapters/base24.js"
+    },
+    "./adapters/xterm": {
+      "types": "./dist/adapters/xterm.d.ts",
+      "import": "./dist/adapters/xterm.js"
+    },
+    "./adapters/css": {
+      "types": "./dist/adapters/css.d.ts",
+      "import": "./dist/adapters/css.js"
+    },
+    "./adapters/tailwind": {
+      "types": "./dist/adapters/tailwind.d.ts",
+      "import": "./dist/adapters/tailwind.js"
+    },
+    "./adapters/shiki": {
+      "types": "./dist/adapters/shiki.d.ts",
+      "import": "./dist/adapters/shiki.js"
+    },
+    "./palettes/*": "./palettes/*",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint",
+    "test": "bun test tests",
+    "vendor": "bun scripts/vendor-palettes.ts",
+    "catalogue:build": "bun scripts/build-catalogue.ts",
+    "catalogue:check": "bun scripts/build-catalogue.ts --check",
+    "verify": "bun run typecheck && bun run lint && bun run catalogue:check && bun run test && bun run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "bun-types": "^1.4.0",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": "24.18.0"
+  },
+  "packageManager": "bun@1.4.0"
+}

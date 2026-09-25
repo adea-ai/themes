@@ -1,0 +1,38 @@
+{
+  "system": "base24",
+  "name": "Ayu Mirage",
+  "author": "iTerm2-Color-Schemes (via oklch-terminal-themes)",
+  "variant": "dark",
+  "palette": {
+    "base00": "#1f2430",
+    "base01": "#305f90",
+    "base02": "#409fff",
+    "base03": "#686868",
+    "base04": "#989894",
+    "base05": "#cccac2",
+    "base06": "#e5e4e0",
+    "base07": "#ffffff",
+    "base08": "#ed8274",
+    "base09": "#fba566",
+    "base0A": "#facc6e",
+    "base0B": "#87d96c",
+    "base0C": "#90e1c6",
+    "base0D": "#6dcbfa",
+    "base0E": "#dabafa",
+    "base0F": "#a47758",
+    "base10": "#171c27",
+    "base11": "#0f141f",
+    "base12": "#f28779",
+    "base13": "#ffd173",
+    "base14": "#d5ff80",
+    "base15": "#95e6cb",
+    "base16": "#73d0ff",
+    "base17": "#dfbfff"
+  },
+  "source": {
+    "slug": "ayu-mirage",
+    "repository": "https://github.com/williamzujkowski/oklch-terminal-themes",
+    "revision": "9e800e7fe760081d4c10317498038ed4227341d6",
+    "path": "data/schemes/base24/ayu-mirage.yaml"
+  }
+}

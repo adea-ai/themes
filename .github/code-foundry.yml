@@ -1,0 +1,55 @@
+# Code Foundry configuration for the theme catalogue.
+#
+# A standalone TypeScript library rather than a monorepo: there is one package, it
+# has no runtime dependencies, and it is consumed by version. `profile: auto` lets
+# the runtime detect that from the manifests instead of being told.
+version: 1
+profile: auto
+languages: typescript
+features: validation,release
+codeql: auto
+dependency_review: auto
+package_manager: bun
+runtime_repository: 0xPlayerOne/code-foundry
+runtime_ref: v1.33.0
+runner: ubuntu-latest
+ci_runner: ubuntu-latest
+test_runner: ubuntu-latest
+unit_runner: ubuntu-latest
+security_runner: ubuntu-latest
+codeql_runner: ubuntu-latest
+pr_runner: ubuntu-latest
+release_runner: ubuntu-latest
+toolchain: auto
+prune_standard: false
+cache_packages: auto
+cache_build: auto
+coverage_minimum: 80
+turbo_remote: auto
+release_type: node
+# This repository owns an npm package and publishes it from a Release Please tag.
+# Publication is gated on the release workflow, so an ordinary push never publishes;
+# see docs/PUBLISHING.md in the runtime.
+npm_publish: true
+post_release: false
+post_release_workflow:
+post_release_mode: auto
+sync_mode: overlay
+custom_workflows: preserve
+license: apache-2.0
+git_workflow: direct
+merge_strategy: squash
+release_merge_strategy: squash
+opencode_security_model:
+performance_runner: ubuntu-latest
+# No performance budget file: this package's work is done at build time and the
+# runtime cost of reading a theme object is not worth a lane.
+performance: false
+performance_command:
+performance_profile:
+performance_budget_file:
+draft_protection: true
+required_capabilities:
+coverage_enforcement: auto
+coverage_metrics: lines
+coverage_report:

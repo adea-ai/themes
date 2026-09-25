@@ -1,0 +1,38 @@
+{
+  "system": "base24",
+  "name": "TokyoNight Day",
+  "author": "iTerm2-Color-Schemes (via oklch-terminal-themes)",
+  "variant": "light",
+  "palette": {
+    "base00": "#e1e2e7",
+    "base01": "#bcc5e4",
+    "base02": "#99a7df",
+    "base03": "#a1a6c5",
+    "base04": "#6886c4",
+    "base05": "#3760bf",
+    "base06": "#3760bf",
+    "base07": "#3760bf",
+    "base08": "#f52a65",
+    "base09": "#c65924",
+    "base0A": "#8c6c3e",
+    "base0B": "#587539",
+    "base0C": "#007197",
+    "base0D": "#2e7de9",
+    "base0E": "#9854f1",
+    "base0F": "#cd8f75",
+    "base10": "#e9eaef",
+    "base11": "#f1f2f7",
+    "base12": "#f52a65",
+    "base13": "#8c6c3e",
+    "base14": "#587539",
+    "base15": "#007197",
+    "base16": "#2e7de9",
+    "base17": "#9854f1"
+  },
+  "source": {
+    "slug": "tokyonight-day",
+    "repository": "https://github.com/williamzujkowski/oklch-terminal-themes",
+    "revision": "9e800e7fe760081d4c10317498038ed4227341d6",
+    "path": "data/schemes/base24/tokyonight-day.yaml"
+  }
+}
