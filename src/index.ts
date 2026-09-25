@@ -57,6 +57,21 @@ export type {
 } from './schema'
 export { ANSI_KEYS, THEME_COLOR_KEYS } from './schema'
 
+export type { AccentPreset, AccentRoles } from './accents'
+export {
+  ACCENTS,
+  ACCENT_HOVER_STEP,
+  ACCENT_IDS,
+  ACCENT_SUBTLE_ALPHA,
+  accentForeground,
+  accentForegroundContrast,
+  accentRoles,
+  accentValue,
+  getAccent,
+  primaryHover,
+  primarySubtleCss,
+} from './accents'
+
 /* --- The catalogue ------------------------------------------------------ */
 export {
   DEFAULT_THEME_IDS,
