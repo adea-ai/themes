@@ -130,6 +130,7 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
       ...(theme.palette ? { palette: theme.palette } : {}),
       ...(theme.accentSlot ? { accentSlot: theme.accentSlot } : {}),
       ...(theme.hueTranspose ? { hueTranspose: theme.hueTranspose } : {}),
+      ...(theme.textFloor === undefined ? {} : { textFloor: theme.textFloor }),
       provenance: theme.provenance,
     })
   }

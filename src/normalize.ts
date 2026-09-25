@@ -193,6 +193,21 @@ export interface ThemeSourceSpec {
    * applied per hue.
    */
   hueTranspose?: { floor: number }
+  /**
+   * The floor for body text, overriding the catalogue's.
+   *
+   * The catalogue holds every palette to WCAG AA on every surface, which is what lets
+   * it admit other people's work. The *defaults* are not other people's work: this
+   * system holds its own themes to AAA — 7:1 — because they are what a user sees when
+   * they have not chosen anything, and `packages/ui/tests/tokens.test.ts` asserts it.
+   *
+   * It has to be declared here rather than left to the consumer's test, because the
+   * binding pair is text on a *raised* surface: Adea Light's foreground is 7.5:1 on its
+   * canvas and 6.2:1 on a popover, since the light ladder descends away from the canvas.
+   * Raising the floor rather than lowering the assertion is the point — the theme is
+   * repaired until the claim is true, and the claim stays.
+   */
+  textFloor?: number
   /** Which ANSI role supplies the accent, when the family's identity demands one. */
   accentSlot?: AnsiKey
   /** Explicit roles for authored themes, applied after derivation. */
@@ -884,13 +899,14 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
 
   // Body text first: several palettes publish a foreground that fails on their own
   // background, and every other role's floors are measured against the canvas.
+  const textFloor = source.textFloor ?? CONTRAST_FLOORS.text
   const textRepair = repairAcrossSurfaces(
     palette.base05,
     surfaces,
-    CONTRAST_FLOORS.text,
+    textFloor,
     REPAIR_BUDGET.text
   )
-  const text = emit(source.id, 'text', textRepair, CONTRAST_FLOORS.text)
+  const text = emit(source.id, 'text', textRepair, textFloor)
   colors.text = text.value
   colors.foreground = text.value
   if (text.finding) findings.push(text.finding)

@@ -99,7 +99,11 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Adea's own two. Both are *composed*, so the entries here are the half that comes
   // from each one's structure donor; the suites below assert the other half, and the
   // light one's canvas carries a recorded chroma correction (see `COMPOSED_SOURCES`).
-  { id: 'adea-light', background: '#e3e9f4', foreground: '#414858' },
+  // The foreground is asserted by hue: the theme is held to AAA on every surface it
+  // renders text on, and Nord Light's own is 7.5:1 on the canvas and 6.2:1 on a popover,
+  // so the repair moves its lightness. Hue and chroma are untouched, which the
+  // assertion below the pair suite checks.
+  { id: 'adea-light', background: '#e3e9f4', foregroundHue: 266.5 },
   { id: 'adea-dark', background: '#0f141f', foreground: '#b4bcca' },
 ])
 

@@ -142,6 +142,8 @@ export interface ComposedSource {
    * moves by one common step rather than each hue being repaired on its own.
    */
   hueTranspose?: { floor: number }
+  /** The body-text floor; the defaults are held to AAA rather than the catalogue's AA. */
+  textFloor?: number
   provenance: ThemeProvenance
 }
 
@@ -228,6 +230,8 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       base11: ['structure', 'background', { lighten: -0.06 }],
     },
     ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    // AAA rather than AA, because this is a default rather than an imported palette.
+    textFloor: 7,
     provenance: {
       project: 'Adea',
       url: 'https://github.com/adea-ai/themes',
@@ -299,6 +303,9 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
     // GitHub's hues were drawn for a `#0d1117` canvas. On Nord Light's they measure
     // between 2.5:1 and 4.1:1, which is legible as an accent and not as terminal text.
     hueTranspose: { floor: CONTRAST_FLOORS.status },
+    // AAA rather than AA; see `textFloor`. The binding pair is text on a popover, since
+    // a light ladder descends away from its canvas.
+    textFloor: 7,
     provenance: {
       project: 'Adea',
       url: 'https://github.com/adea-ai/themes',
