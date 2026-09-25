@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/adea-ai/themes/compare/v0.4.1...v0.4.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* **base24:** strip comments with a scan, not a backtracking regex ([84dc58d](https://github.com/adea-ai/themes/commit/84dc58df8d3f95f224f01da1bcd1a2c3533ac70f))
+
 ## [0.4.1](https://github.com/adea-ai/themes/compare/v0.4.0...v0.4.1) (2026-09-25)
 
 
