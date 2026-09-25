@@ -4,7 +4,12 @@
     "correctness": "error",
     "suspicious": "error"
   },
-  "ignorePatterns": ["dist", "src/generated", "coverage"],
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist",
+    "src/generated",
+    "coverage"
+  ],
   "rules": {
     "no-console": "off"
   }
