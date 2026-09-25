@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/adea-ai/themes/compare/v0.4.0...v0.4.1) (2026-09-25)
+
+
+### Bug Fixes
+
+* **release:** build on publish, so `dist` cannot be missing from the tarball ([e4a3803](https://github.com/adea-ai/themes/commit/e4a380345b86ad1d011f30fac73772d7e54d4744))
+
 ## [0.4.0](https://github.com/adea-ai/themes/compare/v0.3.2...v0.4.0) (2026-09-25)
 
 
