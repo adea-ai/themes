@@ -193,7 +193,34 @@ describe('shadcn bridge', () => {
   test('every canonical role has a destination', () => {
     const theme = getTheme('nord')!
     const variables = shadcnVariables(theme)
-    for (const name of ['--background', '--foreground', '--card', '--popover', '--border', '--ring', '--destructive']) {
+    const required = [
+      '--background',
+      '--foreground',
+      '--card',
+      '--card-foreground',
+      '--popover',
+      '--popover-foreground',
+      '--primary',
+      '--primary-foreground',
+      '--secondary',
+      '--muted',
+      '--muted-foreground',
+      '--accent',
+      '--accent-foreground',
+      '--border',
+      '--input',
+      '--ring',
+      '--destructive',
+      '--success',
+      '--warning',
+      '--info',
+      '--sidebar',
+      '--sidebar-foreground',
+      '--sidebar-accent',
+      '--sidebar-border',
+      '--sidebar-ring',
+    ]
+    for (const name of required) {
       expect(variables[name], `${name} is unmapped`).toBeTruthy()
     }
   })

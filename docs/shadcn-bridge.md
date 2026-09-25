@@ -32,6 +32,7 @@ are not a plain rename.
 | `error` | `--destructive` | same position in a component's vocabulary |
 | `info` | `--info` | |
 | `cursor`, `selection` | `--cursor`, `--selection` | |
+| — | `--card-foreground`, `--popover-foreground`, `--secondary`, `--muted`, `--sidebar*` | filled from existing roles; see below |
 
 ## The two entries that are not renames
 
@@ -75,6 +76,30 @@ catalogue derives both:
   shadcn's default of mixing into `transparent`, so that the text drawn on it can be
   measured — a translucent fill's real contrast depends on whatever is behind it, and
   no automated check can resolve it.
+
+## The rest of shadcn's default vocabulary
+
+shadcn's starter theme has more properties than the canonical schema has roles, and
+they are filled from the roles that exist rather than given entries of their own:
+
+| shadcn property | Filled from | Why |
+| --- | --- | --- |
+| `--card-foreground`, `--popover-foreground` | `text` | the surface's own foreground is the body text |
+| `--secondary`, `--muted` | `surface` | both are the first rung used as a fill |
+| `--secondary-foreground` | `text` | |
+| `--sidebar` | `surface` | |
+| `--sidebar-foreground` | `text` | |
+| `--sidebar-accent` | `surfaceHover` | shadcn's sidebar accent is a hover wash, like its `--accent` |
+| `--sidebar-border` | `border` | |
+| `--sidebar-primary` | `accent` | |
+| `--sidebar-primary-foreground` | `accentForeground` | |
+| `--sidebar-ring` | `accent` | |
+| `--sidebar-muted-foreground` | `textMuted` | |
+
+A consumer with its *own* extra namespaces — a `--terminal-*` ramp, an `--editor-*`
+ramp — should build them from `theme.ansi` and `derive.syntaxRoles` rather than
+expecting the bridge to know about them. Those are presentations of the ANSI and
+syntax data that is already in the schema.
 
 ## Adding a role to the schema
 

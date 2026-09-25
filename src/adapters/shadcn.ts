@@ -91,6 +91,25 @@ export function shadcnVariables(theme: AdeaTheme): Record<string, string> {
   variables['--ring'] = theme.colors.accent
   variables['--input'] = theme.colors.border
 
+  // The rest of shadcn's default vocabulary. These are not in `SHADCN_MAPPING`
+  // because they are not new *roles* — shadcn's `secondary` and `muted` are both the
+  // first surface rung used as a fill, and its `card-foreground` is the body text —
+  // so they are filled from the roles that already exist rather than getting
+  // second-class entries of their own.
+  variables['--card-foreground'] = theme.colors.text
+  variables['--popover-foreground'] = theme.colors.text
+  variables['--secondary'] = theme.colors.surface
+  variables['--secondary-foreground'] = theme.colors.text
+  variables['--muted'] = theme.colors.surface
+  variables['--sidebar'] = theme.colors.surface
+  variables['--sidebar-foreground'] = theme.colors.text
+  variables['--sidebar-accent'] = theme.colors.surfaceHover
+  variables['--sidebar-border'] = theme.colors.border
+  variables['--sidebar-primary'] = theme.colors.accent
+  variables['--sidebar-primary-foreground'] = theme.colors.accentForeground
+  variables['--sidebar-ring'] = theme.colors.accent
+  variables['--sidebar-muted-foreground'] = theme.colors.textMuted
+
   for (const role of STATUS_ROLES) {
     variables[`--${role}-foreground`] = statusForeground(theme, role)
     variables[`--${role}-subtle`] = `color-mix(in oklch, var(--${role}) 12%, transparent)`
