@@ -296,6 +296,30 @@ export function formatBase24Scheme(scheme: Base24Scheme): string {
  * documents this bridge cannot actually honour. Anything outside the specification
  * is rejected loudly instead of being parsed into a half-scheme.
  */
+/**
+ * A line with its trailing `#` comment removed.
+ *
+ * Written as a scan rather than `replace(/\s+#.*$/, '')`, which is what it was: that
+ * pattern is a quantified `\s+` followed by `.*`, so on a line with many spaces and no
+ * `#` the engine retries every split of the run at every start position — quadratic
+ * in the line length, on input this function does not control. CodeQL reports it as
+ * `js/polynomial-redos`, which is how it was found.
+ *
+ * The semantics are the ones the pattern had, including the part that is easy to get
+ * wrong when rewriting: a `#` is only a comment marker when **whitespace precedes
+ * it**, so a line that *begins* with `#` is not stripped here. Those lines are
+ * skipped later, by the `separator === -1` check — a leading `#` has no `:` to split
+ * on — so the outcome is the same and this stays a faithful replacement.
+ */
+function stripTrailingComment(line: string): string {
+  for (let index = 1; index < line.length; index += 1) {
+    if (line[index] !== '#') continue
+    // A single-character test, so there is nothing to backtrack over.
+    if (/\s/.test(line[index - 1]!)) return line.slice(0, index)
+  }
+  return line
+}
+
 export function parseBase24Scheme(source: string): Base24Scheme {
   const scalars = new Map<string, string>()
   const palette = new Map<string, string>()
@@ -304,7 +328,7 @@ export function parseBase24Scheme(source: string): Base24Scheme {
   for (const rawLine of source.split('\n')) {
     // Strip comments before trimming so the dataset's provenance comments, which
     // sit on the same line as a value, do not end up inside the colour string.
-    const line = rawLine.replace(/\s+#.*$/, '').trimEnd()
+    const line = stripTrailingComment(rawLine).trimEnd()
     if (line.trim().length === 0) continue
 
     const indented = /^\s/.test(line)

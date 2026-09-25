@@ -20,6 +20,26 @@ import { contrastRatio, formatOklch, hexToOklch, oklchToHex, parseColor } from '
  * The adapters are the package's promise to a consumer, so each one is held to the
  * contract its target actually has rather than to "it returns something".
  */
+/**
+ * A complete Base24 document, with `head` replacing the default `name` line.
+ *
+ * The parser requires all 24 slots and a variant, so a fixture that only carries the
+ * line under test is rejected before the assertion runs. Everything here except the
+ * scalar lines is boilerplate that the parser insists on.
+ */
+function schemeWith(head: readonly string[]): string {
+  const palette = BASE24_SLOTS.map(
+    (slot, index) => `  ${slot}: "#${(index + 1).toString(16).padStart(2, '0')}1e2e"`
+  )
+  return [
+    'system: "base24"',
+    'variant: "dark"',
+    ...head,
+    'palette:',
+    ...palette,
+  ].join('\n')
+}
+
 describe('oklch core', () => {
   test('a hex round trip is lossless to within one step', () => {
     const samples = ['#000000', '#ffffff', '#1e1e2e', '#e06c75', '#8da101', '#0e7490', '#f92672']
@@ -55,6 +75,33 @@ describe('oklch core', () => {
 })
 
 describe('base24 adapter', () => {
+  /**
+   * The comment strip is a scan, not `replace(/\s+#.*$/, '')`.
+   *
+   * That pattern is a quantified `\s+` followed by `.*`, which is quadratic on a line
+   * with many spaces and no `#` — CodeQL's `js/polynomial-redos`. These pin the
+   * behaviour so the rewrite is verifiably equivalent rather than hopefully so.
+   */
+  test('a trailing comment is stripped, and a leading # is not a comment', () => {
+    const scheme = parseBase24Scheme(
+      schemeWith(['name: Test # this is a trailing comment', '# a full-line comment'])
+    )
+    expect(scheme.name).toBe('Test')
+    expect(scheme.palette.base00).toBe('#011e2e')
+  })
+
+  test('a long run of whitespace with no comment parses', () => {
+    // The pathological input the old pattern backtracked over. It only has to
+    // terminate and produce the right value; a timing assertion would be flaky.
+    const scheme = parseBase24Scheme(schemeWith([`name:${' '.repeat(20_000)}Test`]))
+    expect(scheme.name).toBe('Test')
+  })
+
+  test('a # not preceded by whitespace is left alone', () => {
+    const scheme = parseBase24Scheme(schemeWith(['name: "a#b"']))
+    expect(scheme.name).toBe('a#b')
+  })
+
   test('every theme exports a complete scheme', () => {
     for (const theme of themes) {
       const scheme = toBase24(theme)
