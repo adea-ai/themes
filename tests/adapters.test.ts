@@ -212,7 +212,7 @@ describe('shiki adapter', () => {
       // colour, which is the failure this catches.
       expect(shiki.settings.length).toBeGreaterThan(10)
       const roles = syntaxRoles(theme)
-      expect(Object.keys(roles).length).toBeGreaterThanOrEqual(14)
+      expect(Object.keys(roles).length).toBeGreaterThanOrEqual(18)
     }
   })
 

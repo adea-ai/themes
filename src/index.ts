@@ -143,4 +143,4 @@ export { toTailwindTheme } from './adapters/tailwind'
 export type { ShikiThemeRegistration, ShikiTokenSetting } from './adapters/shiki'
 export { toShikiTheme, toShikiThemes } from './adapters/shiki'
 
-export { SHADCN_MAPPING, shadcnCss, shadcnVariables } from './adapters/shadcn'
+export { SHADCN_MAPPING, shadcnCss, shadcnRoles, shadcnVariables } from './adapters/shadcn'

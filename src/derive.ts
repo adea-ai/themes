@@ -49,6 +49,10 @@ export type SyntaxRole =
   | 'link'
   | 'constant'
   | 'punctuation'
+  | 'diffAdd'
+  | 'diffDelete'
+  | 'diffHunk'
+  | 'searchMatch'
 
 /** Which ANSI role each syntax role is read from, and why. */
 const SYNTAX_SOURCE: Readonly<Record<SyntaxRole, keyof AdeaTheme['ansi']>> = Object.freeze({
@@ -70,6 +74,13 @@ const SYNTAX_SOURCE: Readonly<Record<SyntaxRole, keyof AdeaTheme['ansi']>> = Obj
   link: 'blue',
   constant: 'brightMagenta',
   punctuation: 'brightBlack',
+  // The diff roles read the ANSI colours a `git diff` already uses, so a change
+  // rendered in the editor and the same change rendered in a conversation are the
+  // same two greens and reds.
+  diffAdd: 'green',
+  diffDelete: 'red',
+  diffHunk: 'cyan',
+  searchMatch: 'yellow',
 })
 
 /**

@@ -89,6 +89,10 @@ const SHIKI_SCOPES: Readonly<Record<SyntaxRole, readonly string[]>> = Object.fre
   link: ['markup.underline.link', 'string.other.link'],
   constant: ['constant', 'support.constant', 'variable.language'],
   punctuation: ['punctuation', 'meta.brace', 'punctuation.separator'],
+  diffAdd: ['markup.inserted', 'meta.diff.header.to-file', 'punctuation.definition.inserted'],
+  diffDelete: ['markup.deleted', 'meta.diff.header.from-file', 'punctuation.definition.deleted'],
+  diffHunk: ['meta.diff.range', 'meta.diff.index', 'punctuation.definition.range.diff'],
+  searchMatch: ['markup.highlight', 'markup.underline.match'],
 })
 
 /**

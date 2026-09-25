@@ -56,6 +56,22 @@ export const SHADCN_MAPPING: Readonly<Record<keyof AdeaThemeColors, string>> = O
 })
 
 /**
+ * The shadcn roles as an object, keyed by role name without the `--` prefix.
+ *
+ * For a consumer that keeps a theme as data — a picker showing swatches, a settings
+ * screen, a component reading `theme.colors.card` — rather than writing it straight
+ * to the document.
+ */
+export function shadcnRoles(theme: AdeaTheme): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(shadcnVariables(theme)).map(([name, value]) => [
+      name.replace(/^--/, ''),
+      value,
+    ])
+  )
+}
+
+/**
  * The shadcn custom properties for a theme.
  *
  * `--accent` is filled from `surfaceHover` because that is what shadcn components
