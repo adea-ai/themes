@@ -52,10 +52,10 @@ import type {
   AnsiKey,
   ThemeAppearance,
   ThemeProvenance,
-} from './schema'
-import type { Base24Scheme, Base24Slot } from './adapters/base24'
-import { parseBase24Palette } from './adapters/base24'
-import type { Oklch } from './oklch'
+} from './schema.js'
+import type { Base24Scheme, Base24Slot } from './adapters/base24.js'
+import { parseBase24Palette } from './adapters/base24.js'
+import type { Oklch } from './oklch.js'
 import {
   canonical,
   contrastRatio,
@@ -65,9 +65,9 @@ import {
   mix,
   parseColor,
   shiftLightness,
-} from './oklch'
-import type { ContrastRepair } from './oklch'
-import { repairContrast } from './oklch'
+} from './oklch.js'
+import type { ContrastRepair } from './oklch.js'
+import { repairContrast } from './oklch.js'
 
 /**
  * The contrast floors.

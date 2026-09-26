@@ -27,9 +27,9 @@
  * than silently lossy, which is what an unnamed slot would have been.
  */
 
-import type { AdeaAnsi, AdeaTheme, AdeaThemeColors } from '../schema'
-import type { Oklch } from '../oklch'
-import { formatOklch, parseColor } from '../oklch'
+import type { AdeaAnsi, AdeaTheme, AdeaThemeColors } from '../schema.js'
+import type { Oklch } from '../oklch.js'
+import { formatOklch, parseColor } from '../oklch.js'
 
 /** The twenty-four Base24 slots, in the order the specification lists them. */
 export const BASE24_SLOTS = [

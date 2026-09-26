@@ -27,12 +27,12 @@
  * the only way to know a theme is admissible without reimplementing the rules.
  */
 
-import type { AdeaTheme, AnsiKey, ThemeColorKey } from './schema'
-import { ANSI_KEYS, THEME_COLOR_KEYS } from './schema'
-import type { Oklch } from './oklch'
-import { contrastRatio, deltaEok, parseColor } from './oklch'
-import { CONTRAST_FLOORS } from './normalize'
-import { STATUS_ROLES, statusForeground } from './derive'
+import type { AdeaTheme, AnsiKey, ThemeColorKey } from './schema.js'
+import { ANSI_KEYS, THEME_COLOR_KEYS } from './schema.js'
+import type { Oklch } from './oklch.js'
+import { contrastRatio, deltaEok, parseColor } from './oklch.js'
+import { CONTRAST_FLOORS } from './normalize.js'
+import { STATUS_ROLES, statusForeground } from './derive.js'
 
 /** One measured pairing that failed. */
 export interface ContrastFinding {

@@ -13,8 +13,8 @@
  * utility in every consumer, and a consumer cannot silently fall behind.
  */
 
-import { ANSI_KEYS, THEME_COLOR_KEYS } from '../schema'
-import { STATUS_ROLES } from '../derive'
+import { ANSI_KEYS, THEME_COLOR_KEYS } from '../schema.js'
+import { STATUS_ROLES } from '../derive.js'
 
 export interface TailwindOptions {
   /** The custom-property namespace the CSS adapter used. Defaults to `adea`. */

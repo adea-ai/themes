@@ -220,3 +220,6 @@ export const ANSI_KEYS = [
 
 export type ThemeColorKey = (typeof THEME_COLOR_KEYS)[number]
 export type AnsiKey = (typeof ANSI_KEYS)[number]
+
+/** Lightweight catalogue identities for a picker that loads palettes on demand. */
+export type ThemeMetadata = Omit<AdeaThemeRecord, 'colors' | 'ansi' | 'cursor' | 'selection'>

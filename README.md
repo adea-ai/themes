@@ -45,6 +45,30 @@ credited in [NOTICE](NOTICE).
 
 ## Using it
 
+For an application that needs one palette, import its generated module directly:
+
+```ts
+import theme from '@adea-ai/themes/themes/adea-dark'
+import { toXtermTheme } from '@adea-ai/themes/adapters/xterm'
+
+terminal.options.theme = toXtermTheme(theme)
+```
+
+This entry point does not load the catalogue, other palettes, or normalization.
+`@adea-ai/themes/metadata` exports `themeMetadata`, a picker catalogue containing
+identity, family, appearance, description, tags, and provenance, without palette
+values. Load a selected palette through a static map of dynamic imports so the
+application bundler can create separate chunks. The full catalogue API below
+remains available when every palette is needed.
+
+All JavaScript exports use native ESM with explicit relative file extensions.
+The shadcn adapter is available at `@adea-ai/themes/adapters/shadcn`.
+`tests/package.test.ts` builds and packs the actual archive, resolves its public
+exports in Node, and checks that a single-theme browser bundle excludes other
+palettes and catalogue tooling. Its 16 KiB uncompressed ceiling leaves headroom
+for one record and the terminal adapter while detecting catalogue inclusion.
+This package still has no runtime dependencies.
+
 ```ts
 import { getTheme, themeFamilies, resolveTheme } from '@adea-ai/themes'
 import { themeCssVariables } from '@adea-ai/themes/adapters/css'

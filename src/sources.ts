@@ -36,9 +36,9 @@
  * claim "this is really Catppuccin Mocha" fails the build rather than drifting.
  */
 
-import type { Base24Slot } from './adapters/base24'
-import { CONTRAST_FLOORS } from './normalize'
-import type { ThemeAppearance, ThemeProvenance } from './schema'
+import type { Base24Slot } from './adapters/base24.js'
+import { CONTRAST_FLOORS } from './normalize.js'
+import type { ThemeAppearance, ThemeProvenance } from './schema.js'
 
 /** The dataset the Base24 schemes are reproduced from. */
 export const CATALOGUE_REPOSITORY = 'https://github.com/williamzujkowski/oklch-terminal-themes'
