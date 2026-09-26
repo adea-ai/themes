@@ -44,9 +44,9 @@
  * the step uniform *and* the hue intact — a mix toward a neutral cannot do both.
  */
 
-import type { ThemeAppearance } from './schema'
-import type { Oklch } from './oklch'
-import { contrastRatio, formatOklch, parseColor, shiftLightness } from './oklch'
+import type { ThemeAppearance } from './schema.js'
+import type { Oklch } from './oklch.js'
+import { contrastRatio, formatOklch, parseColor, shiftLightness } from './oklch.js'
 
 /** One accent preset: a named primary, per appearance. */
 export type AccentPreset = {

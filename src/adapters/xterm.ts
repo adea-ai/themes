@@ -14,9 +14,9 @@
  * straight to `terminal.options.theme`.
  */
 
-import type { AdeaTheme } from '../schema'
-import type { Oklch } from '../oklch'
-import { contrastRatio, oklchToHex, parseColor, repairContrast } from '../oklch'
+import type { AdeaTheme } from '../schema.js'
+import type { Oklch } from '../oklch.js'
+import { contrastRatio, oklchToHex, parseColor, repairContrast } from '../oklch.js'
 
 /**
  * The shape xterm.js's `ITheme` requires.

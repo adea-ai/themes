@@ -53,11 +53,12 @@ export type {
   ThemeAppearance,
   ThemeColorKey,
   ThemeFamily,
+  ThemeMetadata,
   ThemeProvenance,
-} from './schema'
-export { ANSI_KEYS, THEME_COLOR_KEYS } from './schema'
+} from './schema.js'
+export { ANSI_KEYS, THEME_COLOR_KEYS } from './schema.js'
 
-export type { AccentPreset, AccentRoles } from './accents'
+export type { AccentPreset, AccentRoles } from './accents.js'
 export {
   ACCENTS,
   ACCENT_HOVER_STEP,
@@ -70,7 +71,7 @@ export {
   getAccent,
   primaryHover,
   primarySubtleCss,
-} from './accents'
+} from './accents.js'
 
 /* --- The catalogue ------------------------------------------------------ */
 export {
@@ -85,10 +86,10 @@ export {
   themes,
   themesByAppearance,
   toTheme,
-} from './catalogue'
+} from './catalogue.js'
 
 /* --- The colour core ---------------------------------------------------- */
-export type { ContrastRepair, Oklch } from './oklch'
+export type { ContrastRepair, Oklch } from './oklch.js'
 export {
   contrastRatio,
   deltaEok,
@@ -103,10 +104,10 @@ export {
   relativeLuminance,
   repairContrast,
   shiftLightness,
-} from './oklch'
+} from './oklch.js'
 
 /* --- The gate ----------------------------------------------------------- */
-export type { AnsiInvariant, ContrastFinding, Pairing } from './validate'
+export type { AnsiInvariant, ContrastFinding, Pairing } from './validate.js'
 export {
   REQUIRED_PAIRINGS,
   STATUS_PAIRINGS,
@@ -114,14 +115,14 @@ export {
   formatFindings,
   validateCatalogue,
   validateTheme,
-} from './validate'
+} from './validate.js'
 
 /* --- Normalization, for a consumer bringing its own palette ------------- */
-export type { NormalizationFinding, NormalizedTheme, ThemeSourceSpec } from './normalize'
-export { CONTRAST_FLOORS, normalizeTheme } from './normalize'
+export type { NormalizationFinding, NormalizedTheme, ThemeSourceSpec } from './normalize.js'
+export { CONTRAST_FLOORS, normalizeTheme } from './normalize.js'
 
 /* --- Derived colours --------------------------------------------------- */
-export type { StatusRole, SyntaxRole } from './derive'
+export type { StatusRole, SyntaxRole } from './derive.js'
 export {
   CHART_SERIES,
   STATUS_ROLES,
@@ -131,10 +132,10 @@ export {
   syntaxRoles,
   syntaxRolesHex,
   tint,
-} from './derive'
+} from './derive.js'
 
 /* --- Adapters ---------------------------------------------------------- */
-export type { Base24Palette, Base24Scheme, Base24Slot } from './adapters/base24'
+export type { Base24Palette, Base24Scheme, Base24Slot } from './adapters/base24.js'
 export {
   BASE24_SLOTS,
   BASE24_SLOT_MEANING,
@@ -144,18 +145,18 @@ export {
   parseBase24Palette,
   parseBase24Scheme,
   toBase24,
-} from './adapters/base24'
+} from './adapters/base24.js'
 
-export type { XtermTheme } from './adapters/xterm'
-export { toXtermTheme } from './adapters/xterm'
+export type { XtermTheme } from './adapters/xterm.js'
+export { toXtermTheme } from './adapters/xterm.js'
 
-export type { CssOptions } from './adapters/css'
-export { catalogueCss, cssVariableName, themeCss, themeCssVariables } from './adapters/css'
+export type { CssOptions } from './adapters/css.js'
+export { catalogueCss, cssVariableName, themeCss, themeCssVariables } from './adapters/css.js'
 
-export type { TailwindOptions } from './adapters/tailwind'
-export { toTailwindTheme } from './adapters/tailwind'
+export type { TailwindOptions } from './adapters/tailwind.js'
+export { toTailwindTheme } from './adapters/tailwind.js'
 
-export type { ShikiThemeRegistration, ShikiTokenSetting } from './adapters/shiki'
-export { toShikiTheme, toShikiThemes } from './adapters/shiki'
+export type { ShikiThemeRegistration, ShikiTokenSetting } from './adapters/shiki.js'
+export { toShikiTheme, toShikiThemes } from './adapters/shiki.js'
 
-export { SHADCN_MAPPING, shadcnCss, shadcnRoles, shadcnVariables } from './adapters/shadcn'
+export { SHADCN_MAPPING, shadcnCss, shadcnRoles, shadcnVariables } from './adapters/shadcn.js'

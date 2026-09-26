@@ -14,10 +14,10 @@
  * component that will eventually ship without the try/catch.
  */
 
-import type { AdeaTheme, AdeaThemeRecord, ThemeAppearance, ThemeFamily } from './schema'
-import type { Base24Scheme } from './adapters/base24'
-import { generatedSchemes } from './generated/schemes'
-import { generatedThemes } from './generated/themes'
+import type { AdeaTheme, AdeaThemeRecord, ThemeAppearance, ThemeFamily } from './schema.js'
+import type { Base24Scheme } from './adapters/base24.js'
+import { generatedSchemes } from './generated/schemes.js'
+import { generatedThemes } from './generated/themes.js'
 
 /**
  * Every theme in the catalogue, ordered by id.

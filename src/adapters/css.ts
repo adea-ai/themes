@@ -31,9 +31,9 @@
  * an sRGB blend, which is what makes hand-mixed tints go muddy.
  */
 
-import type { AdeaTheme, AdeaThemeColors } from '../schema'
-import { THEME_COLOR_KEYS, ANSI_KEYS } from '../schema'
-import { STATUS_ROLES, chartSeries, statusForeground, tint } from '../derive'
+import type { AdeaTheme, AdeaThemeColors } from '../schema.js'
+import { THEME_COLOR_KEYS, ANSI_KEYS } from '../schema.js'
+import { STATUS_ROLES, chartSeries, statusForeground, tint } from '../derive.js'
 
 /** How the variables are named. */
 export interface CssOptions {

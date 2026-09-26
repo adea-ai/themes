@@ -22,8 +22,8 @@
  * A table of the whole mapping is in `docs/shadcn-bridge.md`.
  */
 
-import type { AdeaTheme, AdeaThemeColors } from '../schema'
-import { STATUS_ROLES, statusForeground } from '../derive'
+import type { AdeaTheme, AdeaThemeColors } from '../schema.js'
+import { STATUS_ROLES, statusForeground } from '../derive.js'
 
 /**
  * Canonical role → shadcn custom-property name.

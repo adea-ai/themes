@@ -6,7 +6,7 @@
  * disagree.
  */
 
-import type { Base24Scheme } from '../adapters/base24'
+import type { Base24Scheme } from '../adapters/base24.js'
 
 /**
  * The Base24 schemes as they were vendored, keyed by theme id.

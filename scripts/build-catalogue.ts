@@ -20,7 +20,7 @@
  *   bun run catalogue:check    # fail if the committed output is stale
  */
 
-import { readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -249,16 +249,48 @@ const BANNER = `/**
 `
 
 function renderThemes(records: AdeaThemeRecord[]): string {
-  const body = records
-    .map((record) => `  ${JSON.stringify(record, null, 2).replace(/\n/g, '\n  ')},`)
+  const imports = records
+    .map((record, index) => `import theme${index} from './themes/${record.id}.js'`)
     .join('\n')
   return `${BANNER}
-import type { AdeaThemeRecord } from '../schema'
+import type { AdeaThemeRecord } from '../schema.js'
+${imports}
 
 /** Every theme in the catalogue, ordered by id. */
 export const generatedThemes: readonly AdeaThemeRecord[] = Object.freeze([
-${body}
+${records.map((_, index) => `  theme${index},`).join('\n')}
 ])
+`
+}
+
+function renderTheme(record: AdeaThemeRecord): string {
+  return `${BANNER}
+import type { AdeaThemeRecord } from '../../schema.js'
+
+const theme: AdeaThemeRecord = ${JSON.stringify(record, null, 2)}
+export default theme
+`
+}
+
+function renderMetadata(records: AdeaThemeRecord[]): string {
+  const metadata = records.map(
+    ({ id, name, appearance, family, familyLabel, label, description, tags, provenance }) => ({
+      id,
+      name,
+      appearance,
+      family,
+      familyLabel,
+      label,
+      description,
+      tags,
+      provenance,
+    })
+  )
+  return `${BANNER}
+import type { ThemeMetadata } from '../schema.js'
+
+/** Picker identities and provenance, without runtime palettes. */
+export const themeMetadata: readonly ThemeMetadata[] = Object.freeze(${JSON.stringify(metadata, null, 2)})
 `
 }
 
@@ -271,7 +303,7 @@ function renderSchemes(schemes: Record<string, Base24Scheme>): string {
     )
     .join('\n')
   return `${BANNER}
-import type { Base24Scheme } from '../adapters/base24'
+import type { Base24Scheme } from '../adapters/base24.js'
 
 /**
  * The Base24 schemes as they were vendored, keyed by theme id.
@@ -323,10 +355,28 @@ for (const finding of exceeded) {
   )
 }
 
+const themeDirectory = join(GENERATED_DIR, 'themes')
+if (!check) await mkdir(themeDirectory, { recursive: true })
+const expected = new Set(records.map((record) => `${record.id}.ts`))
+let isolatedOk = true
+for (const record of records) {
+  const valid = await writeOrCheck(join(themeDirectory, `${record.id}.ts`), renderTheme(record))
+  isolatedOk = valid && isolatedOk
+}
+for (const file of await readdir(themeDirectory).catch(() => [])) {
+  if (expected.has(file)) continue
+  if (check) {
+    console.error(`stale generated theme: ${file}`)
+    isolatedOk = false
+  } else {
+    await unlink(join(themeDirectory, file))
+  }
+}
+const metadataOk = await writeOrCheck(join(GENERATED_DIR, 'metadata.ts'), renderMetadata(records))
 const themesOk = await writeOrCheck(join(GENERATED_DIR, 'themes.ts'), renderThemes(records))
 const schemesOk = await writeOrCheck(join(GENERATED_DIR, 'schemes.ts'), renderSchemes(schemes))
 
-if (check && (!themesOk || !schemesOk)) {
+if (check && (!themesOk || !schemesOk || !isolatedOk || !metadataOk)) {
   console.error('The committed catalogue is stale. Run: bun run catalogue:build')
   process.exit(1)
 }

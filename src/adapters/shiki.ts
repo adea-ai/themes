@@ -24,10 +24,10 @@
  * however it likes — synchronously, into a custom highlighter, or inside a worker.
  */
 
-import type { AdeaTheme } from '../schema'
-import type { SyntaxRole } from '../derive'
-import { syntaxRolesHex } from '../derive'
-import { oklchToHex, parseColor } from '../oklch'
+import type { AdeaTheme } from '../schema.js'
+import type { SyntaxRole } from '../derive.js'
+import { syntaxRolesHex } from '../derive.js'
+import { oklchToHex, parseColor } from '../oklch.js'
 
 /**
  * A Shiki theme registration.

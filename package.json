@@ -77,7 +77,19 @@
       "import": "./dist/adapters/shiki.js"
     },
     "./palettes/*": "./palettes/*",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./adapters/shadcn": {
+      "types": "./dist/adapters/shadcn.d.ts",
+      "import": "./dist/adapters/shadcn.js"
+    },
+    "./themes/*": {
+      "types": "./dist/generated/themes/*.d.ts",
+      "import": "./dist/generated/themes/*.js"
+    },
+    "./metadata": {
+      "types": "./dist/generated/metadata.d.ts",
+      "import": "./dist/generated/metadata.js"
+    }
   },
   "publishConfig": {
     "access": "public"

@@ -29,9 +29,9 @@
  * palettes today.
  */
 
-import type { AdeaTheme } from './schema'
-import type { Oklch } from './oklch'
-import { contrastRatio, formatOklch, mix, oklchToHex, parseColor, repairContrast } from './oklch'
+import type { AdeaTheme } from './schema.js'
+import type { Oklch } from './oklch.js'
+import { contrastRatio, formatOklch, mix, oklchToHex, parseColor, repairContrast } from './oklch.js'
 
 /** The syntax roles, matching the names Shiki's theme contract expects. */
 export type SyntaxRole =
