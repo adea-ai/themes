@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/adea-ai/themes/compare/v0.4.2...v0.4.3) (2026-09-26)
+
+
+### Maintenance
+
+* enable the oxfmt format lane and sync the Code Foundry runtime ([#4](https://github.com/adea-ai/themes/issues/4)) ([6d3b822](https://github.com/adea-ai/themes/commit/6d3b822b2cef03b5e72a99294fd3fea563473dcd))
+
 ## [0.4.2](https://github.com/adea-ai/themes/compare/v0.4.1...v0.4.2) (2026-09-25)
 
 
