@@ -16,7 +16,7 @@ to internalise before touching anything:
 
 The palettes belong to the projects that maintain them — Catppuccin, Nord, Gruvbox
 and the rest — and they are reproduced rather than authored. This repository's value
-is the *normalizer*: the one place a terminal palette becomes an application theme,
+is the _normalizer_: the one place a terminal palette becomes an application theme,
 measured against contrast floors, for every consumer at once.
 
 So when a theme looks wrong, the fix is almost never a literal in a source file. It
@@ -41,18 +41,18 @@ thirty themes benefit.
 Each is enforced by a test, a lint rule or the build. Breaking one is a failing
 check rather than a review comment.
 
-| Invariant | Enforced by |
-| --- | --- |
-| Every theme clears every contrast floor | `tests/catalogue.test.ts` |
-| `src/generated` matches `palettes/` and `src/sources.ts` | `catalogue:check` |
-| Every theme's background and foreground match its upstream project | `tests/provenance.test.ts` |
-| A contrast repair moves lightness, never hue | `tests/provenance.test.ts` |
-| Every theme records a project, a URL and an SPDX licence | `tests/provenance.test.ts` |
-| Only permissively licensed families are present | `tests/provenance.test.ts` |
-| Every value that leaves an adapter is valid for that adapter | `tests/adapters.test.ts` |
-| No theme is added without a fidelity assertion | `tests/provenance.test.ts` |
-| Every published symbol is a `oklch()` string or an adapter's own format | `tests/adapters.test.ts` |
-| The package has no runtime dependencies | `package.json`, and review |
+| Invariant                                                               | Enforced by                |
+| ----------------------------------------------------------------------- | -------------------------- |
+| Every theme clears every contrast floor                                 | `tests/catalogue.test.ts`  |
+| `src/generated` matches `palettes/` and `src/sources.ts`                | `catalogue:check`          |
+| Every theme's background and foreground match its upstream project      | `tests/provenance.test.ts` |
+| A contrast repair moves lightness, never hue                            | `tests/provenance.test.ts` |
+| Every theme records a project, a URL and an SPDX licence                | `tests/provenance.test.ts` |
+| Only permissively licensed families are present                         | `tests/provenance.test.ts` |
+| Every value that leaves an adapter is valid for that adapter            | `tests/adapters.test.ts`   |
+| No theme is added without a fidelity assertion                          | `tests/provenance.test.ts` |
+| Every published symbol is a `oklch()` string or an adapter's own format | `tests/adapters.test.ts`   |
+| The package has no runtime dependencies                                 | `package.json`, and review |
 
 ## Working rules
 
@@ -62,7 +62,7 @@ files are committed on purpose — so that a palette change is a reviewable diff
 
 **Never hand-edit `palettes/`.** Run `bun run vendor`. The files are reproduced from a
 pinned revision so that every value can be traced; an edit there destroys the audit
-trail. If a vendored value is *wrong* — a port that has drifted from the project's own
+trail. If a vendored value is _wrong_ — a port that has drifted from the project's own
 palette — the correction is a `palette` block in `src/sources.ts`, which is reported
 as a finding on every build. One Dark is the worked example.
 
@@ -81,7 +81,7 @@ upstream values rather than internal consistency, because "this is really Catppu
 Mocha" is the claim the catalogue makes and the only one worth checking.
 
 **Comment the decision, not the code.** In this repository that means saying why a
-step is *not* the obvious thing: why the surface ladder's direction is measured
+step is _not_ the obvious thing: why the surface ladder's direction is measured
 rather than declared, why `base01` is a ramp candidate on dark themes only, why
 Everforest Light's status colours are deepened. A comment that restates the next line
 will be asked for in review.
@@ -124,7 +124,7 @@ them, and this repository publishes to npm, so a `feat` is a minor release and a
 `fix` is a patch. Open the pull request as a **draft** and mark it ready only once
 `bun run verify` is clean.
 
-A change to what a role *means* lands in the same commit as the schema, the
+A change to what a role _means_ lands in the same commit as the schema, the
 normalizer, the adapters, the affected themes, and the tests.
 
 <!-- code-foundry-managed: pull-request-policy -->

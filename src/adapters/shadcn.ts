@@ -64,10 +64,7 @@ export const SHADCN_MAPPING: Readonly<Record<keyof AdeaThemeColors, string>> = O
  */
 export function shadcnRoles(theme: AdeaTheme): Record<string, string> {
   return Object.fromEntries(
-    Object.entries(shadcnVariables(theme)).map(([name, value]) => [
-      name.replace(/^--/, ''),
-      value,
-    ])
+    Object.entries(shadcnVariables(theme)).map(([name, value]) => [name.replace(/^--/, ''), value])
   )
 }
 

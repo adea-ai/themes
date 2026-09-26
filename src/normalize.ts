@@ -251,10 +251,7 @@ function ladderDirection(background: Oklch): 1 | -1 {
 }
 
 /** True when the declared variant and the measured canvas agree. */
-export function appearanceMatchesCanvas(
-  appearance: ThemeAppearance,
-  background: Oklch
-): boolean {
+export function appearanceMatchesCanvas(appearance: ThemeAppearance, background: Oklch): boolean {
   return (background.l <= 0.5 ? 'dark' : 'light') === appearance
 }
 
@@ -317,7 +314,14 @@ function buildAnsiRamp(
   // to work with.
   const candidates =
     appearance === 'dark'
-      ? [palette.base01, palette.base03, palette.base04, palette.base05, palette.base06, palette.base07]
+      ? [
+          palette.base01,
+          palette.base03,
+          palette.base04,
+          palette.base05,
+          palette.base06,
+          palette.base07,
+        ]
       : [palette.base03, palette.base04, palette.base05]
 
   const distinct: Oklch[] = []
@@ -414,7 +418,9 @@ function chooseAccent(
 ): { role: AnsiKey; repair: ContrastRepair; findings: NormalizationFinding[] } {
   const findings: NormalizationFinding[] = []
   const background = surfaces[0] as Oklch
-  const order: readonly AnsiKey[] = preferred ? [preferred, ...ACCENT_PREFERENCE] : ACCENT_PREFERENCE
+  const order: readonly AnsiKey[] = preferred
+    ? [preferred, ...ACCENT_PREFERENCE]
+    : ACCENT_PREFERENCE
 
   let fallback: { role: AnsiKey; repair: ContrastRepair } | undefined
   const satisfying: {
@@ -461,7 +467,12 @@ function chooseAccent(
     }
 
     if (attempt.repair.satisfied) {
-      satisfying.push({ role, repair: attempt.repair, distortion: distortionOf(attempt), blended: attempt.blended })
+      satisfying.push({
+        role,
+        repair: attempt.repair,
+        distortion: distortionOf(attempt),
+        blended: attempt.blended,
+      })
       continue
     }
     // Track the best attempt so a theme that cannot satisfy the floor still gets
@@ -698,7 +709,6 @@ function repairRole(
   return { repair: lightness, blended: false }
 }
 
-
 /**
  * The Base24 slots that carry a hue rather than a grey.
  *
@@ -900,12 +910,7 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
   // Body text first: several palettes publish a foreground that fails on their own
   // background, and every other role's floors are measured against the canvas.
   const textFloor = source.textFloor ?? CONTRAST_FLOORS.text
-  const textRepair = repairAcrossSurfaces(
-    palette.base05,
-    surfaces,
-    textFloor,
-    REPAIR_BUDGET.text
-  )
+  const textRepair = repairAcrossSurfaces(palette.base05, surfaces, textFloor, REPAIR_BUDGET.text)
   const text = emit(source.id, 'text', textRepair, textFloor)
   colors.text = text.value
   colors.foreground = text.value
@@ -947,15 +952,14 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
   const paletteSubtleContrast = contrastRatio(fromPalette.color, background)
 
   const subtleFromPalette = paletteSubtleContrast < mutedContrast
-  const subtleRepair =
-    subtleFromPalette
-      ? fromPalette
-      : repairAcrossSurfaces(
-          mix(textRepair.color, background, 0.55),
-          surfaces,
-          CONTRAST_FLOORS.textSubtle,
-          0.3
-        )
+  const subtleRepair = subtleFromPalette
+    ? fromPalette
+    : repairAcrossSurfaces(
+        mix(textRepair.color, background, 0.55),
+        surfaces,
+        CONTRAST_FLOORS.textSubtle,
+        0.3
+      )
 
   const subtle = emit(source.id, 'textSubtle', subtleRepair, CONTRAST_FLOORS.textSubtle)
   colors.textSubtle = subtle.value
@@ -1072,7 +1076,13 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
       if (!chosen || combined.repair.ratio > chosen.repair.ratio) chosen = combined
     }
 
-    const result = emit(source.id, key, chosen!.repair, CONTRAST_FLOORS.statusRaised, chosen!.blended)
+    const result = emit(
+      source.id,
+      key,
+      chosen!.repair,
+      CONTRAST_FLOORS.statusRaised,
+      chosen!.blended
+    )
     colors[key] = result.value
     if (result.finding) findings.push(result.finding)
     if (chosen!.blended) {

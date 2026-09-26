@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 
-import { ACCENTS, ACCENT_HOVER_STEP, accentForegroundContrast, accentRoles, getAccent } from '../src'
+import {
+  ACCENTS,
+  ACCENT_HOVER_STEP,
+  accentForegroundContrast,
+  accentRoles,
+  getAccent,
+} from '../src'
 import { contrastRatio, parseColor, shiftLightness } from '../src/oklch'
 
 /**

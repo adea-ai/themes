@@ -78,10 +78,7 @@ describe('catalogue shape', () => {
   test('every theme records its provenance and licence', () => {
     const missing = themes
       .filter(
-        (theme) =>
-          !theme.provenance.url ||
-          !theme.provenance.license ||
-          !theme.provenance.project
+        (theme) => !theme.provenance.url || !theme.provenance.license || !theme.provenance.project
       )
       .map((theme) => theme.id)
 
@@ -124,10 +121,9 @@ describe('catalogue shape', () => {
         // light theme deliberately does. What must never happen is a rung that
         // *descends* toward the canvas, which reads as a pressed surface.
         const step = (rung - previous) * direction
-        expect(
-          step,
-          `${theme.id} rung ${index} descends toward the canvas`
-        ).toBeGreaterThanOrEqual(-1e-9)
+        expect(step, `${theme.id} rung ${index} descends toward the canvas`).toBeGreaterThanOrEqual(
+          -1e-9
+        )
         previous = rung
       }
 
@@ -138,9 +134,10 @@ describe('catalogue shape', () => {
           parseColor(theme.colors[role])!,
           parseColor(theme.colors.background)!
         )
-        expect(ratio, `${theme.id} ${role} is indistinguishable from the canvas`).toBeGreaterThanOrEqual(
-          CONTRAST_FLOORS.surface * 0.7
-        )
+        expect(
+          ratio,
+          `${theme.id} ${role} is indistinguishable from the canvas`
+        ).toBeGreaterThanOrEqual(CONTRAST_FLOORS.surface * 0.7)
       }
     }
   })

@@ -209,7 +209,10 @@ export const ACCENT_SUBTLE_ALPHA: Readonly<Record<ThemeAppearance, number>> = Ob
  * Takes the appearance because the alpha is appearance-dependent — see
  * {@link ACCENT_SUBTLE_ALPHA}.
  */
-export function primarySubtleCss(appearance: ThemeAppearance, primaryVariable = '--primary'): string {
+export function primarySubtleCss(
+  appearance: ThemeAppearance,
+  primaryVariable = '--primary'
+): string {
   return `color-mix(in oklch, var(${primaryVariable}) ${ACCENT_SUBTLE_ALPHA[appearance]}%, transparent)`
 }
 

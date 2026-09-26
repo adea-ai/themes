@@ -92,8 +92,7 @@ export const oklabToOklch = ({ l, a, b }: Oklab): Oklch => {
 /** True when every linear channel sits inside the sRGB cube. */
 export function inGamut(color: Oklch, tolerance = 1e-4): boolean {
   const { r, g, b } = oklabToLinearRgb(oklchToOklab(color))
-  const within = (channel: number): boolean =>
-    channel >= -tolerance && channel <= 1 + tolerance
+  const within = (channel: number): boolean => channel >= -tolerance && channel <= 1 + tolerance
   return within(r) && within(g) && within(b)
 }
 

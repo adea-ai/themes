@@ -31,13 +31,7 @@ function schemeWith(head: readonly string[]): string {
   const palette = BASE24_SLOTS.map(
     (slot, index) => `  ${slot}: "#${(index + 1).toString(16).padStart(2, '0')}1e2e"`
   )
-  return [
-    'system: "base24"',
-    'variant: "dark"',
-    ...head,
-    'palette:',
-    ...palette,
-  ].join('\n')
+  return ['system: "base24"', 'variant: "dark"', ...head, 'palette:', ...palette].join('\n')
 }
 
 describe('oklch core', () => {
@@ -108,7 +102,10 @@ describe('base24 adapter', () => {
       expect(scheme.variant).toBe(theme.appearance)
       for (const slot of BASE24_SLOTS) {
         expect(scheme.palette[slot], `${theme.id} leaves ${slot} empty`).toBeTruthy()
-        expect(parseColor(scheme.palette[slot]!), `${theme.id} ${slot} is unparseable`).toBeDefined()
+        expect(
+          parseColor(scheme.palette[slot]!),
+          `${theme.id} ${slot} is unparseable`
+        ).toBeDefined()
       }
     }
   })
@@ -151,7 +148,8 @@ describe('base24 adapter', () => {
   })
 
   test('a malformed scheme is rejected with the offending slot named', () => {
-    const incomplete = 'system: "base24"\nname: "x"\nvariant: "dark"\npalette:\n  base00: "#000000"\n'
+    const incomplete =
+      'system: "base24"\nname: "x"\nvariant: "dark"\npalette:\n  base00: "#000000"\n'
     expect(() => parseBase24Scheme(incomplete)).toThrow(/base01/)
   })
 
@@ -185,7 +183,9 @@ describe('xterm adapter', () => {
       ] as const
       for (const [name, background, foreground, floor] of cases) {
         const ratio = contrastRatio(parseColor(foreground)!, parseColor(background)!)
-        expect(ratio, `${theme.id} ${name} measures ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(floor)
+        expect(ratio, `${theme.id} ${name} measures ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(
+          floor
+        )
       }
     }
   })
@@ -304,7 +304,10 @@ describe('shiki adapter', () => {
 describe('derived colours', () => {
   test('the chart series is the same six slots in every theme', () => {
     for (const theme of themes) {
-      expect(chartSeries(theme), `${theme.id} has ${chartSeries(theme).length} series`).toHaveLength(6)
+      expect(
+        chartSeries(theme),
+        `${theme.id} has ${chartSeries(theme).length} series`
+      ).toHaveLength(6)
     }
     // Same role, different value per theme: series 1 is always the palette's blue.
     const mocha = chartSeries(getTheme('catppuccin-mocha')!)
@@ -343,10 +346,7 @@ describe('derived colours', () => {
     // role rather than improve it.
     for (const theme of themes) {
       const roles = syntaxRoles(theme)
-      const ratio = contrastRatio(
-        parseColor(roles.comment)!,
-        parseColor(theme.colors.background)!
-      )
+      const ratio = contrastRatio(parseColor(roles.comment)!, parseColor(theme.colors.background)!)
       expect(ratio, `${theme.id} comment is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(1.95)
     }
   })

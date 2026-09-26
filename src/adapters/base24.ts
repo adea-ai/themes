@@ -131,9 +131,10 @@ export const BASE24_TO_ANSI = Object.freeze({
 
 /** The inverse of {@link BASE24_TO_ANSI}, for export. */
 export const ANSI_TO_BASE24: Readonly<Record<string, Base24Slot>> = Object.freeze(
-  Object.fromEntries(
-    Object.entries(BASE24_TO_ANSI).map(([ansi, slot]) => [slot, ansi])
-  ) as Record<string, Base24Slot>
+  Object.fromEntries(Object.entries(BASE24_TO_ANSI).map(([ansi, slot]) => [slot, ansi])) as Record<
+    string,
+    Base24Slot
+  >
 )
 
 /**

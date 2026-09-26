@@ -68,7 +68,9 @@ export function hasTheme(id: string): boolean {
  * "Catppuccin: Latte, Frappé, Macchiato, Mocha" the way the project itself presents
  * its flavours, which is how someone who wants Mocha looks for it.
  */
-export function themeFamilies(themesList: readonly AdeaThemeRecord[] = generatedThemes): ThemeFamily[] {
+export function themeFamilies(
+  themesList: readonly AdeaThemeRecord[] = generatedThemes
+): ThemeFamily[] {
   const families: ThemeFamily[] = []
   const index = new Map<string, ThemeFamily>()
 
