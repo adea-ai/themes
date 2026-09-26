@@ -265,7 +265,10 @@ ${body}
 function renderSchemes(schemes: Record<string, Base24Scheme>): string {
   const entries = Object.entries(schemes)
     .toSorted(([a], [b]) => a.localeCompare(b))
-    .map(([id, scheme]) => `  ${JSON.stringify(id)}: ${JSON.stringify(scheme, null, 2).replace(/\n/g, '\n  ')},`)
+    .map(
+      ([id, scheme]) =>
+        `  ${JSON.stringify(id)}: ${JSON.stringify(scheme, null, 2).replace(/\n/g, '\n  ')},`
+    )
     .join('\n')
   return `${BANNER}
 import type { Base24Scheme } from '../adapters/base24'
@@ -309,11 +312,15 @@ const exceeded = findings.filter((finding) => finding.kind === 'budget-exceeded'
 console.log(`catalogue: ${records.length} themes, ${findings.length} findings`)
 for (const group of [substituted, repaired]) {
   for (const finding of group) {
-    console.log(`  ${finding.kind.padEnd(12)} ${finding.themeId}.${finding.role}: ${finding.message}`)
+    console.log(
+      `  ${finding.kind.padEnd(12)} ${finding.themeId}.${finding.role}: ${finding.message}`
+    )
   }
 }
 for (const finding of exceeded) {
-  console.error(`  ${finding.kind.padEnd(12)} ${finding.themeId}.${finding.role}: ${finding.message}`)
+  console.error(
+    `  ${finding.kind.padEnd(12)} ${finding.themeId}.${finding.role}: ${finding.message}`
+  )
 }
 
 const themesOk = await writeOrCheck(join(GENERATED_DIR, 'themes.ts'), renderThemes(records))

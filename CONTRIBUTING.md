@@ -54,7 +54,7 @@ and the log together are the whole story of what changed.
 
 ## Testing
 
-- Assert *upstream* values, not internal consistency. `tests/provenance.test.ts` is
+- Assert _upstream_ values, not internal consistency. `tests/provenance.test.ts` is
   the model: it knows what Catppuccin Mocha's background is and checks it.
 - Assert the contract an adapter's target actually has, not that it returned
   something. xterm's is "every value is valid hex and selected text is legible";

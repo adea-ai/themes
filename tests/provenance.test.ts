@@ -39,15 +39,28 @@ type Fidelity = {
    */
   foregroundHue?: number
   /** A hue the family is known for, asserted so a repair cannot erase the identity. */
-  signature?: { role: 'accent' | 'ansi.green' | 'ansi.blue' | 'ansi.magenta' | 'ansi.cyan'; hue: [number, number] }
+  signature?: {
+    role: 'accent' | 'ansi.green' | 'ansi.blue' | 'ansi.magenta' | 'ansi.cyan'
+    hue: [number, number]
+  }
 }
 
 const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Catppuccin's four flavours. Backgrounds and foregrounds as published.
-  { id: 'catppuccin-latte', background: '#eff1f5', foreground: '#4c4f69', signature: { role: 'ansi.magenta', hue: [320, 345] } },
+  {
+    id: 'catppuccin-latte',
+    background: '#eff1f5',
+    foreground: '#4c4f69',
+    signature: { role: 'ansi.magenta', hue: [320, 345] },
+  },
   { id: 'catppuccin-frappe', background: '#303446', foreground: '#c6d0f5' },
   { id: 'catppuccin-macchiato', background: '#24273a', foreground: '#cad3f5' },
-  { id: 'catppuccin-mocha', background: '#1e1e2e', foreground: '#cdd6f4', signature: { role: 'ansi.blue', hue: [250, 270] } },
+  {
+    id: 'catppuccin-mocha',
+    background: '#1e1e2e',
+    foreground: '#cdd6f4',
+    signature: { role: 'ansi.blue', hue: [250, 270] },
+  },
 
   // Tokyo Night.
   { id: 'tokyonight-night', background: '#1a1b26', foreground: '#c0caf5' },
@@ -55,19 +68,44 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   { id: 'tokyonight-day', background: '#e1e2e7', foregroundHue: 264.1 },
 
   // Rosé Pine. Its signature is iris, which the accent must still be.
-  { id: 'rosepine', background: '#191724', foreground: '#e0def4', signature: { role: 'accent', hue: [290, 320] } },
-  { id: 'rosepine-moon', background: '#232136', foreground: '#e0def4', signature: { role: 'accent', hue: [290, 320] } },
-  { id: 'rosepine-dawn', background: '#faf4ed', foreground: '#575279', signature: { role: 'accent', hue: [290, 320] } },
+  {
+    id: 'rosepine',
+    background: '#191724',
+    foreground: '#e0def4',
+    signature: { role: 'accent', hue: [290, 320] },
+  },
+  {
+    id: 'rosepine-moon',
+    background: '#232136',
+    foreground: '#e0def4',
+    signature: { role: 'accent', hue: [290, 320] },
+  },
+  {
+    id: 'rosepine-dawn',
+    background: '#faf4ed',
+    foreground: '#575279',
+    signature: { role: 'accent', hue: [290, 320] },
+  },
 
   // Gruvbox's warm ground.
   { id: 'gruvbox-dark', background: '#282828', foreground: '#ebdbb2' },
   { id: 'gruvbox-light', background: '#fbf1c7', foreground: '#3c3836' },
 
   // Nord's polar blue-grey.
-  { id: 'nord', background: '#2e3440', foreground: '#d8dee9', signature: { role: 'ansi.blue', hue: [240, 260] } },
+  {
+    id: 'nord',
+    background: '#2e3440',
+    foreground: '#d8dee9',
+    signature: { role: 'ansi.blue', hue: [240, 260] },
+  },
 
   // Dracula.
-  { id: 'dracula', background: '#282a36', foreground: '#f8f8f2', signature: { role: 'accent', hue: [295, 315] } },
+  {
+    id: 'dracula',
+    background: '#282a36',
+    foreground: '#f8f8f2',
+    signature: { role: 'accent', hue: [295, 315] },
+  },
 
   // One Dark, asserted against *Atom's* palette rather than the terminal port's
   // darker canvas. See `ONE_DARK_OFFICIAL` in `src/sources.ts`.
@@ -79,8 +117,18 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   { id: 'solarized-light', background: '#fdf6e3', foregroundHue: 221.9 },
 
   // Everforest's forest ground.
-  { id: 'everforest-dark', background: '#232a2e', foreground: '#d3c6aa', signature: { role: 'accent', hue: [100, 145] } },
-  { id: 'everforest-light', background: '#efebd4', foregroundHue: 232.9, signature: { role: 'accent', hue: [100, 160] } },
+  {
+    id: 'everforest-dark',
+    background: '#232a2e',
+    foreground: '#d3c6aa',
+    signature: { role: 'accent', hue: [100, 145] },
+  },
+  {
+    id: 'everforest-light',
+    background: '#efebd4',
+    foregroundHue: 232.9,
+    signature: { role: 'accent', hue: [100, 160] },
+  },
 
   // Ayu's three variants.
   { id: 'ayu', background: '#0b0e14', foreground: '#bfbdb6' },
@@ -88,7 +136,12 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   { id: 'ayu-light', background: '#f8f9fa', foreground: '#5c6166' },
 
   // Kanagawa's sumi ink.
-  { id: 'kanagawa', background: '#1f1f28', foreground: '#dcd7ba', signature: { role: 'accent', hue: [250, 275] } },
+  {
+    id: 'kanagawa',
+    background: '#1f1f28',
+    foreground: '#dcd7ba',
+    signature: { role: 'accent', hue: [250, 275] },
+  },
 
   // Vesper.
   { id: 'vesper', background: '#101010', foreground: '#ffffff' },
@@ -112,7 +165,10 @@ function hex(value: string): string {
   return oklchToHex(parseColor(value)!)
 }
 
-function resolve(theme: ReturnType<typeof getTheme>, role: Fidelity['signature'] extends never ? never : string): string | undefined {
+function resolve(
+  theme: ReturnType<typeof getTheme>,
+  role: Fidelity['signature'] extends never ? never : string
+): string | undefined {
   if (!theme) return undefined
   const [group, key] = role.split('.')
   if (key) {
@@ -242,7 +298,9 @@ describe('adea-dark composition', () => {
     const background = parseColor(theme.colors.background)!
     for (const role of ['success', 'warning', 'error', 'info', 'accent'] as const) {
       const ratio = contrastRatio(parseColor(theme.colors[role])!, background)
-      expect(ratio, `${role} measures ${ratio.toFixed(2)}:1 on the canvas`).toBeGreaterThanOrEqual(4.5)
+      expect(ratio, `${role} measures ${ratio.toFixed(2)}:1 on the canvas`).toBeGreaterThanOrEqual(
+        4.5
+      )
     }
   })
 
@@ -414,7 +472,10 @@ describe('provenance', () => {
   test('only permissively licensed families are present', () => {
     const allowed = new Set(['MIT', 'Apache-2.0', 'BSD-3-Clause', 'ISC', '0BSD'])
     for (const theme of themes) {
-      expect(allowed.has(theme.provenance.license), `${theme.id} is ${theme.provenance.license}`).toBe(true)
+      expect(
+        allowed.has(theme.provenance.license),
+        `${theme.id} is ${theme.provenance.license}`
+      ).toBe(true)
     }
   })
 })

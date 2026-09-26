@@ -4,25 +4,25 @@
   "description": "The Adea theme catalogue: semantic OKLCH themes normalized from upstream palettes, with Base24, terminal, CSS and syntax adapters.",
   "keywords": [
     "adea",
+    "base16",
+    "base24",
+    "design-tokens",
+    "oklch",
+    "palette",
+    "shiki",
+    "terminal",
     "theme",
     "themes",
-    "oklch",
-    "base24",
-    "base16",
-    "palette",
-    "design-tokens",
-    "terminal",
-    "shiki",
     "xterm"
   ],
   "homepage": "https://github.com/adea-ai/themes#readme",
+  "bugs": {
+    "url": "https://github.com/adea-ai/themes/issues"
+  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/adea-ai/themes.git"
-  },
-  "bugs": {
-    "url": "https://github.com/adea-ai/themes/issues"
   },
   "files": [
     "dist",
@@ -86,12 +86,15 @@
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "bun run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "fmt": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "format:write": "oxfmt --write .",
     "lint": "oxlint",
     "test": "bun test tests",
     "vendor": "bun scripts/vendor-palettes.ts",
     "catalogue:build": "bun scripts/build-catalogue.ts",
     "catalogue:check": "bun scripts/build-catalogue.ts --check",
-    "verify": "bun run typecheck && bun run lint && bun run catalogue:check && bun run test && bun run build"
+    "verify": "bun run format:check && bun run typecheck && bun run lint && bun run catalogue:check && bun run test && bun run build"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

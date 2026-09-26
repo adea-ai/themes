@@ -110,14 +110,15 @@ export function syntaxRoles(
   const floor = options.commentFloor ?? 2
   const roles = {} as Record<SyntaxRole, string>
 
-  for (const [role, source] of Object.entries(SYNTAX_SOURCE) as [SyntaxRole, keyof AdeaTheme['ansi']][]) {
+  for (const [role, source] of Object.entries(SYNTAX_SOURCE) as [
+    SyntaxRole,
+    keyof AdeaTheme['ansi'],
+  ][]) {
     const value: Oklch | undefined = parseColor(theme.ansi[source])
     if (!value) continue
 
     if (role === 'comment' || role === 'punctuation') {
-      const repaired = background
-        ? repairContrast(value, background, floor, 0.3)
-        : { color: value }
+      const repaired = background ? repairContrast(value, background, floor, 0.3) : { color: value }
       roles[role] = formatOklch(repaired.color)
       continue
     }
@@ -211,4 +212,3 @@ export function statusForegroundHex(theme: AdeaTheme, role: StatusRole): string 
   const parsed = parseColor(statusForeground(theme, role))
   return parsed ? oklchToHex(parsed) : theme.colors.foreground
 }
-

@@ -150,7 +150,8 @@ export function checkAnsiRamp(theme: AdeaTheme): AnsiInvariant[] {
       findings.push({
         themeId: theme.id,
         role: 'black',
-        message: 'ANSI black and bright black resolve to the same colour, so the theme cannot express dim text',
+        message:
+          'ANSI black and bright black resolve to the same colour, so the theme cannot express dim text',
       })
     }
     // On both appearances ANSI 8 sits above ANSI 0 in lightness: it is the dim grey

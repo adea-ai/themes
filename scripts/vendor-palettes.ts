@@ -122,7 +122,10 @@ async function fetchPalette(slug: string): Promise<PublishedPalette> {
  * matching what `toBase24` does on export, and the two rungs below the canvas are
  * darkened slices of the structure donor's background.
  */
-function compose(source: (typeof COMPOSED_SOURCES)[number], donors: Record<string, PublishedPalette>) {
+function compose(
+  source: (typeof COMPOSED_SOURCES)[number],
+  donors: Record<string, PublishedPalette>
+) {
   const palette: Record<string, string> = {}
 
   for (const [slot, [donor, key]] of Object.entries(source.slots)) {
@@ -189,7 +192,10 @@ function serialiseComposed(
   return `${JSON.stringify(payload, null, 2)}\n`
 }
 
-function serialise(theme: (typeof VENDORED_SOURCES)[number], scheme: ReturnType<typeof parseBase24Scheme>): string {
+function serialise(
+  theme: (typeof VENDORED_SOURCES)[number],
+  scheme: ReturnType<typeof parseBase24Scheme>
+): string {
   const payload: VendoredFile = {
     system: 'base24',
     name: scheme.name,

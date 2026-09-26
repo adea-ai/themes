@@ -117,9 +117,7 @@ export function themeCss(theme: AdeaTheme, options: CssOptions = {}): string {
   const indent = options.indent ?? '  '
   const entries = Object.entries(themeCssVariables(theme, options))
 
-  const body = entries
-    .map(([name, value]) => `${indent}${name}: ${value};`)
-    .join('\n')
+  const body = entries.map(([name, value]) => `${indent}${name}: ${value};`).join('\n')
 
   return `${selector} {\n${body}\n}`
 }

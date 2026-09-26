@@ -74,12 +74,7 @@ const SHIKI_SCOPES: Readonly<Record<SyntaxRole, readonly string[]>> = Object.fre
   string: ['string', 'string.quoted', 'string.template', 'punctuation.definition.string'],
   number: ['constant.numeric', 'constant.language', 'constant.other'],
   comment: ['comment', 'punctuation.definition.comment'],
-  function: [
-    'entity.name.function',
-    'support.function',
-    'meta.function-call',
-    'variable.function',
-  ],
+  function: ['entity.name.function', 'support.function', 'meta.function-call', 'variable.function'],
   variable: ['variable', 'variable.other', 'variable.parameter', 'meta.definition.variable'],
   type: ['entity.name.type', 'entity.name.class', 'support.type', 'support.class'],
   tag: ['entity.name.tag', 'meta.tag'],

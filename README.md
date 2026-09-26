@@ -11,26 +11,26 @@ bun add @adea-ai/themes
 
 ## The catalogue
 
-| Family | Variants |
-| --- | --- |
-| **Adea** | Light, Dark |
-| **Catppuccin** | Latte, Frappé, Macchiato, Mocha |
-| **Tokyo Night** | Day, Storm, Night |
-| **Rosé Pine** | Dawn, Moon, Main |
-| **Gruvbox** | Light, Dark |
-| **Everforest** | Light, Dark |
-| **Ayu** | Light, Mirage, Dark |
-| **Solarized** | Light, Dark |
-| **Monokai** | Classic |
-| **Nord**, **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each |
+| Family                                                        | Variants                        |
+| ------------------------------------------------------------- | ------------------------------- |
+| **Adea**                                                      | Light, Dark                     |
+| **Catppuccin**                                                | Latte, Frappé, Macchiato, Mocha |
+| **Tokyo Night**                                               | Day, Storm, Night               |
+| **Rosé Pine**                                                 | Dawn, Moon, Main                |
+| **Gruvbox**                                                   | Light, Dark                     |
+| **Everforest**                                                | Light, Dark                     |
+| **Ayu**                                                       | Light, Mirage, Dark             |
+| **Solarized**                                                 | Light, Dark                     |
+| **Monokai**                                                   | Classic                         |
+| **Nord**, **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each                        |
 
 `adea-light` and `adea-dark` are the defaults, and both are **composed** from two
 upstream palettes rather than authored or copied:
 
-| | canvas | canvas hue | hues |
-| --- | --- | --- | --- |
-| Adea Dark | Aardvark Ink `#0f141f` | 265° | GitHub Dark Default |
-| Adea Light | Nord Light `#e3e9f4` | 262° | GitHub Dark Default |
+|            | canvas                 | canvas hue | hues                |
+| ---------- | ---------------------- | ---------- | ------------------- |
+| Adea Dark  | Aardvark Ink `#0f141f` | 265°       | GitHub Dark Default |
+| Adea Light | Nord Light `#e3e9f4`   | 262°       | GitHub Dark Default |
 
 They share a hue donor, so a red is the same red in both and only the canvas changes;
 the canvases are three degrees apart in hue and both are tinted rather than neutral,
@@ -109,14 +109,14 @@ disagree about what colour a keyword is.
 
 Base24 is an excellent interchange format and a poor application schema: it has a
 slot for the colour of a deprecated API and nothing that means "the surface one step
-above the card". So Base24 is how values get *in* and how they get *out*:
+above the card". So Base24 is how values get _in_ and how they get _out_:
 
 ```ts
 import { toBase24, formatBase24Scheme, parseBase24Scheme } from '@adea-ai/themes'
 import { getBase24Scheme } from '@adea-ai/themes'
 
-formatBase24Scheme(toBase24(getTheme('nord')!))   // a Base24 scheme
-getBase24Scheme('nord')                            // the vendored original, untouched
+formatBase24Scheme(toBase24(getTheme('nord')!)) // a Base24 scheme
+getBase24Scheme('nord') // the vendored original, untouched
 ```
 
 `toBase24` re-derives Base24's orange and brown slots, because Adea's schema has no
@@ -125,14 +125,14 @@ need it byte-for-byte. The mapping is documented in `src/adapters/base24.ts`.
 
 ## Adapters
 
-| Import | For | Output |
-| --- | --- | --- |
-| `adapters/css` | the application | CSS custom properties in OKLCH |
-| `adapters/tailwind` | the application | a Tailwind v4 `@theme inline` block |
-| `adapters/shadcn` | this org's components | the shadcn vocabulary, bridged from the same source |
-| `adapters/xterm` | shells | xterm.js's hex-only `ITheme` |
-| `adapters/shiki` | code views | a Shiki theme registration |
-| `adapters/base24` | interop | Base24, both directions |
+| Import              | For                   | Output                                              |
+| ------------------- | --------------------- | --------------------------------------------------- |
+| `adapters/css`      | the application       | CSS custom properties in OKLCH                      |
+| `adapters/tailwind` | the application       | a Tailwind v4 `@theme inline` block                 |
+| `adapters/shadcn`   | this org's components | the shadcn vocabulary, bridged from the same source |
+| `adapters/xterm`    | shells                | xterm.js's hex-only `ITheme`                        |
+| `adapters/shiki`    | code views            | a Shiki theme registration                          |
+| `adapters/base24`   | interop               | Base24, both directions                             |
 
 The shadcn bridge is worth knowing about before you read the code: Adea's `accent`
 becomes shadcn's **`primary`**, because in shadcn `--primary` is the action colour and
