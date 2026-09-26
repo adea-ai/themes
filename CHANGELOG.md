@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/adea-ai/themes/compare/v0.4.3...v0.5.0) (2026-09-26)
+
+
+### Features
+
+* support isolated themes and native ESM consumers ([#6](https://github.com/adea-ai/themes/issues/6)) ([ba1493a](https://github.com/adea-ai/themes/commit/ba1493afd99a974bde0c66fdde4358e1e40753e9))
+
 ## [0.4.3](https://github.com/adea-ai/themes/compare/v0.4.2...v0.4.3) (2026-09-26)
 
 
