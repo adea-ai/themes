@@ -91,6 +91,11 @@ terminal.options.theme = toXtermTheme(theme)
 const highlighter = await createHighlighter({ themes: [toShikiTheme(theme)], langs: [...] })
 ```
 
+`syntaxRolesHex(theme)` keeps comments at the catalogue's intentionally quiet default.
+For editor palettes where comments and diff markers are small content text,
+`editorRolesHex(theme)` returns the editor roles with every rounded hex value checked
+against a 4.5:1 contrast floor. The source syntax palette remains unchanged.
+
 Every exported theme value is an `oklch()` string, which means the browser does the
 colour work and a consumer can compose — `color-mix(in oklch, var(--adea-accent),
 transparent 20%)` — and get a predictable result. The adapters that need hex (xterm,

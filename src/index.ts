@@ -123,11 +123,12 @@ export type { NormalizationFinding, NormalizedTheme, ThemeSourceSpec } from './n
 export { CONTRAST_FLOORS, normalizeTheme } from './normalize.js'
 
 /* --- Derived colours --------------------------------------------------- */
-export type { StatusRole, SyntaxRole } from './derive.js'
+export type { EditorRole, StatusRole, SyntaxRole } from './derive.js'
 export {
   CHART_SERIES,
   STATUS_ROLES,
   chartSeries,
+  editorRolesHex,
   statusForeground,
   statusForegroundHex,
   syntaxRoles,

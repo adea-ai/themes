@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { getBase24Scheme, getTheme, themes } from '../src'
+import { editorRolesHex, getBase24Scheme, getTheme, themes } from '../src'
 import {
   BASE24_SLOTS,
   formatBase24Scheme,
@@ -13,7 +13,7 @@ import { toXtermTheme } from '../src/adapters/xterm'
 import { catalogueCss, themeCssVariables } from '../src/adapters/css'
 import { toTailwindTheme } from '../src/adapters/tailwind'
 import { SHADCN_MAPPING, shadcnVariables } from '../src/adapters/shadcn'
-import { chartSeries, statusForeground, syntaxRoles, tint } from '../src/derive'
+import { chartSeries, statusForeground, syntaxRoles, syntaxRolesHex, tint } from '../src/derive'
 import { contrastRatio, formatOklch, hexToOklch, oklchToHex, parseColor } from '../src/oklch'
 
 /**
@@ -523,6 +523,41 @@ describe('derived colours', () => {
         comment,
         `${theme.id} comment (${comment.toFixed(2)}:1) is not quieter than text (${text.toFixed(2)}:1)`
       ).toBeLessThan(text)
+    }
+  })
+
+  test('the canonical editor projection meets its contrast floor after hex rounding', () => {
+    const theme = getTheme('contrast-dark')!
+    const canonical = syntaxRolesHex(theme)
+    const projected = editorRolesHex(theme)
+
+    expect(oklchToHex(parseColor(theme.ansi.brightBlack)!)).toBe('#57606a')
+    expect(canonical.comment).toBe('#57606a')
+    expect(projected.comment).toBe('#6c7680')
+    for (const [role, value] of Object.entries(projected)) {
+      const ratio = contrastRatio(parseColor(value)!, parseColor(theme.colors.background)!)
+      expect(ratio, `${role} is ${ratio.toFixed(5)}:1 after hex rounding`).toBeGreaterThanOrEqual(
+        4.5
+      )
+    }
+  })
+
+  test('the six first-party editor palettes clear 4.5:1 in their rendered hex roles', () => {
+    for (const id of [
+      'adea-light',
+      'adea-dark',
+      'slate-light',
+      'slate-dark',
+      'contrast-light',
+      'contrast-dark',
+    ]) {
+      const theme = getTheme(id)!
+      const roles = editorRolesHex(theme)
+      expect(Object.keys(roles)).toHaveLength(16)
+      for (const [role, value] of Object.entries(roles)) {
+        const ratio = contrastRatio(parseColor(value)!, parseColor(theme.colors.background)!)
+        expect(ratio, `${id} editor.${role} is ${ratio.toFixed(5)}:1`).toBeGreaterThanOrEqual(4.5)
+      }
     }
   })
 })
