@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/adea-ai/themes/compare/v0.6.0...v0.6.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* keep editor hex roles above contrast floor ([#13](https://github.com/adea-ai/themes/issues/13)) ([d412629](https://github.com/adea-ai/themes/commit/d412629fc466f480273a89904f8be506aa11e505))
+
 ## [0.6.0](https://github.com/adea-ai/themes/compare/v0.5.1...v0.6.0) (2026-09-27)
 
 
