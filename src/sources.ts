@@ -3,8 +3,8 @@
  *
  * Two lists. {@link VENDORED_SOURCES} names the Base24 schemes that
  * `scripts/vendor-palettes.ts` reproduces from upstream, and {@link AUTHORED_SOURCES}
- * is Adea's own theme, which has no upstream to vendor from. Together they are the
- * catalogue's input; `scripts/build-catalogue.ts` runs them all through the
+ * records Adea-owned themes that have no upstream palette to vendor. Together they
+ * are the catalogue's input; `scripts/build-catalogue.ts` runs them all through the
  * normalizer and writes the committed output.
  *
  * ## Provenance is per-family, and it was checked rather than assumed
@@ -29,8 +29,9 @@
  * which is itself derived from `iTerm2-Color-Schemes` at a pinned revision, which
  * is where the per-family values were first published as terminal schemes. Each
  * family's official project is recorded as the design's origin, and the values were
- * checked against those projects' published palettes — the backgrounds and
- * foregrounds of all fourteen families match the official palettes exactly.
+ * checked against those projects' published palettes — imported backgrounds and
+ * foregrounds match their official palettes exactly. Adea's composed and authored
+ * families are asserted from their own source definitions instead.
  *
  * `tests/provenance.test.ts` holds those official values as assertions, so the
  * claim "this is really Catppuccin Mocha" fails the build rather than drifting.
@@ -38,7 +39,7 @@
 
 import type { Base24Slot } from './adapters/base24.js'
 import { CONTRAST_FLOORS } from './normalize.js'
-import type { ThemeAppearance, ThemeProvenance } from './schema.js'
+import type { ShadcnThemeProjection, ThemeAppearance, ThemeProvenance } from './schema.js'
 
 /** The dataset the Base24 schemes are reproduced from. */
 export const CATALOGUE_REPOSITORY = 'https://github.com/williamzujkowski/oklch-terminal-themes'
@@ -338,6 +339,16 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
  */
 export const FAMILY_PROVENANCE: Readonly<Record<string, ThemeProvenance>> = Object.freeze({
   adea: ADEA_PROVENANCE,
+  slate: {
+    project: 'Adea',
+    url: 'https://github.com/adea-ai/adea',
+    license: 'Apache-2.0',
+  },
+  contrast: {
+    project: 'Adea',
+    url: 'https://github.com/adea-ai/adea',
+    license: 'Apache-2.0',
+  },
   catppuccin: {
     project: 'Catppuccin',
     url: 'https://github.com/catppuccin/catppuccin',
@@ -768,24 +779,13 @@ export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
 ])
 
 /**
- * Adea's own theme.
+ * Adea-authored themes whose exact semantic values have no external palette to vendor.
  *
- * Authored here rather than vendored, and the only entry whose colours are chosen
- * rather than reproduced. It is deliberately a neutral ladder with a monochrome
- * accent — the design system's default has to work as a default for everyone, which
- * means it cannot be anybody's favourite colour.
- *
- * Intentionally empty, and worth leaving that way until something needs it.
- *
- * This was where both default themes lived. They are now
- * {@link COMPOSED_SOURCES} entries instead, which is a better home for them: a
- * composition names the upstream palettes it came from and can be rebuilt when either
- * moves, while an authored entry is a table of values nobody can refresh.
- *
- * The route stays because it is the only way to specify *semantic* roles directly
- * rather than deriving them through Base24 slots — which is what a brand theme with
- * values handed over by a designer would need. Nothing uses it today; if nothing has by
- * the time someone reads this, delete it.
+ * The default pair is composed above because its donors can be named and refreshed.
+ * Slate and High Contrast are retained from the product's own appearance registry:
+ * these hand-maintained semantic roles are the source, not a transcription of a
+ * third-party palette. Their optional shadcn projection keeps distinctions (including
+ * source-authored alpha) that the canonical opaque roles cannot represent.
  */
 export interface AuthoredSource {
   id: string
@@ -817,6 +817,8 @@ export interface AuthoredSource {
   }
   accent: string
   accentForeground: string
+  /** Exact shadcn values for authored distinctions outside the canonical schema. */
+  shadcn?: ShadcnThemeProjection
   status: {
     success: string
     warning: string
@@ -853,4 +855,215 @@ export interface AuthoredSource {
   selection: string
 }
 
-export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([])
+const SLATE_ANSI: AuthoredSource['ansi'] = {
+  black: '#1b1f24',
+  red: '#b91c1c',
+  green: '#116a2e',
+  yellow: '#8a5a1b',
+  blue: '#0b57d0',
+  magenta: '#a0186f',
+  cyan: '#0e7490',
+  white: '#57606a',
+  brightBlack: '#57606a',
+  brightRed: '#c94d4d',
+  brightGreen: '#1f9d4f',
+  brightYellow: '#a9752c',
+  brightBlue: '#3b82f6',
+  brightMagenta: '#c04a92',
+  brightCyan: '#0891b2',
+  brightWhite: '#24292f',
+}
+
+const CONTRAST_ANSI: AuthoredSource['ansi'] = {
+  black: '#2f3742',
+  red: '#ff8183',
+  green: '#56d364',
+  yellow: '#e3b341',
+  blue: '#6ca4f8',
+  magenta: '#db61a2',
+  cyan: '#39c5cf',
+  white: '#d5dde5',
+  brightBlack: '#57606a',
+  brightRed: '#ff9494',
+  brightGreen: '#79dd8a',
+  brightYellow: '#f0c264',
+  brightBlue: '#8db9ff',
+  brightMagenta: '#e87cb4',
+  brightCyan: '#66d3dc',
+  brightWhite: '#eef2f6',
+}
+
+export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
+  {
+    id: 'slate-light',
+    family: 'slate',
+    familyLabel: 'Slate',
+    label: 'Light',
+    name: 'Slate Light',
+    description: 'Adea’s slate neutral palette for light appearance.',
+    appearance: 'light',
+    tags: ['light', 'slate', 'neutral'],
+    ramp: {
+      background: '#f8fafc',
+      foreground: '#0f172a',
+      surface: '#f8fafc',
+      surfaceElevated: '#f8fafc',
+      surfaceHover: '#e2e8f0',
+      surfaceActive: '#e2e8f0',
+      border: '#cbd5e1',
+      borderMuted: '#cbd5e1',
+      textMuted: '#475569',
+      textSubtle: '#64748b',
+    },
+    accent: '#0f172a',
+    accentForeground: '#f8fafc',
+    status: {
+      success: '#15803d',
+      warning: SLATE_ANSI.yellow,
+      error: '#b91c1c',
+      info: SLATE_ANSI.blue,
+    },
+    ansi: SLATE_ANSI,
+    cursor: '#24292f',
+    selection: '#b6c7ff',
+    shadcn: {
+      card: '#ffffff',
+      popover: '#ffffff',
+      secondary: '#e2e8f0',
+      muted: '#e2e8f0',
+      border: '#cbd5e1',
+      input: '#cbd5e1',
+      ring: '#64748b',
+    },
+  },
+  {
+    id: 'slate-dark',
+    family: 'slate',
+    familyLabel: 'Slate',
+    label: 'Dark',
+    name: 'Slate Dark',
+    description: 'Adea’s slate neutral palette for dark appearance.',
+    appearance: 'dark',
+    tags: ['dark', 'slate', 'neutral'],
+    ramp: {
+      background: '#0f172a',
+      foreground: '#f1f5f9',
+      surface: '#1e293b',
+      surfaceElevated: '#1e293b',
+      surfaceHover: '#334155',
+      surfaceActive: '#334155',
+      border: '#94a3b8',
+      borderMuted: '#94a3b8',
+      textMuted: '#94a3b8',
+      textSubtle: '#64748b',
+    },
+    accent: '#e2e8f0',
+    accentForeground: '#0f172a',
+    status: {
+      success: '#4ade80',
+      warning: CONTRAST_ANSI.yellow,
+      error: '#f87171',
+      info: CONTRAST_ANSI.blue,
+    },
+    ansi: CONTRAST_ANSI,
+    cursor: '#e6edf3',
+    selection: '#264f78',
+    shadcn: {
+      card: '#1e293b',
+      popover: '#1e293b',
+      secondary: '#334155',
+      muted: '#334155',
+      // The old #94a3b8 remains canonical `textMuted`, but shared UI components
+      // also pair this role with the #334155 muted fill. Move lightness by the
+      // smallest 0.032 OKLCH step that clears 4.5:1 after sRGB conversion.
+      mutedForeground: 'oklch(0.7427 0.0351 256.79)',
+      border: 'rgba(148, 163, 184, 0.2)',
+      input: 'rgba(148, 163, 184, 0.25)',
+      ring: '#64748b',
+    },
+  },
+  {
+    id: 'contrast-light',
+    family: 'contrast',
+    familyLabel: 'High Contrast',
+    label: 'Light',
+    name: 'High Contrast Light',
+    description: 'Adea’s high-contrast palette for light appearance.',
+    appearance: 'light',
+    tags: ['light', 'high-contrast'],
+    ramp: {
+      background: '#ffffff',
+      foreground: '#000000',
+      surface: '#ffffff',
+      surfaceElevated: '#ffffff',
+      surfaceHover: '#f0f0f0',
+      surfaceActive: '#f0f0f0',
+      border: '#767676',
+      borderMuted: '#767676',
+      textMuted: '#333333',
+      textSubtle: '#767676',
+    },
+    accent: '#143d8f',
+    accentForeground: '#ffffff',
+    status: {
+      success: '#14532d',
+      warning: SLATE_ANSI.yellow,
+      error: '#b91c1c',
+      info: SLATE_ANSI.blue,
+    },
+    ansi: SLATE_ANSI,
+    cursor: '#24292f',
+    selection: '#b6c7ff',
+    shadcn: {
+      card: '#ffffff',
+      popover: '#ffffff',
+      secondary: '#f0f0f0',
+      muted: '#f0f0f0',
+      border: '#767676',
+      input: '#767676',
+      ring: '#000000',
+    },
+  },
+  {
+    id: 'contrast-dark',
+    family: 'contrast',
+    familyLabel: 'High Contrast',
+    label: 'Dark',
+    name: 'High Contrast Dark',
+    description: 'Adea’s high-contrast palette for dark appearance.',
+    appearance: 'dark',
+    tags: ['dark', 'high-contrast'],
+    ramp: {
+      background: '#000000',
+      foreground: '#ffffff',
+      surface: '#0a0a0a',
+      surfaceElevated: '#0a0a0a',
+      surfaceHover: '#1a1a1a',
+      surfaceActive: '#1a1a1a',
+      border: '#8f8f8f',
+      borderMuted: '#8f8f8f',
+      textMuted: '#e5e5e5',
+      textSubtle: '#8f8f8f',
+    },
+    accent: '#8ab4ff',
+    accentForeground: '#000000',
+    status: {
+      success: '#4ade80',
+      warning: CONTRAST_ANSI.yellow,
+      error: '#ff6b6b',
+      info: CONTRAST_ANSI.blue,
+    },
+    ansi: CONTRAST_ANSI,
+    cursor: '#e6edf3',
+    selection: '#264f78',
+    shadcn: {
+      card: '#0a0a0a',
+      popover: '#0a0a0a',
+      secondary: '#1a1a1a',
+      muted: '#1a1a1a',
+      border: '#8f8f8f',
+      input: '#8f8f8f',
+      ring: '#ffffff',
+    },
+  },
+])

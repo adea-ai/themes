@@ -200,6 +200,7 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
         error: theme.status.error,
         info: theme.status.info,
       },
+      ...(theme.shadcn ? { shadcn: theme.shadcn } : {}),
       ansi,
       cursor: theme.cursor,
       selection: theme.selection,

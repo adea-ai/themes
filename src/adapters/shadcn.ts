@@ -22,8 +22,11 @@
  * A table of the whole mapping is in `docs/shadcn-bridge.md`.
  */
 
-import type { AdeaTheme, AdeaThemeColors } from '../schema.js'
+import type { AdeaTheme, AdeaThemeColors, ShadcnThemeProjection } from '../schema.js'
 import { STATUS_ROLES, statusForeground, tint } from '../derive.js'
+
+/** A canonical theme with optional owner-authored shadcn presentation values. */
+export type ShadcnTheme = AdeaTheme & { shadcn?: ShadcnThemeProjection }
 
 /**
  * Canonical role → shadcn custom-property name.
@@ -62,7 +65,7 @@ export const SHADCN_MAPPING: Readonly<Record<keyof AdeaThemeColors, string>> = O
  * screen, a component reading `theme.colors.card` — rather than writing it straight
  * to the document.
  */
-export function shadcnRoles(theme: AdeaTheme): Record<string, string> {
+export function shadcnRoles(theme: ShadcnTheme): Record<string, string> {
   return Object.fromEntries(
     Object.entries(shadcnVariables(theme)).map(([name, value]) => [name.replace(/^--/, ''), value])
   )
@@ -76,7 +79,7 @@ export function shadcnRoles(theme: AdeaTheme): Record<string, string> {
  * accent, because that is what a focus ring must be drawn in for the focus state
  * to be visible.
  */
-export function shadcnVariables(theme: AdeaTheme): Record<string, string> {
+export function shadcnVariables(theme: ShadcnTheme): Record<string, string> {
   const variables: Record<string, string> = {}
 
   for (const [role, name] of Object.entries(SHADCN_MAPPING) as [keyof AdeaThemeColors, string][]) {
@@ -85,19 +88,22 @@ export function shadcnVariables(theme: AdeaTheme): Record<string, string> {
 
   variables['--accent'] = theme.colors.surfaceHover
   variables['--accent-foreground'] = theme.colors.text
-  variables['--ring'] = theme.colors.accent
-  variables['--input'] = theme.colors.border
+  variables['--ring'] = theme.shadcn?.ring ?? theme.colors.accent
+  variables['--input'] = theme.shadcn?.input ?? theme.colors.border
 
   // The rest of shadcn's default vocabulary. These are not in `SHADCN_MAPPING`
   // because they are not new *roles* — shadcn's `secondary` and `muted` are both the
   // first surface rung used as a fill, and its `card-foreground` is the body text —
   // so they are filled from the roles that already exist rather than getting
   // second-class entries of their own.
+  variables['--card'] = theme.shadcn?.card ?? theme.colors.surface
+  variables['--popover'] = theme.shadcn?.popover ?? theme.colors.surfaceElevated
   variables['--card-foreground'] = theme.colors.text
   variables['--popover-foreground'] = theme.colors.text
-  variables['--secondary'] = theme.colors.surface
+  variables['--secondary'] = theme.shadcn?.secondary ?? theme.colors.surface
   variables['--secondary-foreground'] = theme.colors.text
-  variables['--muted'] = theme.colors.surface
+  variables['--muted'] = theme.shadcn?.muted ?? theme.colors.surface
+  variables['--muted-foreground'] = theme.shadcn?.mutedForeground ?? theme.colors.textMuted
   variables['--sidebar'] = theme.colors.surface
   variables['--sidebar-foreground'] = theme.colors.text
   variables['--sidebar-accent'] = theme.colors.surfaceHover
@@ -121,6 +127,11 @@ export function shadcnVariables(theme: AdeaTheme): Record<string, string> {
   variables['--surface-raised'] = theme.colors.surfaceElevated
   variables['--surface-overlay'] = theme.colors.surfaceElevated
 
+  // Owner-authored legacy roles can differ from the canonical default. These
+  // values stay in the record's typed source projection so a consumer does not
+  // recreate palette decisions in its own adapter.
+  if (theme.shadcn?.border) variables['--border'] = theme.shadcn.border
+
   variables['--cursor'] = theme.cursor
   variables['--selection'] = theme.selection
 
@@ -128,7 +139,7 @@ export function shadcnVariables(theme: AdeaTheme): Record<string, string> {
 }
 
 /** The shadcn variables as a CSS rule. */
-export function shadcnCss(theme: AdeaTheme, selector = ':root'): string {
+export function shadcnCss(theme: ShadcnTheme, selector = ':root'): string {
   const body = Object.entries(shadcnVariables(theme))
     .map(([name, value]) => `  ${name}: ${value};`)
     .join('\n')

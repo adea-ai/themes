@@ -207,6 +207,42 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     }
   },
   {
+    "id": "contrast-dark",
+    "name": "High Contrast Dark",
+    "appearance": "dark",
+    "family": "contrast",
+    "familyLabel": "High Contrast",
+    "label": "Dark",
+    "description": "Adea’s high-contrast palette for dark appearance.",
+    "tags": [
+      "dark",
+      "high-contrast"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/adea",
+      "license": "Apache-2.0"
+    }
+  },
+  {
+    "id": "contrast-light",
+    "name": "High Contrast Light",
+    "appearance": "light",
+    "family": "contrast",
+    "familyLabel": "High Contrast",
+    "label": "Light",
+    "description": "Adea’s high-contrast palette for light appearance.",
+    "tags": [
+      "light",
+      "high-contrast"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/adea",
+      "license": "Apache-2.0"
+    }
+  },
+  {
     "id": "dracula",
     "name": "Dracula",
     "appearance": "dark",
@@ -472,6 +508,44 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
       "bootstrappedFrom": [
         "https://github.com/mbadolato/iTerm2-Color-Schemes"
       ]
+    }
+  },
+  {
+    "id": "slate-dark",
+    "name": "Slate Dark",
+    "appearance": "dark",
+    "family": "slate",
+    "familyLabel": "Slate",
+    "label": "Dark",
+    "description": "Adea’s slate neutral palette for dark appearance.",
+    "tags": [
+      "dark",
+      "slate",
+      "neutral"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/adea",
+      "license": "Apache-2.0"
+    }
+  },
+  {
+    "id": "slate-light",
+    "name": "Slate Light",
+    "appearance": "light",
+    "family": "slate",
+    "familyLabel": "Slate",
+    "label": "Light",
+    "description": "Adea’s slate neutral palette for light appearance.",
+    "tags": [
+      "light",
+      "slate",
+      "neutral"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/adea",
+      "license": "Apache-2.0"
     }
   },
   {

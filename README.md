@@ -1,9 +1,9 @@
 # @adea-ai/themes
 
-The Adea theme catalogue. Twenty-seven themes — every one an OKLCH theme with the
+The Adea theme catalogue. Thirty-one themes — every one an OKLCH theme with the
 full set of semantic surface roles, sixteen ANSI colours, a cursor and a selection —
-normalized from mature upstream palettes, with adapters for the places a theme has
-to arrive in a foreign shape.
+including first-party Adea palettes and mature upstream palettes normalized through
+the same adapters.
 
 ```sh
 bun add @adea-ai/themes
@@ -14,6 +14,8 @@ bun add @adea-ai/themes
 | Family                                                        | Variants                        |
 | ------------------------------------------------------------- | ------------------------------- |
 | **Adea**                                                      | Light, Dark                     |
+| **Slate**                                                     | Light, Dark                     |
+| **High Contrast**                                             | Light, Dark                     |
 | **Catppuccin**                                                | Latte, Frappé, Macchiato, Mocha |
 | **Tokyo Night**                                               | Day, Storm, Night               |
 | **Rosé Pine**                                                 | Dawn, Moon, Main                |
@@ -40,8 +42,9 @@ hue and chroma for every chromatic role, canvases in one hue family — because 
 halves are built from different donors and could otherwise drift apart without either
 becoming wrong on its own.
 
-Everything else is somebody else's palette, reproduced from a named revision and
-credited in [NOTICE](NOTICE).
+The Slate and High Contrast variants are first-party Adea palettes retained from the
+product's appearance registry. The other twenty-five themes reproduce somebody else's
+palette from a named revision and are credited in [NOTICE](NOTICE).
 
 ## Using it
 
@@ -95,12 +98,12 @@ Shiki) convert, gamut-mapping rather than clipping.
 
 ## The design, in four decisions
 
-**Adea owns the schema and the transformation, not the colours.** The seventeen
-surface roles in `src/schema.ts` are the contract. No upstream project is asked to
-satisfy it, and no palette is hand-authored here: `palettes/` holds Base24 schemes
-reproduced from a pinned revision, and `src/normalize.ts` is the single place a
-terminal palette becomes an application theme. Adding a theme is a line in
-`src/sources.ts` plus a rebuild.
+**Adea owns the schema and the transformation.** The seventeen surface roles in
+`src/schema.ts` are the contract. No upstream project is asked to satisfy it.
+`palettes/` holds Base24 schemes reproduced from a pinned revision; the Slate and
+High Contrast families are first-party authored semantic palettes; and
+`src/normalize.ts` is the single place an input becomes a canonical application theme.
+Adding a theme is a line in `src/sources.ts` plus a rebuild.
 
 A theme may also be **composed from two donors** — one supplying the structure, another
 the hues — which is how both of Adea's own themes are built. The composition is a slot

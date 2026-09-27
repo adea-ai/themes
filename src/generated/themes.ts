@@ -16,24 +16,28 @@ import theme5 from './themes/catppuccin-frappe.js'
 import theme6 from './themes/catppuccin-latte.js'
 import theme7 from './themes/catppuccin-macchiato.js'
 import theme8 from './themes/catppuccin-mocha.js'
-import theme9 from './themes/dracula.js'
-import theme10 from './themes/everforest-dark.js'
-import theme11 from './themes/everforest-light.js'
-import theme12 from './themes/gruvbox-dark.js'
-import theme13 from './themes/gruvbox-light.js'
-import theme14 from './themes/kanagawa.js'
-import theme15 from './themes/monokai.js'
-import theme16 from './themes/nord.js'
-import theme17 from './themes/one-dark.js'
-import theme18 from './themes/rosepine.js'
-import theme19 from './themes/rosepine-dawn.js'
-import theme20 from './themes/rosepine-moon.js'
-import theme21 from './themes/solarized-dark.js'
-import theme22 from './themes/solarized-light.js'
-import theme23 from './themes/tokyonight-day.js'
-import theme24 from './themes/tokyonight-night.js'
-import theme25 from './themes/tokyonight-storm.js'
-import theme26 from './themes/vesper.js'
+import theme9 from './themes/contrast-dark.js'
+import theme10 from './themes/contrast-light.js'
+import theme11 from './themes/dracula.js'
+import theme12 from './themes/everforest-dark.js'
+import theme13 from './themes/everforest-light.js'
+import theme14 from './themes/gruvbox-dark.js'
+import theme15 from './themes/gruvbox-light.js'
+import theme16 from './themes/kanagawa.js'
+import theme17 from './themes/monokai.js'
+import theme18 from './themes/nord.js'
+import theme19 from './themes/one-dark.js'
+import theme20 from './themes/rosepine.js'
+import theme21 from './themes/rosepine-dawn.js'
+import theme22 from './themes/rosepine-moon.js'
+import theme23 from './themes/slate-dark.js'
+import theme24 from './themes/slate-light.js'
+import theme25 from './themes/solarized-dark.js'
+import theme26 from './themes/solarized-light.js'
+import theme27 from './themes/tokyonight-day.js'
+import theme28 from './themes/tokyonight-night.js'
+import theme29 from './themes/tokyonight-storm.js'
+import theme30 from './themes/vesper.js'
 
 /** Every theme in the catalogue, ordered by id. */
 export const generatedThemes: readonly AdeaThemeRecord[] = Object.freeze([
@@ -64,4 +68,8 @@ export const generatedThemes: readonly AdeaThemeRecord[] = Object.freeze([
   theme24,
   theme25,
   theme26,
+  theme27,
+  theme28,
+  theme29,
+  theme30,
 ])

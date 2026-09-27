@@ -4,8 +4,9 @@ import { getTheme, themes } from '../src'
 import { contrastRatio, oklchToHex, parseColor } from '../src/oklch'
 
 /**
- * The catalogue claims to hold *other people's palettes*, and this file is what
- * makes that claim checkable.
+ * The catalogue claims to hold named palettes, and this file is what makes that
+ * claim checkable. Imported palettes are asserted against their upstream projects;
+ * Adea-authored palettes are asserted against their owner-maintained source values.
  *
  * Every value below was read from the upstream project's own published palette — the
  * background and foreground each project's documentation and source files state —
@@ -149,7 +150,7 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Monokai's olive ground.
   { id: 'monokai', background: '#272822', signature: { role: 'accent', hue: [285, 310] } },
 
-  // Adea's own two. Both are *composed*, so the entries here are the half that comes
+  // Adea's composed defaults. Both are *composed*, so the entries here are the half that comes
   // from each one's structure donor; the suites below assert the other half, and the
   // light one's canvas carries a recorded chroma correction (see `COMPOSED_SOURCES`).
   // The foreground is asserted by hue: the theme is held to AAA on every surface it
@@ -158,6 +159,13 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // assertion below the pair suite checks.
   { id: 'adea-light', background: '#e3e9f4', foregroundHue: 266.5 },
   { id: 'adea-dark', background: '#0f141f', foreground: '#b4bcca' },
+
+  // Adea's retained Slate and High Contrast variants, asserted against the
+  // product-owned source palette rather than attributed to an upstream terminal theme.
+  { id: 'slate-light', background: '#f8fafc', foreground: '#0f172a' },
+  { id: 'slate-dark', background: '#0f172a', foreground: '#f1f5f9' },
+  { id: 'contrast-light', background: '#ffffff', foreground: '#000000' },
+  { id: 'contrast-dark', background: '#000000', foreground: '#ffffff' },
 ])
 
 /** A theme role as hex, which is how upstream palettes are published. */
@@ -459,13 +467,38 @@ describe('provenance', () => {
   })
 
   test('every imported theme records what its values were bootstrapped from', () => {
-    // Adea's own theme is authored, so it is the only one without a chain.
-    const imported = themes.filter((theme) => theme.family !== 'adea')
+    // Adea-authored variants are not assigned an invented upstream palette.
+    const imported = themes.filter((theme) => theme.provenance.project !== 'Adea')
     for (const theme of imported) {
       expect(
         theme.provenance.bootstrappedFrom?.length ?? 0,
         `${theme.id} does not record where its values came from`
       ).toBeGreaterThan(0)
+    }
+  })
+
+  test('legacy Slate and High Contrast records keep their Adea family identity and source', () => {
+    const expected = [
+      ['slate-light', 'slate', 'Slate', 'Light', 'light'],
+      ['slate-dark', 'slate', 'Slate', 'Dark', 'dark'],
+      ['contrast-light', 'contrast', 'High Contrast', 'Light', 'light'],
+      ['contrast-dark', 'contrast', 'High Contrast', 'Dark', 'dark'],
+    ] as const
+
+    for (const [id, family, familyLabel, label, appearance] of expected) {
+      const theme = getTheme(id)
+      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
+      if (!theme) continue
+      expect(theme.family).toBe(family)
+      expect(theme.familyLabel).toBe(familyLabel)
+      expect(theme.label).toBe(label)
+      expect(theme.name).toBe(`${familyLabel} ${label}`)
+      expect(theme.appearance).toBe(appearance)
+      expect(theme.provenance).toEqual({
+        project: 'Adea',
+        url: 'https://github.com/adea-ai/adea',
+        license: 'Apache-2.0',
+      })
     }
   })
 

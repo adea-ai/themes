@@ -12,14 +12,13 @@ specific language governing permissions and limitations under the License.
 
 ---
 
-# Third-party palettes
+# Palette provenance
 
-Every theme in this package except Adea's own two is **somebody else's palette**,
-reproduced rather than authored. This section records whose, under what terms, and
-where the specific bytes came from. The per-theme machine-readable form of the same
-information is on each catalogue entry's `provenance` field, and
-`tests/provenance.test.ts` asserts that the values match each project's published
-palette.
+Six themes are Adea-authored: the composed Adea Light and Dark defaults, and the Slate
+and High Contrast light/dark variants. The other twenty-five themes reproduce
+third-party palettes. This section records the sources, terms, and where those values
+came from. The per-theme machine-readable form is on each catalogue entry's
+`provenance` field, and `tests/provenance.test.ts` asserts the published source values.
 
 ## The chain of custody
 
@@ -49,7 +48,9 @@ palette.
 
 | Family | Project | Licence | Vendored values |
 | --- | --- | --- | --- |
-| Adea | this package | Apache-2.0 | composed from the two donors below |
+| Adea (defaults) | this package | Apache-2.0 plus donor terms below | composed from the two donors below |
+| Slate | https://github.com/adea-ai/adea | Apache-2.0 | first-party product appearance registry |
+| High Contrast | https://github.com/adea-ai/adea | Apache-2.0 | first-party product appearance registry |
 | Nord | https://github.com/nordtheme/nord | MIT | via the chain above |
 | Catppuccin | https://github.com/catppuccin/catppuccin | MIT | via the chain above |
 | Tokyo Night | https://github.com/folke/tokyonight.nvim | Apache-2.0 | via the chain above |
