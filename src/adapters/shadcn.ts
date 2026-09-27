@@ -23,6 +23,7 @@
  */
 
 import type { AdeaTheme, AdeaThemeColors, ShadcnThemeProjection } from '../schema.js'
+import { primaryHover, primarySubtleCss } from '../accents.js'
 import { STATUS_ROLES, statusForeground, tint } from '../derive.js'
 import {
   contrastRatio,
@@ -197,6 +198,12 @@ export function shadcnVariables(theme: ShadcnTheme): Record<string, string> {
   for (const [role, name] of Object.entries(SHADCN_MAPPING) as [keyof AdeaThemeColors, string][]) {
     variables[`--${name}`] = role === 'error' ? destructive.fill : theme.colors[role]
   }
+
+  // Keep primary states on the shared appearance-aware accent derivation. Hover is
+  // resolved because its uniform lightness step cannot be expressed as a mix; the
+  // subtle tint stays tied to --primary so it follows runtime primary overrides.
+  variables['--primary-hover'] = primaryHover(theme.colors.accent, theme.appearance)
+  variables['--primary-subtle'] = primarySubtleCss(theme.appearance)
 
   variables['--accent'] = theme.colors.surfaceHover
   variables['--accent-foreground'] = theme.colors.text

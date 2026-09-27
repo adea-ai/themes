@@ -109,13 +109,17 @@ describe('packed package in a native ESM consumer', () => {
     expect(
       run(`
       import { shadcnDestructiveProjection, shadcnVariables } from '@adea-ai/themes/adapters/shadcn';
-      import { getTheme } from '@adea-ai/themes';
+      import { getTheme, primaryHover, primarySubtleCss } from '@adea-ai/themes';
       const theme = getTheme('adea-dark');
       const projection = shadcnDestructiveProjection(theme);
       const variables = shadcnVariables(theme);
       if (variables['--destructive'] !== projection.fill
           || variables['--destructive-foreground'] !== projection.foreground) {
         throw new Error('destructive projection differs from the shadcn adapter');
+      }
+      if (variables['--primary-hover'] !== primaryHover(theme.colors.accent, theme.appearance)
+          || variables['--primary-subtle'] !== primarySubtleCss(theme.appearance)) {
+        throw new Error('primary state derivation differs from the shadcn adapter');
       }
       console.log(variables['--primary']);
     `)

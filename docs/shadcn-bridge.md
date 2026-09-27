@@ -25,7 +25,7 @@ are not a plain rename.
 | `text`                | `--foreground`                                                                      |                                                         |
 | `textMuted`           | `--muted-foreground`                                                                |                                                         |
 | `textSubtle`          | `--subtle-foreground`                                                               |                                                         |
-| `accent`              | **`--primary`**, `--ring`                                                           | see below                                               |
+| `accent`              | **`--primary`**, `--primary-hover`, `--primary-subtle`, `--ring`                    | see below                                               |
 | `accentForeground`    | `--primary-foreground`                                                              |                                                         |
 | `success`             | `--success`                                                                         |                                                         |
 | `warning`             | `--warning`                                                                         |                                                         |
@@ -53,6 +53,15 @@ would paint every primary button as a hover wash.
 The shadcn `--accent` slot is therefore filled from `surfaceHover`, which is what it
 is actually used for, and `--ring` is filled from the accent, because a focus ring
 drawn in anything else is a focus state that cannot be seen.
+
+The bridge also emits the primary's two state values from the shared accent
+derivations in `src/accents.ts`. `--primary-hover` applies the same fixed lightness
+step as `primaryHover`, moving away from the canvas (darker in light themes, lighter
+in dark themes) while retaining the primary hue. `--primary-subtle` uses
+`primarySubtleCss`, a `color-mix()` over `var(--primary)` with the appearance-specific
+tint strength, so it follows a runtime override of `--primary`. The adapter tests
+check both values and the primary foreground's 4.5:1 contrast on the hover fill for
+every exported theme.
 
 ### `border` fills both `--border` and `--input`
 

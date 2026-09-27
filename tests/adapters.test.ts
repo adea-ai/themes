@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
-import { editorRolesHex, getBase24Scheme, getTheme, themes } from '../src'
+import {
+  editorRolesHex,
+  getBase24Scheme,
+  getTheme,
+  primaryHover,
+  primarySubtleCss,
+  themes,
+} from '../src'
 import {
   BASE24_SLOTS,
   formatBase24Scheme,
@@ -269,6 +276,8 @@ describe('shadcn bridge', () => {
       '--popover-foreground',
       '--primary',
       '--primary-foreground',
+      '--primary-hover',
+      '--primary-subtle',
       '--secondary',
       '--muted',
       '--muted-foreground',
@@ -289,6 +298,35 @@ describe('shadcn bridge', () => {
     ]
     for (const name of required) {
       expect(variables[name], `${name} is unmapped`).toBeTruthy()
+    }
+  })
+
+  test('primary state tokens use the canonical appearance-aware derivation for every theme', () => {
+    for (const theme of themes) {
+      const variables = shadcnVariables(theme)
+      const hover = variables['--primary-hover']
+      const primaryForeground = variables['--primary-foreground']
+      const hoverForeground = parseColor(primaryForeground ?? '')
+      const hoverFill = parseColor(hover ?? '')
+
+      expect(variables['--primary'], `${theme.id} primary`).toBe(theme.colors.accent)
+      expect(primaryForeground, `${theme.id} primary foreground`).toBe(
+        theme.colors.accentForeground
+      )
+      expect(hover, `${theme.id} primary hover`).toBe(
+        primaryHover(theme.colors.accent, theme.appearance)
+      )
+      expect(variables['--primary-subtle'], `${theme.id} primary subtle`).toBe(
+        primarySubtleCss(theme.appearance)
+      )
+      expect(hoverForeground, `${theme.id} primary foreground is invalid`).toBeDefined()
+      expect(hoverFill, `${theme.id} primary hover is invalid`).toBeDefined()
+
+      const ratio = contrastRatio(hoverForeground!, hoverFill!)
+      expect(
+        ratio,
+        `${theme.id} primary foreground on hover is ${ratio.toFixed(2)}:1`
+      ).toBeGreaterThanOrEqual(4.5)
     }
   })
 
