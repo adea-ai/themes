@@ -12,9 +12,26 @@ import { toShikiTheme } from '../src/adapters/shiki'
 import { toXtermTheme } from '../src/adapters/xterm'
 import { catalogueCss, themeCssVariables } from '../src/adapters/css'
 import { toTailwindTheme } from '../src/adapters/tailwind'
-import { SHADCN_MAPPING, shadcnVariables } from '../src/adapters/shadcn'
+import {
+  SHADCN_MAPPING,
+  shadcnDestructiveProjection,
+  shadcnVariables,
+} from '../src/adapters/shadcn'
 import { chartSeries, statusForeground, syntaxRoles, syntaxRolesHex, tint } from '../src/derive'
 import { contrastRatio, formatOklch, hexToOklch, oklchToHex, parseColor } from '../src/oklch'
+
+function compositeSrgb(foreground: string, background: string, alpha: number) {
+  const foregroundHex = oklchToHex(parseColor(foreground)!)
+  const backgroundHex = oklchToHex(parseColor(background)!)
+  const channels = [1, 3, 5].map((offset) => {
+    const front = Number.parseInt(foregroundHex.slice(offset, offset + 2), 16)
+    const back = Number.parseInt(backgroundHex.slice(offset, offset + 2), 16)
+    return Math.round(front * alpha + back * (1 - alpha))
+      .toString(16)
+      .padStart(2, '0')
+  })
+  return parseColor(`#${channels.join('')}`)!
+}
 
 /**
  * The adapters are the package's promise to a consumer, so each one is held to the
@@ -295,6 +312,48 @@ describe('shadcn bridge', () => {
           ratio,
           `${theme.id} foreground on ${shadcnRole}-subtle is ${ratio.toFixed(2)}:1`
         ).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+  })
+
+  test('the destructive solid pair stays readable through the shared 90% hover composition', () => {
+    for (const theme of themes) {
+      const sourceError = theme.colors.error
+      const sourceAnsi = { ...theme.ansi }
+      const sourceSyntax = syntaxRoles(theme)
+      const projection = shadcnDestructiveProjection(theme)
+      const variables = shadcnVariables(theme)
+      const fill = parseColor(projection.fill)!
+      const foreground = parseColor(projection.foreground)!
+      const source = parseColor(sourceError)!
+
+      expect(variables['--destructive']).toBe(projection.fill)
+      expect(variables['--destructive-foreground']).toBe(projection.foreground)
+      expect(variables['--destructive-subtle']).toBe(tint(sourceError, theme.colors.background))
+      expect(theme.colors.error).toBe(sourceError)
+      expect(theme.ansi).toEqual(sourceAnsi)
+      expect(syntaxRoles(theme)).toEqual(sourceSyntax)
+      expect(Math.abs(fill.h - source.h), `${theme.id} destructive hue drifted`).toBeLessThan(0.01)
+      expect(
+        Math.abs(fill.l - source.l),
+        `${theme.id} destructive lightness moved too far`
+      ).toBeLessThanOrEqual(0.08)
+
+      const renderedForeground = parseColor(oklchToHex(foreground))!
+      const surfaces = [theme.colors.background, theme.colors.surface, theme.colors.surfaceElevated]
+      const solidRatio = contrastRatio(renderedForeground, parseColor(oklchToHex(fill))!)
+      expect(
+        solidRatio,
+        `${theme.id} solid destructive text is ${solidRatio.toFixed(2)}:1`
+      ).toBeGreaterThanOrEqual(5)
+
+      for (const surface of surfaces) {
+        const hoverBackground = compositeSrgb(projection.fill, surface, 0.9)
+        const hoverRatio = contrastRatio(renderedForeground, hoverBackground)
+        expect(
+          hoverRatio,
+          `${theme.id} destructive text on 90% fill over ${surface} is ${hoverRatio.toFixed(2)}:1`
+        ).toBeGreaterThanOrEqual(5)
       }
     }
   })

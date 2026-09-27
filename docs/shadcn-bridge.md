@@ -65,8 +65,8 @@ to have a text cursor in it. A consumer that wants the quieter rule has
 ## Status fills
 
 shadcn expects each status role to come with a `-foreground` and a `-subtle`. The
-bridge follows the mapped shadcn name, so canonical `error` becomes
-`--destructive-foreground` and `--destructive-subtle`; the catalogue derives both:
+bridge follows the mapped shadcn name, so canonical `error` becomes the destructive
+tokens. The catalogue derives each status foreground and subtle fill:
 
 - `--<mapped-role>-foreground` is the text colour to draw on a **solid** fill of that role.
   It is derived per theme rather than taken from the body text: a dark theme's body
@@ -77,6 +77,18 @@ bridge follows the mapped shadcn name, so canonical `error` becomes
   A translucent fill's real contrast depends on whatever is behind it, so it cannot
   provide a stable text pairing. Small text on a subtle fill uses the theme's body
   `foreground`; the status `-foreground` is reserved for text on the solid role.
+
+The destructive solid pair has one additional presentation rule. The shared Button
+uses `--destructive/90` on hover, so its text must stay readable after that alpha fill
+is composited over a canvas or either card surface. `shadcnDestructiveProjection`
+searches the smallest lightness adjustment along the canonical error hue that targets
+a 5:1 floor for rounded sRGB foreground/fill pairs on the solid fill and its 90%
+composition over those three surfaces. The margin protects the 4.5:1 AA floor from
+browser color quantization. The canonical `theme.colors.error`, ANSI values, and
+syntax roles stay unchanged; `--destructive-subtle` is still tinted from the raw
+canonical error. Consumers that assign the destructive tokens directly can use this
+projection from `@adea-ai/themes/adapters/shadcn`, or use the values from
+`shadcnVariables`.
 
 ## The rest of shadcn's default vocabulary
 

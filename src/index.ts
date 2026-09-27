@@ -161,4 +161,11 @@ export { toTailwindTheme } from './adapters/tailwind.js'
 export type { ShikiThemeRegistration, ShikiTokenSetting } from './adapters/shiki.js'
 export { toShikiTheme, toShikiThemes } from './adapters/shiki.js'
 
-export { SHADCN_MAPPING, shadcnCss, shadcnRoles, shadcnVariables } from './adapters/shadcn.js'
+export type { ShadcnDestructiveProjection } from './adapters/shadcn.js'
+export {
+  SHADCN_MAPPING,
+  shadcnCss,
+  shadcnDestructiveProjection,
+  shadcnRoles,
+  shadcnVariables,
+} from './adapters/shadcn.js'
