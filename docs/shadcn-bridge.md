@@ -62,9 +62,34 @@ in dark themes) while retaining the primary hue. `--primary-subtle` uses
 tint strength, so it follows a runtime override of `--primary`. The hover value is
 resolved from the theme's canonical accent, so a consumer overriding `--primary` at
 runtime must also recompute `--primary-hover` with `primaryHover(customPrimary,
-appearance)`; otherwise the hover retains the theme accent. The adapter tests check
-both values and the primary foreground's 4.5:1 contrast on the hover fill for every
-exported theme.
+appearance)`; otherwise the hover retains the theme accent. A custom primary also
+needs its foreground and focus ring updated:
+
+```ts
+import { accentForeground, getTheme, primaryHover, primarySubtleCss } from '@adea-ai/themes'
+
+const theme = getTheme('adea-dark')!
+const appearance = theme.appearance
+const customPrimary = '#6d28d9'
+const primaryForeground = accentForeground(customPrimary)
+const root = document.documentElement
+for (const [name, value] of Object.entries({
+  '--primary': customPrimary,
+  '--primary-foreground': primaryForeground,
+  '--primary-hover': primaryHover(customPrimary, appearance),
+  '--primary-subtle': primarySubtleCss(appearance),
+  '--ring': customPrimary,
+  '--sidebar-primary': customPrimary,
+  '--sidebar-primary-foreground': primaryForeground,
+  '--sidebar-ring': customPrimary,
+}))
+  root.style.setProperty(name, value)
+```
+
+The subtle expression reads `var(--primary)`, so it follows the custom token. Keep
+the resolved foreground, hover, ring, and sidebar values in sync with the primary as
+the example does. Adapter tests check helper parity and the theme primary
+foreground's 4.5:1 contrast on the hover fill for every exported theme.
 
 ### `border` fills both `--border` and `--input`
 
