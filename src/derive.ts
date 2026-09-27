@@ -54,6 +54,28 @@ export type SyntaxRole =
   | 'diffHunk'
   | 'searchMatch'
 
+/** Roles in the product's editor palette, which are all read as small text. */
+export type EditorRole = Exclude<SyntaxRole, 'constant' | 'punctuation'>
+
+const EDITOR_ROLES = [
+  'keyword',
+  'string',
+  'number',
+  'comment',
+  'function',
+  'variable',
+  'type',
+  'tag',
+  'attribute',
+  'operator',
+  'heading',
+  'link',
+  'diffAdd',
+  'diffDelete',
+  'diffHunk',
+  'searchMatch',
+] as const satisfies readonly EditorRole[]
+
 /** Which ANSI role each syntax role is read from, and why. */
 const SYNTAX_SOURCE: Readonly<Record<SyntaxRole, keyof AdeaTheme['ansi']>> = Object.freeze({
   // Magenta is the slot palettes spend on the most distinctive hue they have, and
@@ -138,6 +160,47 @@ export function syntaxRolesHex(theme: AdeaTheme): Record<SyntaxRole, string> {
       return [role, parsed ? oklchToHex(parsed) : value]
     })
   ) as Record<SyntaxRole, string>
+}
+
+/**
+ * The hex role set for code editors, where comments and diffs are rendered as
+ * content text rather than decorative syntax. The quiet syntax API stays at its
+ * palette-selected comment level; this projection explicitly holds every editor
+ * role to WCAG AA on the canvas.
+ */
+export function editorRolesHex(theme: AdeaTheme): Record<EditorRole, string> {
+  const roles = syntaxRolesHex(theme)
+  const background = parseColor(theme.colors.background)
+  if (!background) throw new Error(`theme ${theme.id} has no valid editor background`)
+
+  return Object.fromEntries(
+    EDITOR_ROLES.map((role) => {
+      const source = parseColor(roles[role])
+      if (!source) throw new Error(`theme ${theme.id} has no valid editor.${role}`)
+
+      const initial = oklchToHex(source)
+      const renderedInitial = parseColor(initial)
+      if (renderedInitial && contrastRatio(renderedInitial, background) >= 4.5 - 1e-9) {
+        return [role, initial]
+      }
+
+      // Repair against the exact role the editor receives. A repair at precisely
+      // 4.5:1 in OKLCH can round to a hex value just below that floor, so advance
+      // the requested threshold by the smallest measured step until the encoded
+      // value itself clears 4.5:1. No source palette value or hue is rewritten.
+      for (let margin = 0.001; margin <= 0.05; margin += 0.001) {
+        const repaired = repairContrast(source, background, 4.5 + margin)
+        if (!repaired.satisfied) continue
+        const candidate = oklchToHex(repaired.color)
+        const renderedCandidate = parseColor(candidate)
+        if (renderedCandidate && contrastRatio(renderedCandidate, background) >= 4.5 - 1e-9) {
+          return [role, candidate]
+        }
+      }
+
+      throw new Error(`cannot encode editor.${role} for ${theme.id} above 4.5:1 contrast`)
+    })
+  ) as Record<EditorRole, string>
 }
 
 /**
