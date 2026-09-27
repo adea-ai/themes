@@ -12,7 +12,7 @@ import { toShikiTheme } from '../src/adapters/shiki'
 import { toXtermTheme } from '../src/adapters/xterm'
 import { catalogueCss, themeCssVariables } from '../src/adapters/css'
 import { toTailwindTheme } from '../src/adapters/tailwind'
-import { shadcnVariables } from '../src/adapters/shadcn'
+import { SHADCN_MAPPING, shadcnVariables } from '../src/adapters/shadcn'
 import { chartSeries, statusForeground, syntaxRoles, tint } from '../src/derive'
 import { contrastRatio, formatOklch, hexToOklch, oklchToHex, parseColor } from '../src/oklch'
 
@@ -272,6 +272,30 @@ describe('shadcn bridge', () => {
     ]
     for (const name of required) {
       expect(variables[name], `${name} is unmapped`).toBeTruthy()
+    }
+  })
+
+  test('status aliases are opaque and keep the small-text pairing readable in every theme', () => {
+    for (const theme of themes) {
+      const variables = shadcnVariables(theme)
+
+      for (const role of ['success', 'warning', 'error', 'info'] as const) {
+        const shadcnRole = SHADCN_MAPPING[role]
+        const fill = variables[`--${shadcnRole}-subtle`]
+        const foreground = parseColor(theme.colors.text)
+
+        expect(fill, `${theme.id} is missing --${shadcnRole}-subtle`).toBeDefined()
+        const parsedFill = parseColor(fill ?? '')
+        expect(parsedFill, `${theme.id} --${shadcnRole}-subtle is not opaque OKLCH`).toBeDefined()
+        expect(fill).toBe(tint(theme.colors[role], theme.colors.background))
+        expect(variables[`--${shadcnRole}-foreground`]).toBe(statusForeground(theme, role))
+
+        const ratio = contrastRatio(foreground!, parsedFill!)
+        expect(
+          ratio,
+          `${theme.id} foreground on ${shadcnRole}-subtle is ${ratio.toFixed(2)}:1`
+        ).toBeGreaterThanOrEqual(4.5)
+      }
     }
   })
 })

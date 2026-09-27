@@ -7,27 +7,31 @@ import { join, resolve } from 'node:path'
 const root = resolve(import.meta.dir, '..')
 let consumer: string
 
-beforeAll(() => {
-  consumer = mkdtempSync(join(tmpdir(), 'adea-themes-consumer-'))
-  execFileSync('bun', ['run', 'build'], { cwd: root, stdio: 'pipe' })
-  const [archive] = JSON.parse(
-    execFileSync('npm', ['pack', '--json', '--pack-destination', consumer], {
-      cwd: root,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-  )
-  const destination = join(consumer, 'node_modules', '@adea-ai', 'themes')
-  mkdirSync(destination, { recursive: true })
-  execFileSync('tar', [
-    '-xzf',
-    join(consumer, archive.filename),
-    '--strip-components=1',
-    '-C',
-    destination,
-  ])
-  writeFileSync(join(consumer, 'package.json'), JSON.stringify({ type: 'module' }))
-})
+// Building and packing the package can take longer than Bun's unit-test default.
+beforeAll(
+  () => {
+    consumer = mkdtempSync(join(tmpdir(), 'adea-themes-consumer-'))
+    execFileSync('bun', ['run', 'build'], { cwd: root, stdio: 'pipe' })
+    const [archive] = JSON.parse(
+      execFileSync('npm', ['pack', '--json', '--pack-destination', consumer], {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+    )
+    const destination = join(consumer, 'node_modules', '@adea-ai', 'themes')
+    mkdirSync(destination, { recursive: true })
+    execFileSync('tar', [
+      '-xzf',
+      join(consumer, archive.filename),
+      '--strip-components=1',
+      '-C',
+      destination,
+    ])
+    writeFileSync(join(consumer, 'package.json'), JSON.stringify({ type: 'module' }))
+  },
+  { timeout: 30_000 }
+)
 
 afterAll(() => {
   if (consumer) rmSync(consumer, { recursive: true, force: true })
