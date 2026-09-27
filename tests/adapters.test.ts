@@ -344,7 +344,13 @@ describe('shadcn bridge', () => {
       ).toBeLessThanOrEqual(0.08)
 
       const renderedForeground = parseColor(oklchToHex(foreground))!
-      const surfaces = [theme.colors.background, theme.colors.surface, theme.colors.surfaceElevated]
+      const surfaces = [
+        theme.colors.background,
+        theme.colors.surface,
+        theme.colors.surfaceElevated,
+        theme.shadcn?.card ?? theme.colors.surface,
+        theme.shadcn?.popover ?? theme.colors.surfaceElevated,
+      ]
       const solidRatio = contrastRatio(renderedForeground, parseColor(oklchToHex(fill))!)
       expect(
         solidRatio,
@@ -360,6 +366,27 @@ describe('shadcn bridge', () => {
         ).toBeGreaterThanOrEqual(5)
       }
     }
+  })
+
+  test('the destructive hover floor includes owner-authored card and popover surfaces', () => {
+    const source = getTheme('catppuccin-frappe')!
+    const theme = {
+      ...source,
+      shadcn: { ...source.shadcn, card: '#000000', popover: '#000000' },
+    }
+    const projection = shadcnDestructiveProjection(theme)
+    const variables = shadcnVariables(theme)
+    const foreground = parseColor(oklchToHex(parseColor(projection.foreground)!))!
+
+    for (const surface of [theme.shadcn.card, theme.shadcn.popover]) {
+      const hoverBackground = compositeSrgb(projection.fill, surface, 0.9)
+      const ratio = contrastRatio(foreground, hoverBackground)
+      expect(ratio, `owner-authored surface hover is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(
+        5
+      )
+    }
+    expect(variables['--destructive']).toBe(projection.fill)
+    expect(variables['--destructive-foreground']).toBe(projection.foreground)
   })
 
   test('legacy Slate and High Contrast records preserve their exact shadcn-only roles', () => {

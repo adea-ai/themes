@@ -94,12 +94,17 @@ export function shadcnDestructiveProjection(theme: ShadcnTheme): ShadcnDestructi
     .filter((entry): entry is { value: string; rendered: NonNullable<typeof entry.rendered> } =>
       Boolean(entry.rendered)
     )
-  const surfaces = DESTRUCTIVE_PRESENTATION_SURFACES.map((role) => theme.colors[role])
+  const surfaceValues = [
+    ...DESTRUCTIVE_PRESENTATION_SURFACES.map((role) => theme.colors[role]),
+    theme.shadcn?.card ?? theme.colors.surface,
+    theme.shadcn?.popover ?? theme.colors.surfaceElevated,
+  ]
+  const surfaces = surfaceValues
     .map((value) => ({ value, rendered: renderedColor(value) }))
     .filter((entry): entry is { value: string; rendered: NonNullable<typeof entry.rendered> } =>
       Boolean(entry.rendered)
     )
-  if (surfaces.length !== DESTRUCTIVE_PRESENTATION_SURFACES.length) {
+  if (surfaces.length !== surfaceValues.length) {
     throw new Error(`theme ${theme.id} has an invalid destructive presentation surface`)
   }
 

@@ -83,8 +83,10 @@ uses `--destructive/90` on hover, so its text must stay readable after that alph
 is composited over a canvas or either card surface. `shadcnDestructiveProjection`
 searches the smallest lightness adjustment along the canonical error hue that targets
 a 5:1 floor for rounded sRGB foreground/fill pairs on the solid fill and its 90%
-composition over those three surfaces. The margin protects the 4.5:1 AA floor from
-browser color quantization. The canonical `theme.colors.error`, ANSI values, and
+composition over the canvas, the canonical surface ladder, and the resolved `--card`
+and `--popover` surfaces, including owner-authored projection overrides. That margin
+protects the 4.5:1 AA floor from browser color quantization. The canonical
+`theme.colors.error`, ANSI values, and
 syntax roles stay unchanged; `--destructive-subtle` is still tinted from the raw
 canonical error. Consumers that assign the destructive tokens directly can use this
 projection from `@adea-ai/themes/adapters/shadcn`, or use the values from
