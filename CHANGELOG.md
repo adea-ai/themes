@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/adea-ai/themes/compare/v0.5.0...v0.5.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* map canonical status roles to readable shadcn fills ([#9](https://github.com/adea-ai/themes/issues/9)) ([fd32f5c](https://github.com/adea-ai/themes/commit/fd32f5c9b10c4ae52ef29e092c13fefcaf9a960b))
+
 ## [0.5.0](https://github.com/adea-ai/themes/compare/v0.4.3...v0.5.0) (2026-09-26)
 
 
