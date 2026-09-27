@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.3](https://github.com/adea-ai/themes/compare/v0.6.2...v0.6.3) (2026-09-27)
+
+
+### Bug Fixes
+
+* document synchronized custom primary tokens ([#18](https://github.com/adea-ai/themes/issues/18)) ([226d567](https://github.com/adea-ai/themes/commit/226d5670ea5949a1d7ab0239612cf6ee74ac9213))
+
 ## [0.6.2](https://github.com/adea-ai/themes/compare/v0.6.1...v0.6.2) (2026-09-27)
 
 
