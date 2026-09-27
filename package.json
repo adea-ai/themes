@@ -1,6 +1,6 @@
 {
   "name": "@adea-ai/themes",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "The Adea theme catalogue: first-party and imported semantic OKLCH themes, with Base24, terminal, CSS and syntax adapters.",
   "keywords": [
     "adea",
