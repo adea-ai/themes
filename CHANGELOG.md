@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/adea-ai/themes/compare/v0.6.1...v0.6.2) (2026-09-27)
+
+
+### Bug Fixes
+
+* preserve destructive contrast on hover ([#15](https://github.com/adea-ai/themes/issues/15)) ([160db17](https://github.com/adea-ai/themes/commit/160db1770cf551e990a02000a6f0f15259e3c2e5))
+
 ## [0.6.1](https://github.com/adea-ai/themes/compare/v0.6.0...v0.6.1) (2026-09-27)
 
 
