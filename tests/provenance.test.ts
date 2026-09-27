@@ -8,11 +8,11 @@ import { contrastRatio, oklchToHex, parseColor } from '../src/oklch'
  * claim checkable. Imported palettes are asserted against their upstream projects;
  * Adea-authored palettes are asserted against their owner-maintained source values.
  *
- * Every value below was read from the upstream project's own published palette — the
- * background and foreground each project's documentation and source files state —
- * and the assertion is that the catalogue reproduces it exactly. Without this, a
- * refresh that pulled the wrong slug, or a normalizer change that quietly rewrote a
- * background, would produce a catalogue that still passed every contrast test while
+ * Imported palette values below were read from the upstream project's published
+ * palette and are checked against it. First-party Adea values are separately checked
+ * against the product's existing source definitions. Without these checks, a refresh
+ * that pulled the wrong slug, or a normalizer change that quietly rewrote a
+ * background, could produce a catalogue that still passed every contrast test while
  * no longer being the theme it says it is. "Catppuccin Mocha" that is not
  * Catppuccin Mocha is a worse failure than an unreadable colour.
  *
