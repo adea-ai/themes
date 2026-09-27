@@ -65,17 +65,18 @@ to have a text cursor in it. A consumer that wants the quieter rule has
 ## Status fills
 
 shadcn expects each status role to come with a `-foreground` and a `-subtle`. The
-catalogue derives both:
+bridge follows the mapped shadcn name, so canonical `error` becomes
+`--destructive-foreground` and `--destructive-subtle`; the catalogue derives both:
 
-- `--<role>-foreground` is the text colour to draw on a **solid** fill of that role.
+- `--<mapped-role>-foreground` is the text colour to draw on a **solid** fill of that role.
   It is derived per theme rather than taken from the body text: a dark theme's body
   text is near-white, and near-white on a bright green measures about 2.6:1. The
   derivation picks whichever of the theme's two extremes measures better, which for a
   bright green is black and for a deep red is white.
-- `--<role>-subtle` is a `color-mix()` of the role into the canvas. **Opaque**, unlike
-  shadcn's default of mixing into `transparent`, so that the text drawn on it can be
-  measured — a translucent fill's real contrast depends on whatever is behind it, and
-  no automated check can resolve it.
+- `--<mapped-role>-subtle` is an opaque OKLCH tint of the role into the theme's canvas.
+  A translucent fill's real contrast depends on whatever is behind it, so it cannot
+  provide a stable text pairing. Small text on a subtle fill uses the theme's body
+  `foreground`; the status `-foreground` is reserved for text on the solid role.
 
 ## The rest of shadcn's default vocabulary
 

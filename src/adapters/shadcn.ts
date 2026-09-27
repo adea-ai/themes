@@ -23,7 +23,7 @@
  */
 
 import type { AdeaTheme, AdeaThemeColors } from '../schema.js'
-import { STATUS_ROLES, statusForeground } from '../derive.js'
+import { STATUS_ROLES, statusForeground, tint } from '../derive.js'
 
 /**
  * Canonical role → shadcn custom-property name.
@@ -108,8 +108,13 @@ export function shadcnVariables(theme: AdeaTheme): Record<string, string> {
   variables['--sidebar-muted-foreground'] = theme.colors.textMuted
 
   for (const role of STATUS_ROLES) {
-    variables[`--${role}-foreground`] = statusForeground(theme, role)
-    variables[`--${role}-subtle`] = `color-mix(in oklch, var(--${role}) 12%, transparent)`
+    // Status labels on a subtle fill use the theme's body foreground; this
+    // foreground is reserved for text on the role's solid colour. Keep the
+    // generated shadcn names aligned with SHADCN_MAPPING, especially error →
+    // destructive, and resolve the tint against a real canvas so it is opaque.
+    const shadcnRole = SHADCN_MAPPING[role]
+    variables[`--${shadcnRole}-foreground`] = statusForeground(theme, role)
+    variables[`--${shadcnRole}-subtle`] = tint(theme.colors[role], theme.colors.background)
   }
 
   variables['--surface-sunken'] = theme.colors.background
