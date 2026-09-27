@@ -50,6 +50,7 @@ import type {
   AdeaThemeColors,
   AdeaThemeRecord,
   AnsiKey,
+  ShadcnThemeProjection,
   ThemeAppearance,
   ThemeProvenance,
 } from './schema.js'
@@ -212,6 +213,8 @@ export interface ThemeSourceSpec {
   accentSlot?: AnsiKey
   /** Explicit roles for authored themes, applied after derivation. */
   colors?: Partial<AdeaThemeColors>
+  /** Exact adapter values for authored distinctions outside the canonical roles. */
+  shadcn?: ShadcnThemeProjection
   ansi?: Partial<AdeaAnsi>
   cursor?: string
   selection?: string
@@ -1196,6 +1199,7 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
       description: source.description,
       provenance: source.provenance ?? { project: '', url: '', license: '' },
       tags: source.tags,
+      ...(source.shadcn ? { shadcn: source.shadcn } : {}),
     },
     findings,
   }

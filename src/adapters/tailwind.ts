@@ -35,7 +35,7 @@ function kebab(name: string): string {
  * The `--color-*` namespace, which is what makes `bg-surface` a valid utility.
  *
  * Takes no theme, and that is the point rather than an oversight. Every declaration
- * this emits is a `var()` reference, so the block is identical for all twenty-seven
+ * this emits is a `var()` reference, so the block is identical for all thirty-one
  * themes and one stylesheet serves every one of them. Accepting a theme would imply
  * the output depended on which theme was passed, and the first person to notice would
  * reasonably conclude they needed one block per theme.

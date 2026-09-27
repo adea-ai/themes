@@ -7,6 +7,7 @@ import {
   formatFindings,
   parseColor,
   themes,
+  themeFamilies,
   validateCatalogue,
   validateTheme,
 } from '../src'
@@ -48,6 +49,11 @@ function lightness(value: string): number {
 }
 
 describe('catalogue shape', () => {
+  test('the published catalogue contains the 31 documented themes in 16 families', () => {
+    expect(themes).toHaveLength(31)
+    expect(themeFamilies()).toHaveLength(16)
+  })
+
   test('ids are unique', () => {
     const ids = themes.map((theme) => theme.id)
     expect(ids.toSorted()).toEqual([...new Set(ids)].toSorted())

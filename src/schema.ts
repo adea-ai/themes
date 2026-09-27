@@ -149,6 +149,34 @@ export interface ThemeProvenance {
 }
 
 /**
+ * Exact shadcn token projections for legacy sources whose vocabulary carries
+ * distinctions the canonical surface roles do not encode.
+ *
+ * These are optional presentation values, not a second palette: canonical roles
+ * remain the default for every adapter, while the shadcn bridge can retain a
+ * source's separate secondary/muted fills, input outline, border alpha, or focus
+ * ring when those were explicitly authored.
+ */
+export interface ShadcnThemeProjection {
+  /** A source surface distinct from the canonical first rung. */
+  card?: string
+  /** A source surface distinct from the canonical second rung. */
+  popover?: string
+  /** A fill distinct from the canonical card surface. */
+  secondary?: string
+  /** A fill distinct from the canonical card surface. */
+  muted?: string
+  /** Text used on a source-specific muted fill. */
+  mutedForeground?: string
+  /** A divider that may carry source-authored alpha. */
+  border?: string
+  /** An input outline that may differ from the divider. */
+  input?: string
+  /** A focus ring that may differ from the canonical interactive accent. */
+  ring?: string
+}
+
+/**
  * A catalogue entry: the theme, plus what a picker and an audit need.
  *
  * Kept as a separate type rather than folded into {@link AdeaTheme} so that a
@@ -168,6 +196,11 @@ export interface AdeaThemeRecord extends AdeaTheme {
   provenance: ThemeProvenance
   /** Search and filter terms, e.g. `['dark', 'muted', 'popular']`. */
   tags: readonly string[]
+  /**
+   * Optional exact shadcn presentation values for source roles that do not map
+   * one-to-one onto the canonical schema. Consumed only by the shadcn adapter.
+   */
+  shadcn?: ShadcnThemeProjection
 }
 
 /** A family of themes: one project, one or more variants. */

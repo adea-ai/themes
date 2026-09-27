@@ -97,6 +97,27 @@ they are filled from the roles that exist rather than given entries of their own
 | `--sidebar-ring`                            | `accent`           |                                                              |
 | `--sidebar-muted-foreground`                | `textMuted`        |                                                              |
 
+## First-party compatibility projections
+
+The `shadcn` field on a catalogue record is an optional, typed projection owned by
+this adapter. It preserves source distinctions that the canonical schema does not
+represent, such as a separate muted fill, input alpha, or focus ring. The canonical
+roles remain the design authority; generic palette validation deliberately does not
+evaluate these presentation-only values. `tests/adapters.test.ts` instead checks the
+exact projected values (including the legacy input and border alpha) and the
+foreground/background pairs that the shared UI actually renders.
+
+The retained Slate Dark source uses `#94a3b8` for canonical `textMuted` and `#334155`
+for its muted fill. The shared UI pairs these in enabled components including the
+message composer, keyboard hints, empty-state icons, avatars, and button groups. That
+pair measures 4.04:1, below the 4.5:1 small-text floor. Its adapter projection raises
+only `--muted-foreground` to `oklch(0.7427 0.0351 256.79)`. A 0.03 step clears 4.5:1
+in OKLCH but rounds to `#9dacc2` in sRGB, which measures 4.49378:1; the next 0.002
+step rounds to `#9eadc2` and measures 4.54142:1. The canonical `textMuted` value,
+saved theme ID, and every other legacy shadcn role remain unchanged. This bounded
+presentation exception preserves the published component contrast contract; it does
+not change the canonical source palette.
+
 A consumer with its _own_ extra namespaces — a `--terminal-*` ramp, an `--editor-*`
 ramp — should build them from `theme.ansi` and `derive.syntaxRoles` rather than
 expecting the bridge to know about them. Those are presentations of the ANSI and

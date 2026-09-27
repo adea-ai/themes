@@ -9,11 +9,11 @@
  * The design is described in four decisions, and the rest of this package follows
  * from them.
  *
- * **Adea owns the schema and the transformation, not the colours.** The seventeen
- * surface roles in `schema.ts` are the contract, and no upstream project is asked
- * to satisfy it. The palettes in `palettes/` are other people's, reproduced from a
- * pinned revision, each recording the project it belongs to and the licence it is
- * used under. Normalizing them is this package's job and it happens once, here.
+ * **Adea owns the schema and the transformation.** The seventeen surface roles in
+ * `schema.ts` are the contract, and no upstream project is asked to satisfy it. The
+ * Base24 palettes in `palettes/` are reproduced from a pinned revision; the Slate
+ * and High Contrast families are Adea-authored semantic palettes. Normalizing inputs
+ * is this package's job and it happens once, here.
  *
  * **OKLCH is the representation.** Every role is an `oklch()` string. Lightness in
  * OKLCH is perceptually uniform, which is what lets a surface ladder be built by
@@ -55,6 +55,7 @@ export type {
   ThemeFamily,
   ThemeMetadata,
   ThemeProvenance,
+  ShadcnThemeProjection,
 } from './schema.js'
 export { ANSI_KEYS, THEME_COLOR_KEYS } from './schema.js'
 

@@ -146,6 +146,7 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
       description: theme.description,
       appearance: theme.appearance,
       tags: theme.tags,
+      ...(theme.provenance ? { provenance: theme.provenance } : {}),
       scheme: {
         system: 'base24',
         name: theme.name,
@@ -200,6 +201,7 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
         error: theme.status.error,
         info: theme.status.info,
       },
+      ...(theme.shadcn ? { shadcn: theme.shadcn } : {}),
       ansi,
       cursor: theme.cursor,
       selection: theme.selection,

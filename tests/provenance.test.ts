@@ -4,14 +4,15 @@ import { getTheme, themes } from '../src'
 import { contrastRatio, oklchToHex, parseColor } from '../src/oklch'
 
 /**
- * The catalogue claims to hold *other people's palettes*, and this file is what
- * makes that claim checkable.
+ * The catalogue claims to hold named palettes, and this file is what makes that
+ * claim checkable. Imported palettes are asserted against their upstream projects;
+ * Adea-authored palettes are asserted against their owner-maintained source values.
  *
- * Every value below was read from the upstream project's own published palette — the
- * background and foreground each project's documentation and source files state —
- * and the assertion is that the catalogue reproduces it exactly. Without this, a
- * refresh that pulled the wrong slug, or a normalizer change that quietly rewrote a
- * background, would produce a catalogue that still passed every contrast test while
+ * Imported palette values below were read from the upstream project's published
+ * palette and are checked against it. First-party Adea values are separately checked
+ * against the product's existing source definitions. Without these checks, a refresh
+ * that pulled the wrong slug, or a normalizer change that quietly rewrote a
+ * background, could produce a catalogue that still passed every contrast test while
  * no longer being the theme it says it is. "Catppuccin Mocha" that is not
  * Catppuccin Mocha is a worse failure than an unreadable colour.
  *
@@ -149,7 +150,7 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Monokai's olive ground.
   { id: 'monokai', background: '#272822', signature: { role: 'accent', hue: [285, 310] } },
 
-  // Adea's own two. Both are *composed*, so the entries here are the half that comes
+  // Adea's composed defaults. Both are *composed*, so the entries here are the half that comes
   // from each one's structure donor; the suites below assert the other half, and the
   // light one's canvas carries a recorded chroma correction (see `COMPOSED_SOURCES`).
   // The foreground is asserted by hue: the theme is held to AAA on every surface it
@@ -158,6 +159,13 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // assertion below the pair suite checks.
   { id: 'adea-light', background: '#e3e9f4', foregroundHue: 266.5 },
   { id: 'adea-dark', background: '#0f141f', foreground: '#b4bcca' },
+
+  // Adea's retained Slate and High Contrast variants, asserted against the
+  // product-owned source palette rather than attributed to an upstream terminal theme.
+  { id: 'slate-light', background: '#f8fafc', foreground: '#0f172a' },
+  { id: 'slate-dark', background: '#0f172a', foreground: '#f1f5f9' },
+  { id: 'contrast-light', background: '#ffffff', foreground: '#000000' },
+  { id: 'contrast-dark', background: '#000000', foreground: '#ffffff' },
 ])
 
 /** A theme role as hex, which is how upstream palettes are published. */
@@ -459,13 +467,102 @@ describe('provenance', () => {
   })
 
   test('every imported theme records what its values were bootstrapped from', () => {
-    // Adea's own theme is authored, so it is the only one without a chain.
-    const imported = themes.filter((theme) => theme.family !== 'adea')
+    // Adea's authored semantic palettes are not assigned one wholesale donor;
+    // their explicitly retained ANSI lineage is asserted separately below.
+    const imported = themes.filter((theme) => theme.provenance.project !== 'Adea')
     for (const theme of imported) {
       expect(
         theme.provenance.bootstrappedFrom?.length ?? 0,
         `${theme.id} does not record where its values came from`
       ).toBeGreaterThan(0)
+    }
+  })
+
+  test('legacy Slate and High Contrast records keep their Adea family identity and source', () => {
+    const expected = [
+      ['slate-light', 'slate', 'Slate', 'Light', 'light'],
+      ['slate-dark', 'slate', 'Slate', 'Dark', 'dark'],
+      ['contrast-light', 'contrast', 'High Contrast', 'Light', 'light'],
+      ['contrast-dark', 'contrast', 'High Contrast', 'Dark', 'dark'],
+    ] as const
+
+    for (const [id, family, familyLabel, label, appearance] of expected) {
+      const theme = getTheme(id)
+      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
+      if (!theme) continue
+      expect(theme.family).toBe(family)
+      expect(theme.familyLabel).toBe(familyLabel)
+      expect(theme.label).toBe(label)
+      expect(theme.name).toBe(`${familyLabel} ${label}`)
+      expect(theme.appearance).toBe(appearance)
+      expect(theme.provenance.project).toBe('Adea')
+      expect(theme.provenance.url).toBe('https://github.com/adea-ai/adea')
+      expect(theme.provenance.license).toBe('Apache-2.0')
+    }
+  })
+
+  test('legacy themes do not claim an unsupported external source for their ANSI values', () => {
+    for (const id of ['slate-light', 'slate-dark', 'contrast-light', 'contrast-dark']) {
+      const theme = getTheme(id)
+      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
+      expect(
+        theme?.provenance.bootstrappedFrom,
+        `${id} must not attribute Adea's existing ANSI constants to an unrelated GitHub palette`
+      ).toBeUndefined()
+    }
+  })
+
+  test('legacy terminal roles preserve the product-approved per-appearance values', () => {
+    const light = {
+      black: '#1b1f24',
+      red: '#b91c1c',
+      green: '#116a2e',
+      yellow: '#8a5a1b',
+      blue: '#0b57d0',
+      magenta: '#a0186f',
+      cyan: '#0e7490',
+      white: '#57606a',
+      brightBlack: '#57606a',
+      brightRed: '#c94d4d',
+      brightGreen: '#1f9d4f',
+      brightYellow: '#a9752c',
+      brightBlue: '#3b82f6',
+      brightMagenta: '#c04a92',
+      brightCyan: '#0891b2',
+      brightWhite: '#24292f',
+    }
+    const dark = {
+      black: '#2f3742',
+      red: '#ff8183',
+      green: '#56d364',
+      yellow: '#e3b341',
+      blue: '#6ca4f8',
+      magenta: '#db61a2',
+      cyan: '#39c5cf',
+      white: '#d5dde5',
+      brightBlack: '#57606a',
+      brightRed: '#ff9494',
+      brightGreen: '#79dd8a',
+      brightYellow: '#f0c264',
+      brightBlue: '#8db9ff',
+      brightMagenta: '#e87cb4',
+      brightCyan: '#66d3dc',
+      brightWhite: '#eef2f6',
+    }
+    const expected = {
+      'slate-light': light,
+      'contrast-light': light,
+      'slate-dark': dark,
+      'contrast-dark': dark,
+    }
+
+    for (const [id, ansi] of Object.entries(expected)) {
+      const theme = getTheme(id)
+      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
+      const actual = Object.fromEntries(
+        Object.entries(ansi).map(([role]) => [role, hex(theme!.ansi[role as keyof typeof ansi])])
+      )
+      expect(actual, `${id} ANSI values differ from the retained appearance set`).toEqual(ansi)
     }
   })
 
