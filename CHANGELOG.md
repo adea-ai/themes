@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/adea-ai/themes/compare/v0.5.1...v0.6.0) (2026-09-27)
+
+
+### Features
+
+* preserve Adea Slate and high-contrast themes ([#11](https://github.com/adea-ai/themes/issues/11)) ([bd1485a](https://github.com/adea-ai/themes/commit/bd1485a8946e7a60258ffa2f3b71bcfece5cfc78))
+
 ## [0.5.1](https://github.com/adea-ai/themes/compare/v0.5.0...v0.5.1) (2026-09-27)
 
 
