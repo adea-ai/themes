@@ -108,9 +108,16 @@ describe('packed package in a native ESM consumer', () => {
   test('the documented shadcn adapter has a public subpath', () => {
     expect(
       run(`
-      import { shadcnVariables } from '@adea-ai/themes/adapters/shadcn';
+      import { shadcnDestructiveProjection, shadcnVariables } from '@adea-ai/themes/adapters/shadcn';
       import { getTheme } from '@adea-ai/themes';
-      console.log(shadcnVariables(getTheme('adea-dark'))['--primary']);
+      const theme = getTheme('adea-dark');
+      const projection = shadcnDestructiveProjection(theme);
+      const variables = shadcnVariables(theme);
+      if (variables['--destructive'] !== projection.fill
+          || variables['--destructive-foreground'] !== projection.foreground) {
+        throw new Error('destructive projection differs from the shadcn adapter');
+      }
+      console.log(variables['--primary']);
     `)
     ).toStartWith('oklch(')
   })
