@@ -467,7 +467,8 @@ describe('provenance', () => {
   })
 
   test('every imported theme records what its values were bootstrapped from', () => {
-    // Adea-authored variants are not assigned an invented upstream palette.
+    // Adea's authored semantic palettes are not assigned one wholesale donor;
+    // their explicitly retained ANSI lineage is asserted separately below.
     const imported = themes.filter((theme) => theme.provenance.project !== 'Adea')
     for (const theme of imported) {
       expect(
@@ -494,11 +495,82 @@ describe('provenance', () => {
       expect(theme.label).toBe(label)
       expect(theme.name).toBe(`${familyLabel} ${label}`)
       expect(theme.appearance).toBe(appearance)
-      expect(theme.provenance).toEqual({
-        project: 'Adea',
-        url: 'https://github.com/adea-ai/adea',
-        license: 'Apache-2.0',
-      })
+      expect(theme.provenance.project).toBe('Adea')
+      expect(theme.provenance.url).toBe('https://github.com/adea-ai/adea')
+      expect(theme.provenance.license).toBe('Apache-2.0')
+    }
+  })
+
+  test('legacy themes retain per-appearance GitHub ANSI lineage and pinned source revision', () => {
+    const expected = {
+      'slate-light': 'GitHub Light Default',
+      'contrast-light': 'GitHub Light Default',
+      'slate-dark': 'GitHub Dark Default',
+      'contrast-dark': 'GitHub Dark Default',
+    }
+    const revision = '9e800e7fe760081d4c10317498038ed4227341d6'
+
+    for (const [id, source] of Object.entries(expected)) {
+      const theme = getTheme(id)
+      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
+      const lineage = theme?.provenance.bootstrappedFrom ?? []
+      expect(lineage, `${id} does not retain its GitHub ANSI lineage`).toContain(
+        `${source} (iTerm2-Color-Schemes via oklch-terminal-themes@${revision})`
+      )
+    }
+  })
+
+  test('legacy terminal roles preserve the product-approved per-appearance values', () => {
+    const light = {
+      black: '#1b1f24',
+      red: '#b91c1c',
+      green: '#116a2e',
+      yellow: '#8a5a1b',
+      blue: '#0b57d0',
+      magenta: '#a0186f',
+      cyan: '#0e7490',
+      white: '#57606a',
+      brightBlack: '#57606a',
+      brightRed: '#c94d4d',
+      brightGreen: '#1f9d4f',
+      brightYellow: '#a9752c',
+      brightBlue: '#3b82f6',
+      brightMagenta: '#c04a92',
+      brightCyan: '#0891b2',
+      brightWhite: '#24292f',
+    }
+    const dark = {
+      black: '#2f3742',
+      red: '#ff8183',
+      green: '#56d364',
+      yellow: '#e3b341',
+      blue: '#6ca4f8',
+      magenta: '#db61a2',
+      cyan: '#39c5cf',
+      white: '#d5dde5',
+      brightBlack: '#57606a',
+      brightRed: '#ff9494',
+      brightGreen: '#79dd8a',
+      brightYellow: '#f0c264',
+      brightBlue: '#8db9ff',
+      brightMagenta: '#e87cb4',
+      brightCyan: '#66d3dc',
+      brightWhite: '#eef2f6',
+    }
+    const expected = {
+      'slate-light': light,
+      'contrast-light': light,
+      'slate-dark': dark,
+      'contrast-dark': dark,
+    }
+
+    for (const [id, ansi] of Object.entries(expected)) {
+      const theme = getTheme(id)
+      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
+      const actual = Object.fromEntries(
+        Object.entries(ansi).map(([role]) => [role, hex(theme!.ansi[role as keyof typeof ansi])])
+      )
+      expect(actual, `${id} ANSI values differ from the retained appearance set`).toEqual(ansi)
     }
   })
 

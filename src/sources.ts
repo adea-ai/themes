@@ -794,6 +794,8 @@ export interface AuthoredSource {
   label: string
   name: string
   description: string
+  /** Palette ownership plus any per-appearance lineage for retained ANSI roles. */
+  provenance?: ThemeProvenance
   appearance: ThemeAppearance
   tags: readonly string[]
   /**
@@ -893,6 +895,18 @@ const CONTRAST_ANSI: AuthoredSource['ansi'] = {
   brightWhite: '#eef2f6',
 }
 
+function adeaAnsiProvenance(appearance: ThemeAppearance): ThemeProvenance {
+  const upstream = appearance === 'light' ? 'GitHub Light Default' : 'GitHub Dark Default'
+  return {
+    project: 'Adea',
+    url: 'https://github.com/adea-ai/adea',
+    license: 'Apache-2.0',
+    bootstrappedFrom: [
+      `${upstream} (iTerm2-Color-Schemes via oklch-terminal-themes@${CATALOGUE_REVISION})`,
+    ],
+  }
+}
+
 export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
   {
     id: 'slate-light',
@@ -901,6 +915,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Light',
     name: 'Slate Light',
     description: 'Adea’s slate neutral palette for light appearance.',
+    provenance: adeaAnsiProvenance('light'),
     appearance: 'light',
     tags: ['light', 'slate', 'neutral'],
     ramp: {
@@ -943,6 +958,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Dark',
     name: 'Slate Dark',
     description: 'Adea’s slate neutral palette for dark appearance.',
+    provenance: adeaAnsiProvenance('dark'),
     appearance: 'dark',
     tags: ['dark', 'slate', 'neutral'],
     ramp: {
@@ -989,6 +1005,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Light',
     name: 'High Contrast Light',
     description: 'Adea’s high-contrast palette for light appearance.',
+    provenance: adeaAnsiProvenance('light'),
     appearance: 'light',
     tags: ['light', 'high-contrast'],
     ramp: {
@@ -1031,6 +1048,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Dark',
     name: 'High Contrast Dark',
     description: 'Adea’s high-contrast palette for dark appearance.',
+    provenance: adeaAnsiProvenance('dark'),
     appearance: 'dark',
     tags: ['dark', 'high-contrast'],
     ramp: {

@@ -49,8 +49,8 @@ palette.
 | Family | Project | Licence | Vendored values |
 | --- | --- | --- | --- |
 | Adea (defaults) | this package | Apache-2.0 plus donor terms below | composed from the two donors below |
-| Slate | https://github.com/adea-ai/adea | Apache-2.0 | first-party product appearance registry |
-| High Contrast | https://github.com/adea-ai/adea | Apache-2.0 | first-party product appearance registry |
+| Slate | https://github.com/adea-ai/adea | Apache-2.0 | first-party semantic roles; GitHub terminal lineage below |
+| High Contrast | https://github.com/adea-ai/adea | Apache-2.0 | first-party semantic roles; GitHub terminal lineage below |
 | Nord | https://github.com/nordtheme/nord | MIT | via the chain above |
 | Catppuccin | https://github.com/catppuccin/catppuccin | MIT | via the chain above |
 | Tokyo Night | https://github.com/folke/tokyonight.nvim | Apache-2.0 | via the chain above |
@@ -65,6 +65,17 @@ palette.
 | Kanagawa | https://github.com/rebelot/kanagawa.nvim | MIT | via the chain above |
 | Vesper | https://github.com/raunofreiberg/vesper | MIT | via the chain above |
 | Monokai | https://monokai.pro (design origin) | MIT | via the chain above |
+
+### GitHub terminal lineage in first-party variants
+
+The semantic roles in Slate and High Contrast are authored by Adea under Apache-2.0. Their
+existing terminal ANSI sets retain the product's per-appearance GitHub lineage: light variants use
+GitHub Light Default and dark variants use GitHub Dark Default. Those source schemes are recorded
+at `oklch-terminal-themes` revision `9e800e7fe760081d4c10317498038ed4227341d6`, an MIT-licensed
+dataset derived from the MIT-licensed iTerm2-Color-Schemes project. Each generated theme's
+`provenance.bootstrappedFrom` records that lineage. This attribution applies to the terminal palette
+only; it does not attribute the semantic Slate or High Contrast palettes to GitHub. The product's
+approved ANSI values remain separately asserted in `tests/provenance.test.ts`.
 
 ### Adea's two defaults are composed from three of these
 

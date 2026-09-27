@@ -146,6 +146,7 @@ async function buildSources(): Promise<ThemeSourceSpec[]> {
       description: theme.description,
       appearance: theme.appearance,
       tags: theme.tags,
+      ...(theme.provenance ? { provenance: theme.provenance } : {}),
       scheme: {
         system: 'base24',
         name: theme.name,

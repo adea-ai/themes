@@ -221,7 +221,10 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "provenance": {
       "project": "Adea",
       "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Dark Default (iTerm2-Color-Schemes via oklch-terminal-themes@9e800e7fe760081d4c10317498038ed4227341d6)"
+      ]
     }
   },
   {
@@ -239,7 +242,10 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "provenance": {
       "project": "Adea",
       "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Light Default (iTerm2-Color-Schemes via oklch-terminal-themes@9e800e7fe760081d4c10317498038ed4227341d6)"
+      ]
     }
   },
   {
@@ -526,7 +532,10 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "provenance": {
       "project": "Adea",
       "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Dark Default (iTerm2-Color-Schemes via oklch-terminal-themes@9e800e7fe760081d4c10317498038ed4227341d6)"
+      ]
     }
   },
   {
@@ -545,7 +554,10 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "provenance": {
       "project": "Adea",
       "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Light Default (iTerm2-Color-Schemes via oklch-terminal-themes@9e800e7fe760081d4c10317498038ed4227341d6)"
+      ]
     }
   },
   {
