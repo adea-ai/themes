@@ -59,9 +59,12 @@ derivations in `src/accents.ts`. `--primary-hover` applies the same fixed lightn
 step as `primaryHover`, moving away from the canvas (darker in light themes, lighter
 in dark themes) while retaining the primary hue. `--primary-subtle` uses
 `primarySubtleCss`, a `color-mix()` over `var(--primary)` with the appearance-specific
-tint strength, so it follows a runtime override of `--primary`. The adapter tests
-check both values and the primary foreground's 4.5:1 contrast on the hover fill for
-every exported theme.
+tint strength, so it follows a runtime override of `--primary`. The hover value is
+resolved from the theme's canonical accent, so a consumer overriding `--primary` at
+runtime must also recompute `--primary-hover` with `primaryHover(customPrimary,
+appearance)`; otherwise the hover retains the theme accent. The adapter tests check
+both values and the primary foreground's 4.5:1 contrast on the hover fill for every
+exported theme.
 
 ### `border` fills both `--border` and `--input`
 
