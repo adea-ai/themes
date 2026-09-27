@@ -58,10 +58,7 @@ const theme: AdeaThemeRecord = {
   "provenance": {
     "project": "Adea",
     "url": "https://github.com/adea-ai/adea",
-    "license": "Apache-2.0",
-    "bootstrappedFrom": [
-      "GitHub Dark Default (iTerm2-Color-Schemes via oklch-terminal-themes@9e800e7fe760081d4c10317498038ed4227341d6)"
-    ]
+    "license": "Apache-2.0"
   },
   "tags": [
     "dark",

@@ -501,22 +501,14 @@ describe('provenance', () => {
     }
   })
 
-  test('legacy themes retain per-appearance GitHub ANSI lineage and pinned source revision', () => {
-    const expected = {
-      'slate-light': 'GitHub Light Default',
-      'contrast-light': 'GitHub Light Default',
-      'slate-dark': 'GitHub Dark Default',
-      'contrast-dark': 'GitHub Dark Default',
-    }
-    const revision = '9e800e7fe760081d4c10317498038ed4227341d6'
-
-    for (const [id, source] of Object.entries(expected)) {
+  test('legacy themes do not claim an unsupported external source for their ANSI values', () => {
+    for (const id of ['slate-light', 'slate-dark', 'contrast-light', 'contrast-dark']) {
       const theme = getTheme(id)
       expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
-      const lineage = theme?.provenance.bootstrappedFrom ?? []
-      expect(lineage, `${id} does not retain its GitHub ANSI lineage`).toContain(
-        `${source} (iTerm2-Color-Schemes via oklch-terminal-themes@${revision})`
-      )
+      expect(
+        theme?.provenance.bootstrappedFrom,
+        `${id} must not attribute Adea's existing ANSI constants to an unrelated GitHub palette`
+      ).toBeUndefined()
     }
   })
 

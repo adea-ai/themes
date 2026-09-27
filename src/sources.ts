@@ -857,6 +857,8 @@ export interface AuthoredSource {
   selection: string
 }
 
+// The Slate and Contrast ANSI values below are carried forward from Adea's existing
+// product theme definitions; no external terminal-scheme lineage is claimed.
 const SLATE_ANSI: AuthoredSource['ansi'] = {
   black: '#1b1f24',
   red: '#b91c1c',
@@ -895,18 +897,6 @@ const CONTRAST_ANSI: AuthoredSource['ansi'] = {
   brightWhite: '#eef2f6',
 }
 
-function adeaAnsiProvenance(appearance: ThemeAppearance): ThemeProvenance {
-  const upstream = appearance === 'light' ? 'GitHub Light Default' : 'GitHub Dark Default'
-  return {
-    project: 'Adea',
-    url: 'https://github.com/adea-ai/adea',
-    license: 'Apache-2.0',
-    bootstrappedFrom: [
-      `${upstream} (iTerm2-Color-Schemes via oklch-terminal-themes@${CATALOGUE_REVISION})`,
-    ],
-  }
-}
-
 export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
   {
     id: 'slate-light',
@@ -915,7 +905,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Light',
     name: 'Slate Light',
     description: 'Adea’s slate neutral palette for light appearance.',
-    provenance: adeaAnsiProvenance('light'),
+    provenance: FAMILY_PROVENANCE.slate,
     appearance: 'light',
     tags: ['light', 'slate', 'neutral'],
     ramp: {
@@ -958,7 +948,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Dark',
     name: 'Slate Dark',
     description: 'Adea’s slate neutral palette for dark appearance.',
-    provenance: adeaAnsiProvenance('dark'),
+    provenance: FAMILY_PROVENANCE.slate,
     appearance: 'dark',
     tags: ['dark', 'slate', 'neutral'],
     ramp: {
@@ -1005,7 +995,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Light',
     name: 'High Contrast Light',
     description: 'Adea’s high-contrast palette for light appearance.',
-    provenance: adeaAnsiProvenance('light'),
+    provenance: FAMILY_PROVENANCE.contrast,
     appearance: 'light',
     tags: ['light', 'high-contrast'],
     ramp: {
@@ -1048,7 +1038,7 @@ export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
     label: 'Dark',
     name: 'High Contrast Dark',
     description: 'Adea’s high-contrast palette for dark appearance.',
-    provenance: adeaAnsiProvenance('dark'),
+    provenance: FAMILY_PROVENANCE.contrast,
     appearance: 'dark',
     tags: ['dark', 'high-contrast'],
     ramp: {
