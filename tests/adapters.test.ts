@@ -305,7 +305,11 @@ describe('shadcn bridge', () => {
         const parsedFill = parseColor(fill ?? '')
         expect(parsedFill, `${theme.id} --${shadcnRole}-subtle is not opaque OKLCH`).toBeDefined()
         expect(fill).toBe(tint(theme.colors[role], theme.colors.background))
-        expect(variables[`--${shadcnRole}-foreground`]).toBe(statusForeground(theme, role))
+        expect(variables[`--${shadcnRole}-foreground`]).toBe(
+          role === 'error'
+            ? shadcnDestructiveProjection(theme).foreground
+            : statusForeground(theme, role)
+        )
 
         const ratio = contrastRatio(foreground!, parsedFill!)
         expect(

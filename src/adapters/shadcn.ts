@@ -39,9 +39,9 @@ export type ShadcnTheme = AdeaTheme & { shadcn?: ShadcnThemeProjection }
 /** The solid destructive pair consumed by filled shadcn actions. */
 export interface ShadcnDestructiveProjection {
   /** Presentation fill derived from, but distinct from, the canonical error role. */
-  fill: string
+  readonly fill: string
   /** Text color that clears the solid and 90%-hover presentation floors. */
-  foreground: string
+  readonly foreground: string
 }
 
 const DESTRUCTIVE_PRESENTATION_FLOOR = 5
@@ -99,6 +99,9 @@ export function shadcnDestructiveProjection(theme: ShadcnTheme): ShadcnDestructi
     .filter((entry): entry is { value: string; rendered: NonNullable<typeof entry.rendered> } =>
       Boolean(entry.rendered)
     )
+  if (surfaces.length !== DESTRUCTIVE_PRESENTATION_SURFACES.length) {
+    throw new Error(`theme ${theme.id} has an invalid destructive presentation surface`)
+  }
 
   for (let step = 0; step <= 250; step += 1) {
     const directions = step === 0 ? [0] : [-1, 1]
@@ -184,9 +187,10 @@ export function shadcnRoles(theme: ShadcnTheme): Record<string, string> {
  */
 export function shadcnVariables(theme: ShadcnTheme): Record<string, string> {
   const variables: Record<string, string> = {}
+  const destructive = shadcnDestructiveProjection(theme)
 
   for (const [role, name] of Object.entries(SHADCN_MAPPING) as [keyof AdeaThemeColors, string][]) {
-    variables[`--${name}`] = theme.colors[role]
+    variables[`--${name}`] = role === 'error' ? destructive.fill : theme.colors[role]
   }
 
   variables['--accent'] = theme.colors.surfaceHover
@@ -216,8 +220,6 @@ export function shadcnVariables(theme: ShadcnTheme): Record<string, string> {
   variables['--sidebar-ring'] = theme.colors.accent
   variables['--sidebar-muted-foreground'] = theme.colors.textMuted
 
-  const destructive = shadcnDestructiveProjection(theme)
-  variables['--destructive'] = destructive.fill
   variables['--destructive-foreground'] = destructive.foreground
 
   for (const role of STATUS_ROLES) {
