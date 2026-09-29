@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.0](https://github.com/adea-ai/themes/compare/v0.7.1...v0.8.0) (2026-09-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* the Adea family becomes six managed variants ([#25](https://github.com/adea-ai/themes/issues/25))
+
+### Features
+
+* the Adea family becomes six managed variants ([#25](https://github.com/adea-ai/themes/issues/25)) ([86b528d](https://github.com/adea-ai/themes/commit/86b528d5d554be55fd9c38a96f2facd2d76cf733))
+
 ## [0.7.1](https://github.com/adea-ai/themes/compare/v0.7.0...v0.7.1) (2026-09-29)
 
 
