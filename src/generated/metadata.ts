@@ -11,50 +11,6 @@ import type { ThemeMetadata } from '../schema.js'
 /** Picker identities and provenance, without runtime palettes. */
 export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
   {
-    "id": "aardvark-blue",
-    "name": "Aardvark Blue",
-    "appearance": "dark",
-    "family": "aardvark",
-    "familyLabel": "Aardvark",
-    "label": "Blue",
-    "description": "Ink's louder sibling: a deep blue ground under bright, cool text.",
-    "tags": [
-      "dark",
-      "blue",
-      "vivid"
-    ],
-    "provenance": {
-      "project": "iTerm2-Color-Schemes",
-      "url": "https://github.com/mbadolato/iTerm2-Color-Schemes",
-      "license": "MIT",
-      "bootstrappedFrom": [
-        "https://github.com/mbadolato/iTerm2-Color-Schemes"
-      ]
-    }
-  },
-  {
-    "id": "aardvark-ink",
-    "name": "Aardvark Ink",
-    "appearance": "dark",
-    "family": "aardvark",
-    "familyLabel": "Aardvark",
-    "label": "Ink",
-    "description": "Near-black navy with muted blue-grey text — the canvas the original Adea Dark was drawn on.",
-    "tags": [
-      "dark",
-      "ink",
-      "muted"
-    ],
-    "provenance": {
-      "project": "iTerm2-Color-Schemes",
-      "url": "https://github.com/mbadolato/iTerm2-Color-Schemes",
-      "license": "MIT",
-      "bootstrappedFrom": [
-        "https://github.com/mbadolato/iTerm2-Color-Schemes"
-      ]
-    }
-  },
-  {
     "id": "adea-dark",
     "name": "Adea Dark",
     "appearance": "dark",
@@ -96,6 +52,50 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
       "bootstrappedFrom": [
         "GitHub Light Default (iTerm2-Color-Schemes)",
         "GitHub Dark Default (iTerm2-Color-Schemes)"
+      ]
+    }
+  },
+  {
+    "id": "aardvark-blue",
+    "name": "Aardvark Blue",
+    "appearance": "dark",
+    "family": "aardvark",
+    "familyLabel": "Aardvark",
+    "label": "Blue",
+    "description": "Ink's louder sibling: a deep blue ground under bright, cool text.",
+    "tags": [
+      "dark",
+      "blue",
+      "vivid"
+    ],
+    "provenance": {
+      "project": "iTerm2-Color-Schemes",
+      "url": "https://github.com/mbadolato/iTerm2-Color-Schemes",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      ]
+    }
+  },
+  {
+    "id": "aardvark-ink",
+    "name": "Aardvark Ink",
+    "appearance": "dark",
+    "family": "aardvark",
+    "familyLabel": "Aardvark",
+    "label": "Ink",
+    "description": "Near-black navy with muted blue-grey text — the canvas the original Adea Dark was drawn on.",
+    "tags": [
+      "dark",
+      "ink",
+      "muted"
+    ],
+    "provenance": {
+      "project": "iTerm2-Color-Schemes",
+      "url": "https://github.com/mbadolato/iTerm2-Color-Schemes",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
       ]
     }
   },

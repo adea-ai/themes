@@ -237,7 +237,14 @@ async function generate(): Promise<Generated> {
     schemes[source.id] = source.scheme
   }
 
-  records.sort((a, b) => a.id.localeCompare(b.id))
+  // The defaults lead the catalogue. This array is the order every picker shows,
+  // and the family a consumer opens on must be its first option rather than
+  // whatever wins an alphabetical race.
+  records.sort((a, b) => {
+    const aDefault = a.family === 'adea' ? 0 : 1
+    const bDefault = b.family === 'adea' ? 0 : 1
+    return aDefault - bDefault || a.id.localeCompare(b.id)
+  })
   return { records, schemes, findings }
 }
 
@@ -258,7 +265,7 @@ function renderThemes(records: AdeaThemeRecord[]): string {
 import type { AdeaThemeRecord } from '../schema.js'
 ${imports}
 
-/** Every theme in the catalogue, ordered by id. */
+/** Every theme in the catalogue, Adea's own family first, then by id. */
 export const generatedThemes: readonly AdeaThemeRecord[] = Object.freeze([
 ${records.map((_, index) => `  theme${index},`).join('\n')}
 ])

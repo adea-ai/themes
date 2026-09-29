@@ -7,10 +7,10 @@
  */
 
 import type { AdeaThemeRecord } from '../schema.js'
-import theme0 from './themes/aardvark-blue.js'
-import theme1 from './themes/aardvark-ink.js'
-import theme2 from './themes/adea-dark.js'
-import theme3 from './themes/adea-light.js'
+import theme0 from './themes/adea-dark.js'
+import theme1 from './themes/adea-light.js'
+import theme2 from './themes/aardvark-blue.js'
+import theme3 from './themes/aardvark-ink.js'
 import theme4 from './themes/ayu.js'
 import theme5 from './themes/ayu-light.js'
 import theme6 from './themes/ayu-mirage.js'
@@ -41,7 +41,7 @@ import theme30 from './themes/tokyonight-night.js'
 import theme31 from './themes/tokyonight-storm.js'
 import theme32 from './themes/vesper.js'
 
-/** Every theme in the catalogue, ordered by id. */
+/** Every theme in the catalogue, Adea's own family first, then by id. */
 export const generatedThemes: readonly AdeaThemeRecord[] = Object.freeze([
   theme0,
   theme1,
