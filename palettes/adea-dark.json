@@ -1,17 +1,17 @@
 {
   "system": "base24",
   "name": "Adea Dark",
-  "author": "Adea, composed from Aardvark Ink and GitHub Dark Default",
+  "author": "Adea, composed from GitHub Dark Default and GitHub Dark Default",
   "variant": "dark",
   "palette": {
-    "base00": "#0f141f",
-    "base01": "#222734",
-    "base02": "#2a3645",
-    "base03": "#3a4152",
-    "base04": "#5a6377",
-    "base05": "#b4bcca",
-    "base06": "#dfe5ee",
-    "base07": "#dfe5ee",
+    "base00": "#0d1117",
+    "base01": "#484f58",
+    "base02": "#e6edf3",
+    "base03": "#6e7681",
+    "base04": "#b1bac4",
+    "base05": "#e6edf3",
+    "base06": "#ffffff",
+    "base07": "#ffffff",
     "base08": "#ff7b72",
     "base0A": "#d29922",
     "base0B": "#3fb950",
@@ -26,23 +26,23 @@
     "base17": "#d2a8ff",
     "base09": "oklch(0.7345 0.1626 51.78)",
     "base0F": "oklch(0.7196 0.1401 45.91)",
-    "base10": "oklch(0.1618 0.019 265.37)",
-    "base11": "oklch(0.1318 0.0161 265.37)"
+    "base10": "oklch(0.1463 0.0103 258.36)",
+    "base11": "oklch(0.1163 0.0086 258.36)"
   },
   "ansi": {
-    "black": "#222734",
-    "brightBlack": "#3a4152",
-    "white": "#5a6377",
-    "brightWhite": "#dfe5ee"
+    "black": "#484f58",
+    "brightBlack": "#6e7681",
+    "white": "#b1bac4",
+    "brightWhite": "#ffffff"
   },
-  "cursor": "#b4bcca",
-  "selection": "#2a3645",
+  "cursor": "#2f81f7",
+  "selection": "#e6edf3",
   "source": {
     "composedFrom": [
       {
         "role": "structure",
-        "slug": "aardvark-ink",
-        "name": "Aardvark Ink"
+        "slug": "github-dark-default",
+        "name": "GitHub Dark Default"
       },
       {
         "role": "hues",

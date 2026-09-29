@@ -162,16 +162,18 @@ export interface ComposedSource {
  * and each borrows its canvas from a palette chosen for the *canvas* rather than for
  * its colours:
  *
- * | | canvas | canvas hue | hues |
- * | --- | --- | --- | --- |
- * | Adea Dark | Aardvark Ink `#0f141f` | 265° | GitHub Dark Default |
- * | Adea Light | Nord Light `#e3e9f4` | 262° | GitHub Dark Default |
+ * | | canvas | hues |
+ * | --- | --- | --- |
+ * | Adea Dark | GitHub Dark Default `#0d1117` | GitHub Dark Default |
+ * | Adea Light | GitHub Light Default `#ffffff` | GitHub Dark Default, transposed |
  *
- * Three degrees apart, and both canvases are *tinted* rather than neutral — 0.024 and
- * 0.016 of chroma — which is the property that makes the pair feel like one theme seen
- * at two exposures instead of two themes that happen to ship together. Switching
- * appearance changes lightness and nothing else about the theme's identity; that claim
- * is asserted in `tests/provenance.test.ts` rather than left as intent.
+ * The defaults are GitHub's two appearances. The dark theme is GitHub Dark Default
+ * entire, and the light theme is GitHub's own white canvas carrying the dark theme's
+ * hues — the same red is the same red in both, and switching appearance changes
+ * lightness and nothing else about the theme's identity; that claim is asserted in
+ * `tests/provenance.test.ts` rather than left as intent. Both stay compositions
+ * rather than vendored copies so that a later customisation is a one-slot diff with
+ * the donors still named.
  *
  * The light theme is the reason `hueTranspose` exists: GitHub's dark hues measure
  * between 2.5:1 and 4.1:1 on a light canvas, so the whole hue set is transposed down in
@@ -187,10 +189,10 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
     familyLabel: 'Adea',
     label: 'Dark',
     description:
-      "The default dark theme. Aardvark Ink's quiet canvas, with GitHub's vivid hues on it.",
+      "The default dark theme: GitHub Dark Default's canvas and hues, kept as a composition so the default can diverge from it one slot at a time.",
     appearance: 'dark',
-    tags: ['dark', 'default', 'vivid'],
-    donors: { structure: 'aardvark-ink', hues: 'github-dark-default' },
+    tags: ['dark', 'default', 'neutral'],
+    donors: { structure: 'github-dark-default', hues: 'github-dark-default' },
     slots: {
       // The structure donor. `base01` receives its `black` rather than a background
       // step: an ANSI black equal to the background is invisible as foreground text,
@@ -237,10 +239,7 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       project: 'Adea',
       url: 'https://github.com/adea-ai/themes',
       license: 'Apache-2.0',
-      bootstrappedFrom: [
-        'Aardvark Ink (iTerm2-Color-Schemes)',
-        'GitHub Dark Default (iTerm2-Color-Schemes)',
-      ],
+      bootstrappedFrom: ['GitHub Dark Default (iTerm2-Color-Schemes)'],
     },
   },
   {
@@ -250,16 +249,15 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
     familyLabel: 'Adea',
     label: 'Light',
     description:
-      "The default light theme. Nord Light's cool canvas, with the same hues as Adea Dark.",
+      "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper.",
     appearance: 'light',
-    tags: ['light', 'default', 'cool'],
-    donors: { structure: 'nord-light', hues: 'github-dark-default' },
+    tags: ['light', 'default', 'neutral'],
+    donors: { structure: 'github-light-default', hues: 'github-dark-default' },
     slots: {
-      // The structure donor. Same shape as the dark theme's, with one difference worth
-      // noting: Nord Light's `black` (`#3b4252`) is *darker* than its foreground, which
-      // is what an ANSI black should be on a light canvas — the text colour and the
-      // darkest neutral are the same role there, and Base24's `base01` is where Nord
-      // keeps it.
+      // The structure donor. Same shape as the dark theme's, with one property worth
+      // noting: GitHub Light's `black` (`#24292f`) is *darker* than its foreground
+      // (`#1f2328`), which is what an ANSI black should be on a light canvas — the
+      // darkest neutral sits below the body text, not above it.
       base00: ['structure', 'background'],
       base01: ['structure', 'black'],
       base02: ['structure', 'selection'],
@@ -289,17 +287,6 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       base10: ['structure', 'background', { lighten: 0.03 }],
       base11: ['structure', 'background', { lighten: 0.06 }],
     },
-    /**
-     * The one deliberate deviation from the donor, and it is aesthetic rather than
-     * factual — unlike the One Dark correction above, nothing here is wrong.
-     *
-     * Nord Light's canvas carries 0.010 of chroma against Aardvark Ink's 0.024, so
-     * rendering the same hue at half the tint makes the light theme read as neutral grey
-     * beside a partner that is clearly navy. Deepening it to 0.016 — two thirds of the
-     * dark theme's — is what makes the pair look like siblings. Lightness and hue are
-     * untouched, so no contrast pairing moves: body text measures 7.5:1 either way.
-     */
-    palette: { base00: 'oklch(0.933 0.016 261.79)' },
     ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
     /*
      * GitHub's hues were drawn for a `#0d1117` canvas. On Nord Light's they measure
@@ -322,7 +309,7 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       url: 'https://github.com/adea-ai/themes',
       license: 'Apache-2.0',
       bootstrappedFrom: [
-        'Nord Light (iTerm2-Color-Schemes)',
+        'GitHub Light Default (iTerm2-Color-Schemes)',
         'GitHub Dark Default (iTerm2-Color-Schemes)',
       ],
     },
@@ -339,15 +326,17 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
  */
 export const FAMILY_PROVENANCE: Readonly<Record<string, ThemeProvenance>> = Object.freeze({
   adea: ADEA_PROVENANCE,
-  slate: {
-    project: 'Adea',
-    url: 'https://github.com/adea-ai/adea',
-    license: 'Apache-2.0',
+  aardvark: {
+    project: 'iTerm2-Color-Schemes',
+    url: ITERM2,
+    license: 'MIT',
+    bootstrappedFrom: [ITERM2],
   },
-  contrast: {
-    project: 'Adea',
-    url: 'https://github.com/adea-ai/adea',
-    license: 'Apache-2.0',
+  github: {
+    project: 'GitHub Primer',
+    url: 'https://github.com/primer/primitives',
+    license: 'MIT',
+    bootstrappedFrom: [ITERM2],
   },
   catppuccin: {
     project: 'Catppuccin',
@@ -477,6 +466,31 @@ const ONE_DARK_OFFICIAL = Object.freeze({
  * is deliberate rather than alphabetical.
  */
 export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
+  /* --- Aardvark: the house canvases, from iTerm2-Color-Schemes ----------- */
+  {
+    id: 'aardvark-ink',
+    slug: 'aardvark-ink',
+    family: 'aardvark',
+    familyLabel: 'Aardvark',
+    label: 'Ink',
+    name: 'Aardvark Ink',
+    description:
+      'Near-black navy with muted blue-grey text — the canvas the original Adea Dark was drawn on.',
+    appearance: 'dark',
+    tags: ['dark', 'ink', 'muted'],
+  },
+  {
+    id: 'aardvark-blue',
+    slug: 'aardvark-blue',
+    family: 'aardvark',
+    familyLabel: 'Aardvark',
+    label: 'Blue',
+    name: 'Aardvark Blue',
+    description: "Ink's louder sibling: a deep blue ground under bright, cool text.",
+    appearance: 'dark',
+    tags: ['dark', 'blue', 'vivid'],
+  },
+
   /* --- Catppuccin: four flavours, lightest first ------------------------- */
   {
     id: 'catppuccin-latte',
@@ -633,6 +647,17 @@ export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
     tags: ['dark', 'cool', 'muted', 'popular'],
   },
   {
+    id: 'nord-light',
+    slug: 'nord-light',
+    family: 'nord',
+    familyLabel: 'Nord',
+    label: 'Light',
+    name: 'Nord Light',
+    description: "Nord's snow variant: the same cool palette for a light canvas.",
+    appearance: 'light',
+    tags: ['light', 'cool', 'muted'],
+  },
+  {
     id: 'dracula',
     slug: 'dracula',
     family: 'dracula',
@@ -690,6 +715,44 @@ export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
     // Monokai's blue slot is orange in the terminal port, which would read as a
     // warning colour. The family's own accent is its magenta.
     accentSlot: 'magenta',
+  },
+
+  /* --- GitHub: the interface palette, and its accessible pair ------------- */
+  {
+    id: 'github-light-default',
+    slug: 'github-light-default',
+    family: 'github',
+    familyLabel: 'GitHub',
+    label: 'Light Default',
+    name: 'GitHub Light Default',
+    description:
+      "GitHub's own light interface palette: white ground, grey steps, familiar syntax hues.",
+    appearance: 'light',
+    tags: ['light', 'neutral', 'popular'],
+  },
+  {
+    id: 'github-dark-high-contrast',
+    slug: 'github-dark-high-contrast',
+    family: 'github',
+    familyLabel: 'GitHub',
+    label: 'Dark High Contrast',
+    name: 'GitHub Dark High Contrast',
+    description:
+      "GitHub's dark palette with its contrast floors pushed up, for accessibility needs.",
+    appearance: 'dark',
+    tags: ['dark', 'high-contrast'],
+  },
+  {
+    id: 'github-light-high-contrast',
+    slug: 'github-light-high-contrast',
+    family: 'github',
+    familyLabel: 'GitHub',
+    label: 'Light High Contrast',
+    name: 'GitHub Light High Contrast',
+    description:
+      "GitHub's light palette with its contrast floors pushed up, for accessibility needs.",
+    appearance: 'light',
+    tags: ['light', 'high-contrast'],
   },
 
   /* --- Solarized: one palette, two appearances --------------------------- */
@@ -857,221 +920,9 @@ export interface AuthoredSource {
   selection: string
 }
 
-// The Slate and Contrast ANSI values below are carried forward from Adea's existing
-// product theme definitions; no external terminal-scheme lineage is claimed.
-const SLATE_ANSI: AuthoredSource['ansi'] = {
-  black: '#1b1f24',
-  red: '#b91c1c',
-  green: '#116a2e',
-  yellow: '#8a5a1b',
-  blue: '#0b57d0',
-  magenta: '#a0186f',
-  cyan: '#0e7490',
-  white: '#57606a',
-  brightBlack: '#57606a',
-  brightRed: '#c94d4d',
-  brightGreen: '#1f9d4f',
-  brightYellow: '#a9752c',
-  brightBlue: '#3b82f6',
-  brightMagenta: '#c04a92',
-  brightCyan: '#0891b2',
-  brightWhite: '#24292f',
-}
-
-const CONTRAST_ANSI: AuthoredSource['ansi'] = {
-  black: '#2f3742',
-  red: '#ff8183',
-  green: '#56d364',
-  yellow: '#e3b341',
-  blue: '#6ca4f8',
-  magenta: '#db61a2',
-  cyan: '#39c5cf',
-  white: '#d5dde5',
-  brightBlack: '#57606a',
-  brightRed: '#ff9494',
-  brightGreen: '#79dd8a',
-  brightYellow: '#f0c264',
-  brightBlue: '#8db9ff',
-  brightMagenta: '#e87cb4',
-  brightCyan: '#66d3dc',
-  brightWhite: '#eef2f6',
-}
-
 export const AUTHORED_SOURCES: readonly AuthoredSource[] = Object.freeze([
-  {
-    id: 'slate-light',
-    family: 'slate',
-    familyLabel: 'Slate',
-    label: 'Light',
-    name: 'Slate Light',
-    description: 'Adea’s slate neutral palette for light appearance.',
-    provenance: FAMILY_PROVENANCE.slate,
-    appearance: 'light',
-    tags: ['light', 'slate', 'neutral'],
-    ramp: {
-      background: '#f8fafc',
-      foreground: '#0f172a',
-      surface: '#f8fafc',
-      surfaceElevated: '#f8fafc',
-      surfaceHover: '#e2e8f0',
-      surfaceActive: '#e2e8f0',
-      border: '#cbd5e1',
-      borderMuted: '#cbd5e1',
-      textMuted: '#475569',
-      textSubtle: '#64748b',
-    },
-    accent: '#0f172a',
-    accentForeground: '#f8fafc',
-    status: {
-      success: '#15803d',
-      warning: SLATE_ANSI.yellow,
-      error: '#b91c1c',
-      info: SLATE_ANSI.blue,
-    },
-    ansi: SLATE_ANSI,
-    cursor: '#24292f',
-    selection: '#b6c7ff',
-    shadcn: {
-      card: '#ffffff',
-      popover: '#ffffff',
-      secondary: '#e2e8f0',
-      muted: '#e2e8f0',
-      border: '#cbd5e1',
-      input: '#cbd5e1',
-      ring: '#64748b',
-    },
-  },
-  {
-    id: 'slate-dark',
-    family: 'slate',
-    familyLabel: 'Slate',
-    label: 'Dark',
-    name: 'Slate Dark',
-    description: 'Adea’s slate neutral palette for dark appearance.',
-    provenance: FAMILY_PROVENANCE.slate,
-    appearance: 'dark',
-    tags: ['dark', 'slate', 'neutral'],
-    ramp: {
-      background: '#0f172a',
-      foreground: '#f1f5f9',
-      surface: '#1e293b',
-      surfaceElevated: '#1e293b',
-      surfaceHover: '#334155',
-      surfaceActive: '#334155',
-      border: '#94a3b8',
-      borderMuted: '#94a3b8',
-      textMuted: '#94a3b8',
-      textSubtle: '#64748b',
-    },
-    accent: '#e2e8f0',
-    accentForeground: '#0f172a',
-    status: {
-      success: '#4ade80',
-      warning: CONTRAST_ANSI.yellow,
-      error: '#f87171',
-      info: CONTRAST_ANSI.blue,
-    },
-    ansi: CONTRAST_ANSI,
-    cursor: '#e6edf3',
-    selection: '#264f78',
-    shadcn: {
-      card: '#1e293b',
-      popover: '#1e293b',
-      secondary: '#334155',
-      muted: '#334155',
-      // The old #94a3b8 remains canonical `textMuted`, but shared UI components
-      // also pair this role with the #334155 muted fill. Move lightness by the
-      // smallest 0.032 OKLCH step that clears 4.5:1 after sRGB conversion.
-      mutedForeground: 'oklch(0.7427 0.0351 256.79)',
-      border: 'rgba(148, 163, 184, 0.2)',
-      input: 'rgba(148, 163, 184, 0.25)',
-      ring: '#64748b',
-    },
-  },
-  {
-    id: 'contrast-light',
-    family: 'contrast',
-    familyLabel: 'High Contrast',
-    label: 'Light',
-    name: 'High Contrast Light',
-    description: 'Adea’s high-contrast palette for light appearance.',
-    provenance: FAMILY_PROVENANCE.contrast,
-    appearance: 'light',
-    tags: ['light', 'high-contrast'],
-    ramp: {
-      background: '#ffffff',
-      foreground: '#000000',
-      surface: '#ffffff',
-      surfaceElevated: '#ffffff',
-      surfaceHover: '#f0f0f0',
-      surfaceActive: '#f0f0f0',
-      border: '#767676',
-      borderMuted: '#767676',
-      textMuted: '#333333',
-      textSubtle: '#767676',
-    },
-    accent: '#143d8f',
-    accentForeground: '#ffffff',
-    status: {
-      success: '#14532d',
-      warning: SLATE_ANSI.yellow,
-      error: '#b91c1c',
-      info: SLATE_ANSI.blue,
-    },
-    ansi: SLATE_ANSI,
-    cursor: '#24292f',
-    selection: '#b6c7ff',
-    shadcn: {
-      card: '#ffffff',
-      popover: '#ffffff',
-      secondary: '#f0f0f0',
-      muted: '#f0f0f0',
-      border: '#767676',
-      input: '#767676',
-      ring: '#000000',
-    },
-  },
-  {
-    id: 'contrast-dark',
-    family: 'contrast',
-    familyLabel: 'High Contrast',
-    label: 'Dark',
-    name: 'High Contrast Dark',
-    description: 'Adea’s high-contrast palette for dark appearance.',
-    provenance: FAMILY_PROVENANCE.contrast,
-    appearance: 'dark',
-    tags: ['dark', 'high-contrast'],
-    ramp: {
-      background: '#000000',
-      foreground: '#ffffff',
-      surface: '#0a0a0a',
-      surfaceElevated: '#0a0a0a',
-      surfaceHover: '#1a1a1a',
-      surfaceActive: '#1a1a1a',
-      border: '#8f8f8f',
-      borderMuted: '#8f8f8f',
-      textMuted: '#e5e5e5',
-      textSubtle: '#8f8f8f',
-    },
-    accent: '#8ab4ff',
-    accentForeground: '#000000',
-    status: {
-      success: '#4ade80',
-      warning: CONTRAST_ANSI.yellow,
-      error: '#ff6b6b',
-      info: CONTRAST_ANSI.blue,
-    },
-    ansi: CONTRAST_ANSI,
-    cursor: '#e6edf3',
-    selection: '#264f78',
-    shadcn: {
-      card: '#0a0a0a',
-      popover: '#0a0a0a',
-      secondary: '#1a1a1a',
-      muted: '#1a1a1a',
-      border: '#8f8f8f',
-      input: '#8f8f8f',
-      ring: '#ffffff',
-    },
-  },
+  // Empty today. A theme lands here when Adea owns a palette that has no upstream
+  // scheme to vendor; the Slate and High Contrast themes that filled this list were
+  // dropped in favour of GitHub's own High Contrast pair, which serve the same
+  // accessibility rung without first-party maintenance.
 ])
