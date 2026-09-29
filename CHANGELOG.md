@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.7.0](https://github.com/adea-ai/themes/compare/v0.6.3...v0.7.0) (2026-09-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* rebuild the defaults on GitHub's palette; add Aardvark and GitHub families ([#20](https://github.com/adea-ai/themes/issues/20))
+
+### Features
+
+* rebuild the defaults on GitHub's palette; add Aardvark and GitHub families ([#20](https://github.com/adea-ai/themes/issues/20)) ([4150d09](https://github.com/adea-ai/themes/commit/4150d09b6a6fa5536922b1d765bb625eb50796ae))
+
 ## [0.6.3](https://github.com/adea-ai/themes/compare/v0.6.2...v0.6.3) (2026-09-27)
 
 
