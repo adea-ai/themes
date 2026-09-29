@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/adea-ai/themes/compare/v0.7.0...v0.7.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* **derive:** source default-ink syntax roles from the dark slot on light themes ([#23](https://github.com/adea-ai/themes/issues/23)) ([52acbaf](https://github.com/adea-ai/themes/commit/52acbaf9e88359068e0454a4e475defed4e0a6dd))
+
 ## [0.7.0](https://github.com/adea-ai/themes/compare/v0.6.3...v0.7.0) (2026-09-29)
 
 
