@@ -512,9 +512,9 @@ describe('derived colours', () => {
     const canonical = syntaxRolesHex(theme)
     const projected = editorRolesHex(theme)
 
-    expect(oklchToHex(parseColor(theme.ansi.brightBlack)!)).toBe('#6e7681')
-    expect(canonical.comment).toBe('#6e7681')
-    expect(projected.comment).toBe('#757d88')
+    expect(oklchToHex(parseColor(theme.ansi.brightBlack)!)).toBe('#76747a')
+    expect(canonical.comment).toBe('#76747a')
+    expect(projected.comment).toBe('#7d7b81')
     for (const [role, value] of Object.entries(projected)) {
       const ratio = contrastRatio(parseColor(value)!, parseColor(theme.colors.background)!)
       expect(ratio, `${role} is ${ratio.toFixed(5)}:1 after hex rounding`).toBeGreaterThanOrEqual(

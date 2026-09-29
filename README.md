@@ -11,38 +11,44 @@ bun add @adea-ai/themes
 
 ## The catalogue
 
-| Family                                              | Variants                                               |
-| --------------------------------------------------- | ------------------------------------------------------ |
-| **Adea**                                            | Light, Dark                                            |
-| **Aardvark**                                        | Ink, Blue                                              |
-| **GitHub**                                          | Light Default, Dark High Contrast, Light High Contrast |
-| **Catppuccin**                                      | Latte, Frappé, Macchiato, Mocha                        |
-| **Tokyo Night**                                     | Day, Storm, Night                                      |
-| **Rosé Pine**                                       | Dawn, Moon, Main                                       |
-| **Gruvbox**                                         | Light, Dark                                            |
-| **Everforest**                                      | Light, Dark                                            |
-| **Ayu**                                             | Light, Mirage, Dark                                    |
-| **Solarized**                                       | Light, Dark                                            |
-| **Monokai**                                         | Classic                                                |
-| **Nord**                                            | Nord, Light                                            |
-| **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each                                               |
+| Family                                              | Variants                                                                                |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Adea**                                            | Dark, Dark Colorblind, Dark High Contrast, Light, Light Colorblind, Light High Contrast |
+| **Aardvark**                                        | Ink, Blue                                                                               |
+| **Catppuccin**                                      | Latte, Frappé, Macchiato, Mocha                                                         |
+| **Tokyo Night**                                     | Day, Storm, Night                                                                       |
+| **Rosé Pine**                                       | Dawn, Moon, Main                                                                        |
+| **Gruvbox**                                         | Light, Dark                                                                             |
+| **Everforest**                                      | Light, Dark                                                                             |
+| **Ayu**                                             | Light, Mirage, Dark                                                                     |
+| **Solarized**                                       | Light, Dark                                                                             |
+| **Monokai**                                         | Classic                                                                                 |
+| **Nord**                                            | Nord, Light                                                                             |
+| **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each                                                                                |
 
-`adea-light` and `adea-dark` are the defaults, and both are **composed** from two
-upstream palettes rather than authored or copied:
+The six **Adea** variants are the managed family — two appearances × three
+accessibility variants — and all of them are **composed** from upstream palettes
+rather than authored or copied:
 
-|            | canvas                         | hues                            |
-| ---------- | ------------------------------ | ------------------------------- |
-| Adea Dark  | GitHub Dark Default `#0d1117`  | GitHub Dark Default             |
-| Adea Light | GitHub Light Default `#ffffff` | GitHub Dark Default, transposed |
+| Variant                  | canvas                               | hues                                  | accent     |
+| ------------------------ | ------------------------------------ | ------------------------------------- | ---------- |
+| Adea Dark                | GitHub Dark Default, re-greyed       | GitHub Dark Default                   | its violet |
+| Adea Dark Colorblind     | same re-greyed canvas                | GitHub Dark Colorblind                | its violet |
+| Adea Dark High Contrast  | GitHub Dark High Contrast, re-greyed | GitHub Dark High Contrast             | its violet |
+| Adea Light               | GitHub Light Default `#ffffff`       | GitHub Dark Default, transposed       | its violet |
+| Adea Light Colorblind    | GitHub Light Colorblind `#ffffff`    | GitHub Dark Colorblind, transposed    | its violet |
+| Adea Light High Contrast | GitHub Light High Contrast           | GitHub Dark High Contrast, transposed | its violet |
 
-The defaults are GitHub's two appearances: the dark theme is GitHub Dark Default
-entire, and the light theme is GitHub's own white canvas carrying the dark theme's
-hues, transposed down one lightness step so they clear the contrast floors on paper.
-They share a hue donor, so a red is the same red in both and only the lightness
-changes. `tests/provenance.test.ts` asserts that partnership — identical hue and
-chroma for every chromatic role, canvases matching GitHub's published palette —
-because the two halves are built from different donors and could otherwise drift
-apart without either becoming wrong on its own.
+The re-greying is the one family-wide customisation: GitHub's dark greyscale is cut
+blue (`h≈258`), so its chroma is halved and the hue rotated to violet-grey — the
+ground the family's violet accent is meant to read on. The hue slots are untouched
+(GitHub's dark palette stays GitHub's), the accessibility variants are compositions
+of GitHub's own accessibility variants, and every light variant is its dark
+counterpart's hues transposed onto paper, so a red is the same red in both modes of
+a variant and switching appearance changes lightness and nothing else.
+`tests/provenance.test.ts` asserts the partnership — identical hue and chroma for
+every chromatic role across a variant's two appearances, the re-tinted canvases,
+and the violet accent on all six.
 
 The other themes reproduce somebody else's palette from a named revision and are
 credited in [NOTICE](NOTICE).

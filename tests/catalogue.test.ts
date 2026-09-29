@@ -49,9 +49,9 @@ function lightness(value: string): number {
 }
 
 describe('catalogue shape', () => {
-  test('the published catalogue contains the 33 documented themes in 16 families', () => {
-    expect(themes).toHaveLength(33)
-    expect(themeFamilies()).toHaveLength(16)
+  test('the published catalogue contains the 34 documented themes in 15 families', () => {
+    expect(themes).toHaveLength(34)
+    expect(themeFamilies()).toHaveLength(15)
   })
 
   test('ids are unique', () => {

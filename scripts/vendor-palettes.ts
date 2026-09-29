@@ -161,6 +161,11 @@ function compose(
     if (!value) throw new Error(`${source.id}: structure donor has no ${role}`)
     ansi[role] = value.toLowerCase()
   }
+  // Family-level corrections over the pinned greyscale, on the same terms as the
+  // `palette` slot corrections: upstream's bytes with named, reviewed adjustments.
+  for (const [role, value] of Object.entries(source.ansiOverrides ?? {})) {
+    ansi[role] = value.toLowerCase()
+  }
 
   return { palette, ansi }
 }

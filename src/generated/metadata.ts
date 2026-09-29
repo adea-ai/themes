@@ -17,7 +17,7 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "family": "adea",
     "familyLabel": "Adea",
     "label": "Dark",
-    "description": "The default dark theme: GitHub Dark Default's canvas and hues, kept as a composition so the default can diverge from it one slot at a time.",
+    "description": "The default dark theme: GitHub Dark Default with the canvas re-greyed to a violet-leaning neutral and the family violet accent, kept as a composition so the default can diverge from it one slot at a time.",
     "tags": [
       "dark",
       "default",
@@ -33,13 +33,57 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     }
   },
   {
+    "id": "adea-dark-colorblind",
+    "name": "Adea Dark Colorblind",
+    "appearance": "dark",
+    "family": "adea",
+    "familyLabel": "Adea",
+    "label": "Dark Colorblind",
+    "description": "The colourblind dark variant: GitHub Dark Colorblind's hues on the family's re-greyed canvas, for deuteranopia and protanopia. The violet accent survives the adjustment untouched.",
+    "tags": [
+      "dark",
+      "default",
+      "colorblind"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/themes",
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Dark Colorblind (iTerm2-Color-Schemes)"
+      ]
+    }
+  },
+  {
+    "id": "adea-dark-high-contrast",
+    "name": "Adea Dark High Contrast",
+    "appearance": "dark",
+    "family": "adea",
+    "familyLabel": "Adea",
+    "label": "Dark High Contrast",
+    "description": "The high-contrast dark variant: GitHub Dark High Contrast's near-black canvas re-greyed to the family neutral, carrying its own high-contrast hues and violet accent.",
+    "tags": [
+      "dark",
+      "default",
+      "high-contrast"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/themes",
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Dark High Contrast (iTerm2-Color-Schemes)"
+      ]
+    }
+  },
+  {
     "id": "adea-light",
     "name": "Adea Light",
     "appearance": "light",
     "family": "adea",
     "familyLabel": "Adea",
     "label": "Light",
-    "description": "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper.",
+    "description": "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper, with the family violet accent.",
     "tags": [
       "light",
       "default",
@@ -52,6 +96,52 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
       "bootstrappedFrom": [
         "GitHub Light Default (iTerm2-Color-Schemes)",
         "GitHub Dark Default (iTerm2-Color-Schemes)"
+      ]
+    }
+  },
+  {
+    "id": "adea-light-colorblind",
+    "name": "Adea Light Colorblind",
+    "appearance": "light",
+    "family": "adea",
+    "familyLabel": "Adea",
+    "label": "Light Colorblind",
+    "description": "The colourblind light variant: GitHub's white colourblind canvas carrying the dark colourblind hues, transposed to survive on paper — the same red is the same red as the dark colourblind variant.",
+    "tags": [
+      "light",
+      "default",
+      "colorblind"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/themes",
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Light Colorblind (iTerm2-Color-Schemes)",
+        "GitHub Dark Colorblind (iTerm2-Color-Schemes)"
+      ]
+    }
+  },
+  {
+    "id": "adea-light-high-contrast",
+    "name": "Adea Light High Contrast",
+    "appearance": "light",
+    "family": "adea",
+    "familyLabel": "Adea",
+    "label": "Light High Contrast",
+    "description": "The high-contrast light variant: GitHub's white high-contrast canvas carrying the dark high-contrast hues, transposed — the paper counterpart of the dark high-contrast variant.",
+    "tags": [
+      "light",
+      "default",
+      "high-contrast"
+    ],
+    "provenance": {
+      "project": "Adea",
+      "url": "https://github.com/adea-ai/themes",
+      "license": "Apache-2.0",
+      "bootstrappedFrom": [
+        "GitHub Light High Contrast (iTerm2-Color-Schemes)",
+        "GitHub Dark High Contrast (iTerm2-Color-Schemes)"
       ]
     }
   },
@@ -311,70 +401,6 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "provenance": {
       "project": "Everforest",
       "url": "https://github.com/sainnhe/everforest",
-      "license": "MIT",
-      "bootstrappedFrom": [
-        "https://github.com/mbadolato/iTerm2-Color-Schemes"
-      ]
-    }
-  },
-  {
-    "id": "github-dark-high-contrast",
-    "name": "GitHub Dark High Contrast",
-    "appearance": "dark",
-    "family": "github",
-    "familyLabel": "GitHub",
-    "label": "Dark High Contrast",
-    "description": "GitHub's dark palette with its contrast floors pushed up, for accessibility needs.",
-    "tags": [
-      "dark",
-      "high-contrast"
-    ],
-    "provenance": {
-      "project": "GitHub Primer",
-      "url": "https://github.com/primer/primitives",
-      "license": "MIT",
-      "bootstrappedFrom": [
-        "https://github.com/mbadolato/iTerm2-Color-Schemes"
-      ]
-    }
-  },
-  {
-    "id": "github-light-default",
-    "name": "GitHub Light Default",
-    "appearance": "light",
-    "family": "github",
-    "familyLabel": "GitHub",
-    "label": "Light Default",
-    "description": "GitHub's own light interface palette: white ground, grey steps, familiar syntax hues.",
-    "tags": [
-      "light",
-      "neutral",
-      "popular"
-    ],
-    "provenance": {
-      "project": "GitHub Primer",
-      "url": "https://github.com/primer/primitives",
-      "license": "MIT",
-      "bootstrappedFrom": [
-        "https://github.com/mbadolato/iTerm2-Color-Schemes"
-      ]
-    }
-  },
-  {
-    "id": "github-light-high-contrast",
-    "name": "GitHub Light High Contrast",
-    "appearance": "light",
-    "family": "github",
-    "familyLabel": "GitHub",
-    "label": "Light High Contrast",
-    "description": "GitHub's light palette with its contrast floors pushed up, for accessibility needs.",
-    "tags": [
-      "light",
-      "high-contrast"
-    ],
-    "provenance": {
-      "project": "GitHub Primer",
-      "url": "https://github.com/primer/primitives",
       "license": "MIT",
       "bootstrappedFrom": [
         "https://github.com/mbadolato/iTerm2-Color-Schemes"

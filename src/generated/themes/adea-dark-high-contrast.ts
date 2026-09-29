@@ -9,38 +9,38 @@
 import type { AdeaThemeRecord } from '../../schema.js'
 
 const theme: AdeaThemeRecord = {
-  "id": "github-dark-high-contrast",
-  "name": "GitHub Dark High Contrast",
+  "id": "adea-dark-high-contrast",
+  "name": "Adea Dark High Contrast",
   "appearance": "dark",
   "colors": {
-    "background": "oklch(0.154 0.0092 264.28)",
-    "foreground": "oklch(0.9627 0.0051 247.88)",
-    "surface": "oklch(0.189 0.0101 264.28)",
-    "surfaceElevated": "oklch(0.219 0.0128 264.28)",
-    "surfaceHover": "oklch(0.254 0.0147 264.28)",
-    "surfaceActive": "oklch(0.289 0.0147 264.28)",
-    "border": "oklch(0.304 0.0083 264.28)",
-    "borderMuted": "oklch(0.249 0.0055 264.28)",
-    "text": "oklch(0.9627 0.0051 247.88)",
-    "textMuted": "oklch(0.7039 0.0064 253.13)",
-    "textSubtle": "oklch(0.5179 0.0074 256.9)",
-    "accent": "oklch(0.7625 0.1261 250.42)",
-    "accentForeground": "oklch(0.154 0.0092 264.28)",
+    "background": "oklch(0.1553 0.0042 285.9)",
+    "foreground": "oklch(0.9625 0.0028 308.43)",
+    "surface": "oklch(0.1903 0.0046 285.9)",
+    "surfaceElevated": "oklch(0.2203 0.0059 285.9)",
+    "surfaceHover": "oklch(0.2553 0.0067 285.9)",
+    "surfaceActive": "oklch(0.2903 0.0067 285.9)",
+    "border": "oklch(0.3053 0.0038 285.9)",
+    "borderMuted": "oklch(0.2503 0.0025 285.9)",
+    "text": "oklch(0.9625 0.0028 308.43)",
+    "textMuted": "oklch(0.7042 0.0033 301.22)",
+    "textSubtle": "oklch(0.5185 0.0036 296.04)",
+    "accent": "oklch(0.7767 0.1418 304.66)",
+    "accentForeground": "oklch(0.1553 0.0042 285.9)",
     "success": "oklch(0.7422 0.2143 146.17)",
     "warning": "oklch(0.8105 0.1541 83.76)",
     "error": "oklch(0.7788 0.1293 21.59)",
     "info": "oklch(0.7555 0.1155 202.14)"
   },
   "ansi": {
-    "black": "oklch(0.5585 0.0066 264.51)",
+    "black": "oklch(0.6039 0.0107 299.11)",
     "red": "oklch(0.7788 0.1293 21.59)",
     "green": "oklch(0.7422 0.2143 146.17)",
     "yellow": "oklch(0.8105 0.1541 83.76)",
     "blue": "oklch(0.7625 0.1261 250.42)",
     "magenta": "oklch(0.7767 0.1418 304.66)",
     "cyan": "oklch(0.7555 0.1155 202.14)",
-    "white": "oklch(0.9627 0.0051 247.88)",
-    "brightBlack": "oklch(0.725 0.0202 255.56)",
+    "white": "oklch(0.8992 0.0042 301.42)",
+    "brightBlack": "oklch(0.7257 0.0102 299.17)",
     "brightRed": "oklch(0.834 0.0918 20.84)",
     "brightGreen": "oklch(0.8042 0.2068 146.79)",
     "brightYellow": "oklch(0.8518 0.1527 88.6)",
@@ -49,22 +49,23 @@ const theme: AdeaThemeRecord = {
     "brightCyan": "oklch(0.8036 0.1107 201.78)",
     "brightWhite": "oklch(1 0 0)"
   },
-  "cursor": "oklch(0.9627 0.0051 247.88)",
+  "cursor": "oklch(0.7625 0.1261 250.42)",
   "selection": "oklch(0.9627 0.0051 247.88)",
-  "family": "github",
-  "familyLabel": "GitHub",
+  "family": "adea",
+  "familyLabel": "Adea",
   "label": "Dark High Contrast",
-  "description": "GitHub's dark palette with its contrast floors pushed up, for accessibility needs.",
+  "description": "The high-contrast dark variant: GitHub Dark High Contrast's near-black canvas re-greyed to the family neutral, carrying its own high-contrast hues and violet accent.",
   "provenance": {
-    "project": "GitHub Primer",
-    "url": "https://github.com/primer/primitives",
-    "license": "MIT",
+    "project": "Adea",
+    "url": "https://github.com/adea-ai/themes",
+    "license": "Apache-2.0",
     "bootstrappedFrom": [
-      "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      "GitHub Dark High Contrast (iTerm2-Color-Schemes)"
     ]
   },
   "tags": [
     "dark",
+    "default",
     "high-contrast"
   ]
 }

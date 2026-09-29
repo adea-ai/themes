@@ -9,8 +9,8 @@
 import type { AdeaThemeRecord } from '../../schema.js'
 
 const theme: AdeaThemeRecord = {
-  "id": "adea-dark",
-  "name": "Adea Dark",
+  "id": "adea-dark-colorblind",
+  "name": "Adea Dark Colorblind",
   "appearance": "dark",
   "colors": {
     "background": "oklch(0.1756 0.0063 300.91)",
@@ -26,47 +26,47 @@ const theme: AdeaThemeRecord = {
     "textSubtle": "oklch(0.5627 0.0094 301.22)",
     "accent": "oklch(0.7323 0.1668 301.69)",
     "accentForeground": "oklch(0.1756 0.0063 300.91)",
-    "success": "oklch(0.6951 0.1809 145.62)",
+    "success": "oklch(0.7153 0.1518 253.31)",
     "warning": "oklch(0.7196 0.1401 79.91)",
-    "error": "oklch(0.7345 0.1626 25.78)",
+    "error": "oklch(0.7309 0.1542 61.14)",
     "info": "oklch(0.7555 0.1155 202.14)"
   },
   "ansi": {
     "black": "oklch(0.4243 0.0101 301.11)",
-    "red": "oklch(0.7345 0.1626 25.78)",
-    "green": "oklch(0.6951 0.1809 145.62)",
+    "red": "oklch(0.7309 0.1542 61.14)",
+    "green": "oklch(0.7153 0.1518 253.31)",
     "yellow": "oklch(0.7196 0.1401 79.91)",
     "blue": "oklch(0.7153 0.1518 253.31)",
     "magenta": "oklch(0.7323 0.1668 301.69)",
     "cyan": "oklch(0.7555 0.1155 202.14)",
     "white": "oklch(0.786 0.0087 301.32)",
     "brightBlack": "oklch(0.5627 0.0094 301.22)",
-    "brightRed": "oklch(0.8014 0.1134 25.81)",
-    "brightGreen": "oklch(0.7717 0.188 145.48)",
+    "brightRed": "oklch(0.8071 0.14 65.6)",
+    "brightGreen": "oklch(0.7857 0.1153 246.66)",
     "brightYellow": "oklch(0.7904 0.1386 85.24)",
     "brightBlue": "oklch(0.7857 0.1153 246.66)",
     "brightMagenta": "oklch(0.8005 0.1275 305.86)",
     "brightCyan": "oklch(0.8036 0.1107 201.78)",
     "brightWhite": "oklch(1 0 0)"
   },
-  "cursor": "oklch(0.6182 0.1935 258.33)",
-  "selection": "oklch(0.9425 0.0111 243.66)",
+  "cursor": "oklch(0.7153 0.1518 253.31)",
+  "selection": "oklch(0.8569 0.0141 247.99)",
   "family": "adea",
   "familyLabel": "Adea",
-  "label": "Dark",
-  "description": "The default dark theme: GitHub Dark Default with the canvas re-greyed to a violet-leaning neutral and the family violet accent, kept as a composition so the default can diverge from it one slot at a time.",
+  "label": "Dark Colorblind",
+  "description": "The colourblind dark variant: GitHub Dark Colorblind's hues on the family's re-greyed canvas, for deuteranopia and protanopia. The violet accent survives the adjustment untouched.",
   "provenance": {
     "project": "Adea",
     "url": "https://github.com/adea-ai/themes",
     "license": "Apache-2.0",
     "bootstrappedFrom": [
-      "GitHub Dark Default (iTerm2-Color-Schemes)"
+      "GitHub Dark Colorblind (iTerm2-Color-Schemes)"
     ]
   },
   "tags": [
     "dark",
     "default",
-    "neutral"
+    "colorblind"
   ]
 }
 export default theme

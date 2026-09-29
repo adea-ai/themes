@@ -150,15 +150,38 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   // Monokai's olive ground.
   { id: 'monokai', background: '#272822', signature: { role: 'accent', hue: [285, 310] } },
 
-  // Adea's composed defaults. Both are *composed*, so the entries here are the half that comes
-  // from each one's structure donor; the suites below assert the other half. The
-  // dark one is GitHub's palette entire and the light one is GitHub's own canvas,
-  // so both reproduce their structure donor exactly. The light foreground is
-  // asserted by hue: the theme is held to AAA on every surface it renders text on,
-  // so the normalizer may move the lightness. Hue and chroma are untouched, which
-  // the assertion below the pair suite checks.
+  // Adea's managed family. All six are *composed*, so the entries here are the half
+  // that comes from each one's structure donor; the suites below assert the other
+  // half. The dark canvases are the structure donor's greyscale re-tinted (chroma
+  // halved, hue rotated to violet-grey) and the light foregrounds are the donors'
+  // own, so those reproduce their structure donor exactly. The violet accent is the
+  // family's identity and is asserted as a signature hue on every variant.
   { id: 'adea-light', background: '#ffffff', foreground: '#1f2328' },
-  { id: 'adea-dark', background: '#0d1117', foreground: '#e6edf3' },
+  { id: 'adea-dark', background: '#111013', foreground: '#ecebef' },
+  {
+    id: 'adea-dark-colorblind',
+    background: '#111013',
+    foreground: '#ecebef',
+    signature: { role: 'accent', hue: [295, 310] },
+  },
+  {
+    id: 'adea-dark-high-contrast',
+    background: '#0c0c0e',
+    foreground: '#f3f2f4',
+    signature: { role: 'accent', hue: [295, 312] },
+  },
+  {
+    id: 'adea-light-colorblind',
+    background: '#ffffff',
+    foreground: '#24292f',
+    signature: { role: 'accent', hue: [295, 310] },
+  },
+  {
+    id: 'adea-light-high-contrast',
+    background: '#ffffff',
+    foreground: '#0e1116',
+    signature: { role: 'accent', hue: [295, 312] },
+  },
 
   // The Aardvark pair — the canvases the original Adea Dark was drawn from.
   { id: 'aardvark-ink', background: '#0f141f', foreground: '#b4bcca' },
@@ -166,11 +189,6 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
 
   // Nord Light, the snow variant of the arctic palette.
   { id: 'nord-light', background: '#e5e9f0', foreground: '#414858' },
-
-  // GitHub's interface palette, plus the accessible pair.
-  { id: 'github-light-default', background: '#ffffff', foreground: '#1f2328' },
-  { id: 'github-dark-high-contrast', background: '#0a0c10', foreground: '#f0f3f6' },
-  { id: 'github-light-high-contrast', background: '#ffffff', foreground: '#0e1116' },
 ])
 
 /** A theme role as hex, which is how upstream palettes are published. */
@@ -249,12 +267,19 @@ describe('upstream fidelity', () => {
  * Adea's dark theme is composed rather than copied, so "does it match upstream" has
  * two answers and the interesting failure is a composition that quietly stops
  * honouring one of its donors. These assert each half against the palette it came
- * from: the canvas and greyscale against Aardvark Ink, the sixteen hues against
- * GitHub Dark Default.
+ * from: the sixteen hues against GitHub Dark Default exactly, and the greyscale
+ * against GitHub's own greyscale *re-tinted* by the family canvas decision — same
+ * lightness, chroma halved, hue rotated to violet-grey.
  */
+
+/** Chroma halved, hue moved from GitHub's 258° blue-grey to the family's violet-grey. */
+const RETINT = (value: string): string => {
+  const color = parseColor(value)!
+  return oklchToHex({ l: color.l, c: color.c / 2, h: 300 })
+}
+
 describe('adea-dark composition', () => {
   const GITHUB_CANVAS = {
-    background: '#0d1117',
     foreground: '#e6edf3',
     black: '#484f58',
     brightBlack: '#6e7681',
@@ -262,6 +287,16 @@ describe('adea-dark composition', () => {
     brightWhite: '#ffffff',
     cursor: '#2f81f7',
     selection: '#e6edf3',
+  } as const
+
+  const ADEA_CANVAS = {
+    background: '#111013',
+    foreground: RETINT(GITHUB_CANVAS.foreground),
+    black: RETINT(GITHUB_CANVAS.black),
+    brightBlack: RETINT(GITHUB_CANVAS.brightBlack),
+    white: RETINT(GITHUB_CANVAS.white),
+    brightWhite: '#ffffff',
+    cursor: GITHUB_CANVAS.cursor,
   } as const
 
   const GITHUB = {
@@ -279,17 +314,19 @@ describe('adea-dark composition', () => {
     brightCyan: '#56d4dd',
   } as const
 
-  test('the structure comes from GitHub Dark Default', () => {
+  test('the greyscale is GitHub Dark Default, re-tinted', () => {
     const theme = getTheme('adea-dark')!
 
-    expect(hex(theme.colors.background), 'canvas').toBe(GITHUB_CANVAS.background)
-    expect(hex(theme.colors.foreground), 'foreground').toBe(GITHUB_CANVAS.foreground)
-    expect(hex(theme.cursor), 'cursor').toBe(GITHUB_CANVAS.cursor)
+    expect(hex(theme.colors.background), 'canvas').toBe(ADEA_CANVAS.background)
+    expect(hex(theme.colors.foreground), 'foreground').toBe(ADEA_CANVAS.foreground)
+    expect(hex(theme.cursor), 'cursor').toBe(ADEA_CANVAS.cursor)
+    // Cursor and selection stay the structure donor's own values, verbatim: they
+    // are pinned like the ANSI greyscale, and only the ANSI greyscale is re-tinted.
     expect(hex(theme.selection), 'selection').toBe(GITHUB_CANVAS.selection)
-    expect(hex(theme.ansi.black), 'ansi black').toBe(GITHUB_CANVAS.black)
-    expect(hex(theme.ansi.brightBlack), 'ansi bright black').toBe(GITHUB_CANVAS.brightBlack)
-    expect(hex(theme.ansi.white), 'ansi white').toBe(GITHUB_CANVAS.white)
-    expect(hex(theme.ansi.brightWhite), 'ansi bright white').toBe(GITHUB_CANVAS.brightWhite)
+    expect(hex(theme.ansi.black), 'ansi black').toBe(ADEA_CANVAS.black)
+    expect(hex(theme.ansi.brightBlack), 'ansi bright black').toBe(ADEA_CANVAS.brightBlack)
+    expect(hex(theme.ansi.white), 'ansi white').toBe(ADEA_CANVAS.white)
+    expect(hex(theme.ansi.brightWhite), 'ansi bright white').toBe(ADEA_CANVAS.brightWhite)
   })
 
   test('the hues come from GitHub Dark Default, unmodified', () => {
@@ -360,24 +397,31 @@ describe('the adea pair', () => {
     expect(dark.appearance).toBe('dark')
   })
 
-  test('their canvases are the palette GitHub ships', () => {
-    // The defaults are meant to read as GitHub's two appearances, so each canvas is
-    // asserted against the published hex rather than against the other: a drift
-    // here means the default stopped looking like the thing it is named for.
+  test('their canvases are the family decision', () => {
+    // The dark canvas is GitHub's re-tinted by the family canvas rule (chroma
+    // halved, hue rotated to violet-grey so the violet accent reads on a neutral
+    // ground); the light canvas is GitHub's plain paper. Asserted against the
+    // committed hexes rather than derived, so a drift in the tint rule is visible.
+    expect(hex(dark.colors.background), 'dark canvas').toBe('#111013')
     expect(hex(light.colors.background), 'light canvas').toBe('#ffffff')
-    expect(hex(dark.colors.background), 'dark canvas').toBe('#0d1117')
   })
 
-  test('the dark canvas keeps its tint, and the light one is paper', () => {
-    // GitHub's dark canvas is faintly blue, not neutral grey, and the default
-    // should keep that character. The light canvas is the same palette's paper: no
-    // tint correction is applied to it, and one creeping in would mean the light
-    // default had stopped being GitHub Light.
-    const darkChroma = parseColor(dark.colors.background)!.c
+  test('the dark canvas is a violet-leaning grey, and the light one is paper', () => {
+    // The tint is deliberate and directional: less chroma than GitHub's blue-grey
+    // (which measured 0.014), rotated to the accent's side of the wheel so the
+    // violet primary reads against a neutral ground. A drift back toward blue or
+    // into dead neutral both fail here.
+    const darkCanvas = parseColor(dark.colors.background)!
     expect(
-      darkChroma,
-      `the dark canvas carries ${darkChroma.toFixed(3)} of chroma, which is too close to neutral to read as tinted`
-    ).toBeGreaterThanOrEqual(0.012)
+      darkCanvas.c,
+      `the dark canvas carries ${darkCanvas.c.toFixed(3)} of chroma; the family tint is a quarter-strength whisper, not a blue wash and not dead grey`
+    ).toBeGreaterThanOrEqual(0.004)
+    expect(darkCanvas.c).toBeLessThanOrEqual(0.012)
+    expect(
+      darkCanvas.h,
+      `the dark canvas hue is ${darkCanvas.h.toFixed(1)}°; the family tint leans violet`
+    ).toBeGreaterThanOrEqual(280)
+    expect(darkCanvas.h).toBeLessThanOrEqual(320)
 
     const lightChroma = parseColor(light.colors.background)!.c
     expect(

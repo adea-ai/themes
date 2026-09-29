@@ -9,40 +9,40 @@
 import type { AdeaThemeRecord } from '../../schema.js'
 
 const theme: AdeaThemeRecord = {
-  "id": "adea-light",
-  "name": "Adea Light",
+  "id": "adea-light-colorblind",
+  "name": "Adea Light Colorblind",
   "appearance": "light",
   "colors": {
     "background": "oklch(1 0 0)",
-    "foreground": "oklch(0.2542 0.0111 254.04)",
+    "foreground": "oklch(0.2785 0.0132 253.04)",
     "surface": "oklch(0.965 0 0)",
     "surfaceElevated": "oklch(0.935 0 0)",
     "surfaceHover": "oklch(0.9 0 0)",
     "surfaceActive": "oklch(0.865 0 0)",
     "border": "oklch(0.85 0 0)",
     "borderMuted": "oklch(0.905 0 0)",
-    "text": "oklch(0.2542 0.0111 254.04)",
-    "textMuted": "oklch(0.4929 0.0076 254.04)",
-    "textSubtle": "oklch(0.6204 0.005 254.04)",
+    "text": "oklch(0.2785 0.0132 253.04)",
+    "textMuted": "oklch(0.5094 0.009 253.04)",
+    "textSubtle": "oklch(0.6193 0.0059 253.04)",
     "accent": "oklch(0.5143 0.1668 301.69)",
     "accentForeground": "oklch(1 0 0)",
-    "success": "oklch(0.4771 0.1809 145.62)",
+    "success": "oklch(0.4973 0.1518 253.31)",
     "warning": "oklch(0.5016 0.1401 79.91)",
-    "error": "oklch(0.5165 0.1626 25.78)",
+    "error": "oklch(0.5129 0.1542 61.14)",
     "info": "oklch(0.5375 0.1155 202.14)"
   },
   "ansi": {
     "black": "oklch(0.2785 0.0132 253.04)",
-    "red": "oklch(0.5165 0.1626 25.78)",
-    "green": "oklch(0.4771 0.1809 145.62)",
+    "red": "oklch(0.5129 0.1542 61.14)",
+    "green": "oklch(0.4973 0.1518 253.31)",
     "yellow": "oklch(0.5016 0.1401 79.91)",
     "blue": "oklch(0.4973 0.1518 253.31)",
     "magenta": "oklch(0.5143 0.1668 301.69)",
     "cyan": "oklch(0.5375 0.1155 202.14)",
     "white": "oklch(0.5651 0.0189 250.97)",
     "brightBlack": "oklch(0.4849 0.0196 251.02)",
-    "brightRed": "oklch(0.5834 0.1134 25.81)",
-    "brightGreen": "oklch(0.5537 0.188 145.48)",
+    "brightRed": "oklch(0.5891 0.14 65.6)",
+    "brightGreen": "oklch(0.5677 0.1153 246.66)",
     "brightYellow": "oklch(0.5724 0.1386 85.24)",
     "brightBlue": "oklch(0.5677 0.1153 246.66)",
     "brightMagenta": "oklch(0.5825 0.1275 305.86)",
@@ -50,24 +50,24 @@ const theme: AdeaThemeRecord = {
     "brightWhite": "oklch(0.6658 0.0181 250.92)"
   },
   "cursor": "oklch(0.5399 0.1906 257.48)",
-  "selection": "oklch(0.2542 0.0111 254.04)",
+  "selection": "oklch(0.2785 0.0132 253.04)",
   "family": "adea",
   "familyLabel": "Adea",
-  "label": "Light",
-  "description": "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper, with the family violet accent.",
+  "label": "Light Colorblind",
+  "description": "The colourblind light variant: GitHub's white colourblind canvas carrying the dark colourblind hues, transposed to survive on paper — the same red is the same red as the dark colourblind variant.",
   "provenance": {
     "project": "Adea",
     "url": "https://github.com/adea-ai/themes",
     "license": "Apache-2.0",
     "bootstrappedFrom": [
-      "GitHub Light Default (iTerm2-Color-Schemes)",
-      "GitHub Dark Default (iTerm2-Color-Schemes)"
+      "GitHub Light Colorblind (iTerm2-Color-Schemes)",
+      "GitHub Dark Colorblind (iTerm2-Color-Schemes)"
     ]
   },
   "tags": [
     "light",
     "default",
-    "neutral"
+    "colorblind"
   ]
 }
 export default theme
