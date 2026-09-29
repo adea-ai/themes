@@ -534,4 +534,20 @@ describe('derived colours', () => {
       }
     }
   })
+
+  test('every theme in the catalogue encodes an editor projection', () => {
+    // `editorRolesHex` throws rather than shipping an unreadable role, so this is
+    // the tripwire a consumer with a generation-time floor hits. It failed for
+    // every community light theme when `variable`/`operator` read the terminal's
+    // brightest slot on paper; the light-theme source override is what this pins.
+    for (const theme of themes) {
+      const roles = editorRolesHex(theme)
+      for (const [role, value] of Object.entries(roles)) {
+        const ratio = contrastRatio(parseColor(value)!, parseColor(theme.colors.background)!)
+        expect(ratio, `${theme.id} editor.${role} is ${ratio.toFixed(5)}:1`).toBeGreaterThanOrEqual(
+          4.5
+        )
+      }
+    }
+  })
 })
