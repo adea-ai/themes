@@ -76,6 +76,26 @@ const EDITOR_ROLES = [
   'searchMatch',
 ] as const satisfies readonly EditorRole[]
 
+/**
+ * Light themes read the two default-ink roles from the dark end of the palette
+ * instead.
+ *
+ * `variable` and `operator` mean "the ink most of the code is drawn in", and ANSI
+ * `white` is that slot *on a dark terminal* — a light grey against a dark canvas.
+ * On a light theme the same slot is the terminal's brightest colour, at or near
+ * the paper itself, so the mapping hands the editor a foreground it cannot draw
+ * with: `editorRolesHex`'s bounded repair could not reach 4.5:1 from a chroma-less
+ * near-white within its lightness budget, and every community light theme threw.
+ * ANSI `black` is the same "default ink" slot from the paper's side of the
+ * palette — dark by construction, and it keeps each palette's own tint
+ * (Solarized Light's variables stay dark teal, not a repaired grey).
+ */
+const LIGHT_SYNTAX_SOURCE: Readonly<Partial<Record<SyntaxRole, keyof AdeaTheme['ansi']>>> =
+  Object.freeze({
+    variable: 'black',
+    operator: 'black',
+  })
+
 /** Which ANSI role each syntax role is read from, and why. */
 const SYNTAX_SOURCE: Readonly<Record<SyntaxRole, keyof AdeaTheme['ansi']>> = Object.freeze({
   // Magenta is the slot palettes spend on the most distinctive hue they have, and
@@ -136,7 +156,8 @@ export function syntaxRoles(
     SyntaxRole,
     keyof AdeaTheme['ansi'],
   ][]) {
-    const value: Oklch | undefined = parseColor(theme.ansi[source])
+    const slot = theme.appearance === 'light' ? (LIGHT_SYNTAX_SOURCE[role] ?? source) : source
+    const value: Oklch | undefined = parseColor(theme.ansi[slot])
     if (!value) continue
 
     if (role === 'comment' || role === 'punctuation') {
@@ -188,8 +209,15 @@ export function editorRolesHex(theme: AdeaTheme): Record<EditorRole, string> {
       // 4.5:1 in OKLCH can round to a hex value just below that floor, so advance
       // the requested threshold by the smallest measured step until the encoded
       // value itself clears 4.5:1. No source palette value or hue is rewritten.
+      //
+      // The projection runs with a wider lightness budget than the default repair,
+      // because a light theme's brightest ANSI slots start near the paper: a
+      // pastel yellow `number` has more lightness between it and 4.5:1 than the
+      // default budget allows, and this projection's contract is to hold the role
+      // to AA however far the lightness has to travel — darkening a chromatic
+      // colour keeps its hue, so the number stays yellow, just amber.
       for (let margin = 0.001; margin <= 0.05; margin += 0.001) {
-        const repaired = repairContrast(source, background, 4.5 + margin)
+        const repaired = repairContrast(source, background, 4.5 + margin, 0.55)
         if (!repaired.satisfied) continue
         const candidate = oklchToHex(repaired.color)
         const renderedCandidate = parseColor(candidate)
