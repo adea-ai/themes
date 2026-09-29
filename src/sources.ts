@@ -131,6 +131,13 @@ export interface ComposedSource {
    * pinned to the donor's own values instead.
    */
   ansiFromStructure: readonly ('black' | 'brightBlack' | 'white' | 'brightWhite')[]
+  /**
+   * Corrections to the ANSI greyscale the structure donor pinned, on the same terms
+   * as {@link palette}: upstream's bytes with named, reviewed adjustments. The pins
+   * keep the donor's greyscale verbatim; these keep a family-wide canvas decision
+   * (a less blue, more grey ramp) from stopping at the Base24 slots.
+   */
+  ansiOverrides?: Partial<Record<'black' | 'brightBlack' | 'white' | 'brightWhite', string>>
   /** The role supplying the accent, when the family's identity demands one. */
   accentSlot?: 'blue' | 'magenta' | 'cyan' | 'green'
   palette?: Partial<Record<Base24Slot, string>>
@@ -149,33 +156,34 @@ export interface ComposedSource {
 }
 
 /**
- * Adea's two default themes.
+ * Adea's managed family: two appearances × three accessibility variants.
  *
- * Both are compositions and both were previously authored here — the light one as a
- * neutral grey ramp on white with a monochrome accent, the dark one as a neutral grey
- * ramp on `#252525`. They replaced those entirely while keeping their names, because
- * they are the defaults: the system's own appearance, not a pair of options beside it.
+ * | | canvas | hues | accent |
+ * | --- | --- | --- | --- |
+ * | Adea Dark | GitHub Dark Default, re-greyed | GitHub Dark Default | its violet |
+ * | Adea Dark Colorblind | same re-greyed canvas | GitHub Dark Colorblind | its violet |
+ * | Adea Dark High Contrast | GitHub Dark HC, re-greyed | GitHub Dark High Contrast | its violet |
+ * | Adea Light | GitHub Light Default `#ffffff` | GitHub Dark Default, transposed | its violet |
+ * | Adea Light Colorblind | GitHub Light Colorblind `#ffffff` | GitHub Dark Colorblind, transposed | its violet |
+ * | Adea Light High Contrast | GitHub Light High Contrast | GitHub Dark High Contrast, transposed | its violet |
  *
- * ## Why they are a *pair* rather than two themes
+ * The family started as GitHub's two appearances verbatim and has now taken the
+ * step the composition design was waiting for: the canvas greyscale is re-tinted
+ * (chroma halved, hue rotated to violet-grey) so the family's violet accent reads
+ * against a neutral ground instead of GitHub's blue one, and every variant's own
+ * accent is the accent slot — violet/magenta, which GitHub keeps constant across
+ * all six of its palettes, colourblind and high-contrast included.
  *
- * They share one hue donor, so a red is the same red and a blue the same blue in both,
- * and each borrows its canvas from a palette chosen for the *canvas* rather than for
- * its colours:
+ * The accessibility variants are compositions of GitHub's own accessibility
+ * variants, not afterthoughts: the colorblind pair adjusts the red/green hues the
+ * way GitHub's does, and the high-contrast pair takes GitHub's HC canvases and
+ * hues. The light variants keep the family rule that a light theme is the dark
+ * theme's hues transposed onto paper, so a red is the same red in both modes of a
+ * variant and switching appearance changes lightness and nothing else about the
+ * identity. All six stay compositions rather than vendored copies so that a later
+ * customisation is a one-slot diff with the donors still named.
  *
- * | | canvas | hues |
- * | --- | --- | --- |
- * | Adea Dark | GitHub Dark Default `#0d1117` | GitHub Dark Default |
- * | Adea Light | GitHub Light Default `#ffffff` | GitHub Dark Default, transposed |
- *
- * The defaults are GitHub's two appearances. The dark theme is GitHub Dark Default
- * entire, and the light theme is GitHub's own white canvas carrying the dark theme's
- * hues — the same red is the same red in both, and switching appearance changes
- * lightness and nothing else about the theme's identity; that claim is asserted in
- * `tests/provenance.test.ts` rather than left as intent. Both stay compositions
- * rather than vendored copies so that a later customisation is a one-slot diff with
- * the donors still named.
- *
- * The light theme is the reason `hueTranspose` exists: GitHub's dark hues measure
+ * The light themes are the reason `hueTranspose` exists: GitHub's dark hues measure
  * between 2.5:1 and 4.1:1 on a light canvas, so the whole hue set is transposed down in
  * lightness by one common step — hue and chroma intact, relative brightness ordering
  * intact — rather than repaired hue by hue, which would have collapsed every bright
@@ -189,7 +197,7 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
     familyLabel: 'Adea',
     label: 'Dark',
     description:
-      "The default dark theme: GitHub Dark Default's canvas and hues, kept as a composition so the default can diverge from it one slot at a time.",
+      'The default dark theme: GitHub Dark Default with the canvas re-greyed to a violet-leaning neutral and the family violet accent, kept as a composition so the default can diverge from it one slot at a time.',
     appearance: 'dark',
     tags: ['dark', 'default', 'neutral'],
     donors: { structure: 'github-dark-default', hues: 'github-dark-default' },
@@ -233,6 +241,31 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       base11: ['structure', 'background', { lighten: -0.06 }],
     },
     ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    /*
+     * The family canvas decision: GitHub's greyscale is cut blue (`h≈258`, chroma
+     * 0.014 on the canvas), which is exactly the tint a violet accent has to fight
+     * for. Halving the chroma and rotating the greyscale to violet-grey keeps every
+     * lightness relationship the ladder was built on and takes the tint out of the
+     * way. The hue slots are untouched — the GitHub dark palette stays GitHub's.
+     */
+    palette: {
+      base00: '#111013',
+      base01: '#4f4d53',
+      base02: '#ecebef',
+      base03: '#76747a',
+      base04: '#bab8be',
+      base05: '#ecebef',
+      base10: '#0a0a0c',
+      base11: '#050506',
+    },
+    ansiOverrides: {
+      black: '#4f4d53',
+      brightBlack: '#76747a',
+      white: '#bab8be',
+    },
+    // The family accent: the donor's violet, which GitHub keeps constant across its
+    // colourblind and high-contrast palettes too.
+    accentSlot: 'magenta',
     // AAA rather than AA, because this is a default rather than an imported palette.
     textFloor: 7,
     provenance: {
@@ -249,7 +282,7 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
     familyLabel: 'Adea',
     label: 'Light',
     description:
-      "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper.",
+      "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper, with the family violet accent.",
     appearance: 'light',
     tags: ['light', 'default', 'neutral'],
     donors: { structure: 'github-light-default', hues: 'github-dark-default' },
@@ -288,6 +321,9 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       base11: ['structure', 'background', { lighten: 0.06 }],
     },
     ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    // The family accent on paper: the transposed violet, dark enough to carry text
+    // against the white canvas. See the dark theme for the canvas decision.
+    accentSlot: 'magenta',
     /*
      * GitHub's hues were drawn for a `#0d1117` canvas. On Nord Light's they measure
      * between 2.5:1 and 4.1:1, which is legible as an accent and not as terminal text.
@@ -314,6 +350,243 @@ export const COMPOSED_SOURCES: readonly ComposedSource[] = Object.freeze([
       ],
     },
   },
+  {
+    id: 'adea-dark-colorblind',
+    name: 'Adea Dark Colorblind',
+    family: 'adea',
+    familyLabel: 'Adea',
+    label: 'Dark Colorblind',
+    description:
+      "The colourblind dark variant: GitHub Dark Colorblind's hues on the family's re-greyed canvas, for deuteranopia and protanopia. The violet accent survives the adjustment untouched.",
+    appearance: 'dark',
+    tags: ['dark', 'default', 'colorblind'],
+    donors: { structure: 'github-dark-colorblind', hues: 'github-dark-colorblind' },
+    slots: {
+      base00: ['structure', 'background'],
+      base01: ['structure', 'black'],
+      base02: ['structure', 'selection'],
+      base03: ['structure', 'brightBlack'],
+      base04: ['structure', 'white'],
+      base05: ['structure', 'foreground'],
+      base06: ['structure', 'brightWhite'],
+      base07: ['structure', 'brightWhite'],
+      base08: ['hues', 'red'],
+      base0A: ['hues', 'yellow'],
+      base0B: ['hues', 'green'],
+      base0C: ['hues', 'cyan'],
+      base0D: ['hues', 'blue'],
+      base0E: ['hues', 'purple'],
+      base12: ['hues', 'brightRed'],
+      base13: ['hues', 'brightYellow'],
+      base14: ['hues', 'brightGreen'],
+      base15: ['hues', 'brightCyan'],
+      base16: ['hues', 'brightBlue'],
+      base17: ['hues', 'brightPurple'],
+    },
+    synthesise: {
+      base09: ['hues', 'red', { rotate: 26 }],
+      base0F: ['hues', 'yellow', { rotate: -34 }],
+      base10: ['structure', 'background', { lighten: -0.03 }],
+      base11: ['structure', 'background', { lighten: -0.06 }],
+    },
+    ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    // The same canvas decision as the default dark theme; the colourblind donor's
+    // greyscale is identical to the default donor's, so the corrections match.
+    palette: {
+      base00: '#111013',
+      base01: '#4f4d53',
+      base02: '#ecebef',
+      base03: '#76747a',
+      base04: '#bab8be',
+      base05: '#ecebef',
+      base10: '#0a0a0c',
+      base11: '#050506',
+    },
+    ansiOverrides: {
+      black: '#4f4d53',
+      brightBlack: '#76747a',
+      white: '#bab8be',
+    },
+    accentSlot: 'magenta',
+    textFloor: 7,
+    provenance: {
+      project: 'Adea',
+      url: 'https://github.com/adea-ai/themes',
+      license: 'Apache-2.0',
+      bootstrappedFrom: ['GitHub Dark Colorblind (iTerm2-Color-Schemes)'],
+    },
+  },
+  {
+    id: 'adea-dark-high-contrast',
+    name: 'Adea Dark High Contrast',
+    family: 'adea',
+    familyLabel: 'Adea',
+    label: 'Dark High Contrast',
+    description:
+      "The high-contrast dark variant: GitHub Dark High Contrast's near-black canvas re-greyed to the family neutral, carrying its own high-contrast hues and violet accent.",
+    appearance: 'dark',
+    tags: ['dark', 'default', 'high-contrast'],
+    donors: { structure: 'github-dark-high-contrast', hues: 'github-dark-high-contrast' },
+    slots: {
+      base00: ['structure', 'background'],
+      base01: ['structure', 'black'],
+      base02: ['structure', 'selection'],
+      base03: ['structure', 'brightBlack'],
+      base04: ['structure', 'white'],
+      base05: ['structure', 'foreground'],
+      base06: ['structure', 'brightWhite'],
+      base07: ['structure', 'brightWhite'],
+      base08: ['hues', 'red'],
+      base0A: ['hues', 'yellow'],
+      base0B: ['hues', 'green'],
+      base0C: ['hues', 'cyan'],
+      base0D: ['hues', 'blue'],
+      base0E: ['hues', 'purple'],
+      base12: ['hues', 'brightRed'],
+      base13: ['hues', 'brightYellow'],
+      base14: ['hues', 'brightGreen'],
+      base15: ['hues', 'brightCyan'],
+      base16: ['hues', 'brightBlue'],
+      base17: ['hues', 'brightPurple'],
+    },
+    synthesise: {
+      base09: ['hues', 'red', { rotate: 26 }],
+      base0F: ['hues', 'yellow', { rotate: -34 }],
+      base10: ['structure', 'background', { lighten: -0.03 }],
+      base11: ['structure', 'background', { lighten: -0.06 }],
+    },
+    ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    // The HC canvas is already near-black, so the correction is almost entirely
+    // de-tinting: the chroma was half the default's to begin with.
+    palette: {
+      base00: '#0c0c0e',
+      base01: '#828087',
+      base02: '#f3f2f4',
+      base03: '#a7a5ac',
+      base04: '#dedde0',
+      base05: '#f3f2f4',
+      base10: '#060607',
+      base11: '#030303',
+    },
+    ansiOverrides: {
+      black: '#828087',
+      brightBlack: '#a7a5ac',
+      white: '#dedde0',
+    },
+    accentSlot: 'magenta',
+    provenance: {
+      project: 'Adea',
+      url: 'https://github.com/adea-ai/themes',
+      license: 'Apache-2.0',
+      bootstrappedFrom: ['GitHub Dark High Contrast (iTerm2-Color-Schemes)'],
+    },
+  },
+  {
+    id: 'adea-light-colorblind',
+    name: 'Adea Light Colorblind',
+    family: 'adea',
+    familyLabel: 'Adea',
+    label: 'Light Colorblind',
+    description:
+      "The colourblind light variant: GitHub's white colourblind canvas carrying the dark colourblind hues, transposed to survive on paper — the same red is the same red as the dark colourblind variant.",
+    appearance: 'light',
+    tags: ['light', 'default', 'colorblind'],
+    donors: { structure: 'github-light-colorblind', hues: 'github-dark-colorblind' },
+    slots: {
+      base00: ['structure', 'background'],
+      base01: ['structure', 'black'],
+      base02: ['structure', 'selection'],
+      base03: ['structure', 'brightBlack'],
+      base04: ['structure', 'white'],
+      base05: ['structure', 'foreground'],
+      base06: ['structure', 'brightWhite'],
+      base07: ['structure', 'brightWhite'],
+      base08: ['hues', 'red'],
+      base0A: ['hues', 'yellow'],
+      base0B: ['hues', 'green'],
+      base0C: ['hues', 'cyan'],
+      base0D: ['hues', 'blue'],
+      base0E: ['hues', 'purple'],
+      base12: ['hues', 'brightRed'],
+      base13: ['hues', 'brightYellow'],
+      base14: ['hues', 'brightGreen'],
+      base15: ['hues', 'brightCyan'],
+      base16: ['hues', 'brightBlue'],
+      base17: ['hues', 'brightPurple'],
+    },
+    synthesise: {
+      base09: ['hues', 'red', { rotate: 26 }],
+      base0F: ['hues', 'yellow', { rotate: -34 }],
+      base10: ['structure', 'background', { lighten: 0.03 }],
+      base11: ['structure', 'background', { lighten: 0.06 }],
+    },
+    ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    accentSlot: 'magenta',
+    hueTranspose: { floor: CONTRAST_FLOORS.status + 0.4 },
+    textFloor: 7,
+    provenance: {
+      project: 'Adea',
+      url: 'https://github.com/adea-ai/themes',
+      license: 'Apache-2.0',
+      bootstrappedFrom: [
+        'GitHub Light Colorblind (iTerm2-Color-Schemes)',
+        'GitHub Dark Colorblind (iTerm2-Color-Schemes)',
+      ],
+    },
+  },
+  {
+    id: 'adea-light-high-contrast',
+    name: 'Adea Light High Contrast',
+    family: 'adea',
+    familyLabel: 'Adea',
+    label: 'Light High Contrast',
+    description:
+      "The high-contrast light variant: GitHub's white high-contrast canvas carrying the dark high-contrast hues, transposed — the paper counterpart of the dark high-contrast variant.",
+    appearance: 'light',
+    tags: ['light', 'default', 'high-contrast'],
+    donors: { structure: 'github-light-high-contrast', hues: 'github-dark-high-contrast' },
+    slots: {
+      base00: ['structure', 'background'],
+      base01: ['structure', 'black'],
+      base02: ['structure', 'selection'],
+      base03: ['structure', 'brightBlack'],
+      base04: ['structure', 'white'],
+      base05: ['structure', 'foreground'],
+      base06: ['structure', 'brightWhite'],
+      base07: ['structure', 'brightWhite'],
+      base08: ['hues', 'red'],
+      base0A: ['hues', 'yellow'],
+      base0B: ['hues', 'green'],
+      base0C: ['hues', 'cyan'],
+      base0D: ['hues', 'blue'],
+      base0E: ['hues', 'purple'],
+      base12: ['hues', 'brightRed'],
+      base13: ['hues', 'brightYellow'],
+      base14: ['hues', 'brightGreen'],
+      base15: ['hues', 'brightCyan'],
+      base16: ['hues', 'brightBlue'],
+      base17: ['hues', 'brightPurple'],
+    },
+    synthesise: {
+      base09: ['hues', 'red', { rotate: 26 }],
+      base0F: ['hues', 'yellow', { rotate: -34 }],
+      base10: ['structure', 'background', { lighten: 0.03 }],
+      base11: ['structure', 'background', { lighten: 0.06 }],
+    },
+    ansiFromStructure: ['black', 'brightBlack', 'white', 'brightWhite'],
+    accentSlot: 'magenta',
+    hueTranspose: { floor: CONTRAST_FLOORS.status + 0.4 },
+    textFloor: 7,
+    provenance: {
+      project: 'Adea',
+      url: 'https://github.com/adea-ai/themes',
+      license: 'Apache-2.0',
+      bootstrappedFrom: [
+        'GitHub Light High Contrast (iTerm2-Color-Schemes)',
+        'GitHub Dark High Contrast (iTerm2-Color-Schemes)',
+      ],
+    },
+  },
 ])
 
 /**
@@ -332,12 +605,11 @@ export const FAMILY_PROVENANCE: Readonly<Record<string, ThemeProvenance>> = Obje
     license: 'MIT',
     bootstrappedFrom: [ITERM2],
   },
-  github: {
-    project: 'GitHub Primer',
-    url: 'https://github.com/primer/primitives',
-    license: 'MIT',
-    bootstrappedFrom: [ITERM2],
-  },
+  /*
+   * The `github` family has no catalogue entry of its own any more: GitHub Primer's
+   * palettes survive as the donors of the composed Adea variants, whose provenance
+   * records the bootstrapping — and Primer itself is credited here by name.
+   */
   catppuccin: {
     project: 'Catppuccin',
     url: 'https://github.com/catppuccin/catppuccin',
@@ -717,43 +989,12 @@ export const VENDORED_SOURCES: readonly VendoredSource[] = Object.freeze([
     accentSlot: 'magenta',
   },
 
-  /* --- GitHub: the interface palette, and its accessible pair ------------- */
-  {
-    id: 'github-light-default',
-    slug: 'github-light-default',
-    family: 'github',
-    familyLabel: 'GitHub',
-    label: 'Light Default',
-    name: 'GitHub Light Default',
-    description:
-      "GitHub's own light interface palette: white ground, grey steps, familiar syntax hues.",
-    appearance: 'light',
-    tags: ['light', 'neutral', 'popular'],
-  },
-  {
-    id: 'github-dark-high-contrast',
-    slug: 'github-dark-high-contrast',
-    family: 'github',
-    familyLabel: 'GitHub',
-    label: 'Dark High Contrast',
-    name: 'GitHub Dark High Contrast',
-    description:
-      "GitHub's dark palette with its contrast floors pushed up, for accessibility needs.",
-    appearance: 'dark',
-    tags: ['dark', 'high-contrast'],
-  },
-  {
-    id: 'github-light-high-contrast',
-    slug: 'github-light-high-contrast',
-    family: 'github',
-    familyLabel: 'GitHub',
-    label: 'Light High Contrast',
-    name: 'GitHub Light High Contrast',
-    description:
-      "GitHub's light palette with its contrast floors pushed up, for accessibility needs.",
-    appearance: 'light',
-    tags: ['light', 'high-contrast'],
-  },
+  /*
+   * The GitHub interface palettes are not vendored as themes: Adea's six managed
+   * variants are compositions *of* them (see the composed sources above), so a
+   * standalone GitHub entry would be the default wearing another name. The donor
+   * palettes stay in the dataset and the composed outputs in `palettes/`.
+   */
 
   /* --- Solarized: one palette, two appearances --------------------------- */
   {

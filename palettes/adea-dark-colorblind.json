@@ -1,30 +1,30 @@
 {
   "system": "base24",
-  "name": "Adea Dark",
-  "author": "Adea, composed from GitHub Dark Default and GitHub Dark Default",
+  "name": "Adea Dark Colorblind",
+  "author": "Adea, composed from GitHub Dark Colorblind and GitHub Dark Colorblind",
   "variant": "dark",
   "palette": {
     "base00": "#0d1117",
     "base01": "#484f58",
-    "base02": "#e6edf3",
+    "base02": "#c9d1d9",
     "base03": "#6e7681",
     "base04": "#b1bac4",
-    "base05": "#e6edf3",
+    "base05": "#c9d1d9",
     "base06": "#ffffff",
     "base07": "#ffffff",
-    "base08": "#ff7b72",
+    "base08": "#ec8e2c",
     "base0A": "#d29922",
-    "base0B": "#3fb950",
+    "base0B": "#58a6ff",
     "base0C": "#39c5cf",
     "base0D": "#58a6ff",
     "base0E": "#bc8cff",
-    "base12": "#ffa198",
+    "base12": "#fdac54",
     "base13": "#e3b341",
-    "base14": "#56d364",
+    "base14": "#79c0ff",
     "base15": "#56d4dd",
     "base16": "#79c0ff",
     "base17": "#d2a8ff",
-    "base09": "oklch(0.7345 0.1626 51.78)",
+    "base09": "oklch(0.7309 0.1542 87.14)",
     "base0F": "oklch(0.7196 0.1401 45.91)",
     "base10": "oklch(0.1463 0.0103 258.36)",
     "base11": "oklch(0.1163 0.0086 258.36)"
@@ -35,19 +35,19 @@
     "white": "#bab8be",
     "brightWhite": "#ffffff"
   },
-  "cursor": "#2f81f7",
-  "selection": "#e6edf3",
+  "cursor": "#58a6ff",
+  "selection": "#c9d1d9",
   "source": {
     "composedFrom": [
       {
         "role": "structure",
-        "slug": "github-dark-default",
-        "name": "GitHub Dark Default"
+        "slug": "github-dark-colorblind",
+        "name": "GitHub Dark Colorblind"
       },
       {
         "role": "hues",
-        "slug": "github-dark-default",
-        "name": "GitHub Dark Default"
+        "slug": "github-dark-colorblind",
+        "name": "GitHub Dark Colorblind"
       }
     ],
     "repository": "https://github.com/williamzujkowski/oklch-terminal-themes",

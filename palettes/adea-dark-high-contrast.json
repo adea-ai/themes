@@ -1,0 +1,56 @@
+{
+  "system": "base24",
+  "name": "Adea Dark High Contrast",
+  "author": "Adea, composed from GitHub Dark High Contrast and GitHub Dark High Contrast",
+  "variant": "dark",
+  "palette": {
+    "base00": "#0a0c10",
+    "base01": "#7a828e",
+    "base02": "#f0f3f6",
+    "base03": "#9ea7b3",
+    "base04": "#d9dee3",
+    "base05": "#f0f3f6",
+    "base06": "#ffffff",
+    "base07": "#ffffff",
+    "base08": "#ff9492",
+    "base0A": "#f0b72f",
+    "base0B": "#26cd4d",
+    "base0C": "#39c5cf",
+    "base0D": "#71b7ff",
+    "base0E": "#cb9eff",
+    "base12": "#ffb1af",
+    "base13": "#f7c843",
+    "base14": "#4ae168",
+    "base15": "#56d4dd",
+    "base16": "#91cbff",
+    "base17": "#dbb7ff",
+    "base09": "oklch(0.7788 0.1293 47.59)",
+    "base0F": "oklch(0.8105 0.1541 49.76)",
+    "base10": "oklch(0.124 0.0059 264.28)",
+    "base11": "oklch(0.094 0.0048 264.28)"
+  },
+  "ansi": {
+    "black": "#828087",
+    "brightBlack": "#a7a5ac",
+    "white": "#dedde0",
+    "brightWhite": "#ffffff"
+  },
+  "cursor": "#71b7ff",
+  "selection": "#f0f3f6",
+  "source": {
+    "composedFrom": [
+      {
+        "role": "structure",
+        "slug": "github-dark-high-contrast",
+        "name": "GitHub Dark High Contrast"
+      },
+      {
+        "role": "hues",
+        "slug": "github-dark-high-contrast",
+        "name": "GitHub Dark High Contrast"
+      }
+    ],
+    "repository": "https://github.com/williamzujkowski/oklch-terminal-themes",
+    "revision": "9e800e7fe760081d4c10317498038ed4227341d6"
+  }
+}
