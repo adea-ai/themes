@@ -48,9 +48,9 @@ palette.
 
 | Family | Project | Licence | Vendored values |
 | --- | --- | --- | --- |
-| Adea (defaults) | this package | Apache-2.0 plus donor terms below | composed from the two donors below |
-| Slate | https://github.com/adea-ai/adea | Apache-2.0 | first-party semantic and terminal roles carried forward from the product |
-| High Contrast | https://github.com/adea-ai/adea | Apache-2.0 | first-party semantic and terminal roles carried forward from the product |
+| Adea (defaults) | this package | Apache-2.0 plus donor terms below | composed from GitHub's palette (below) |
+| Aardvark | https://github.com/mbadolato/iTerm2-Color-Schemes | MIT | via the chain above |
+| GitHub | https://github.com/primer/primitives | MIT | via the chain above |
 | Nord | https://github.com/nordtheme/nord | MIT | via the chain above |
 | Catppuccin | https://github.com/catppuccin/catppuccin | MIT | via the chain above |
 | Tokyo Night | https://github.com/folke/tokyonight.nvim | Apache-2.0 | via the chain above |

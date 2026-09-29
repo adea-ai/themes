@@ -151,21 +151,26 @@ const FIDELITY: readonly Fidelity[] = Object.freeze([
   { id: 'monokai', background: '#272822', signature: { role: 'accent', hue: [285, 310] } },
 
   // Adea's composed defaults. Both are *composed*, so the entries here are the half that comes
-  // from each one's structure donor; the suites below assert the other half, and the
-  // light one's canvas carries a recorded chroma correction (see `COMPOSED_SOURCES`).
-  // The foreground is asserted by hue: the theme is held to AAA on every surface it
-  // renders text on, and Nord Light's own is 7.5:1 on the canvas and 6.2:1 on a popover,
-  // so the repair moves its lightness. Hue and chroma are untouched, which the
-  // assertion below the pair suite checks.
-  { id: 'adea-light', background: '#e3e9f4', foregroundHue: 266.5 },
-  { id: 'adea-dark', background: '#0f141f', foreground: '#b4bcca' },
+  // from each one's structure donor; the suites below assert the other half. The
+  // dark one is GitHub's palette entire and the light one is GitHub's own canvas,
+  // so both reproduce their structure donor exactly. The light foreground is
+  // asserted by hue: the theme is held to AAA on every surface it renders text on,
+  // so the normalizer may move the lightness. Hue and chroma are untouched, which
+  // the assertion below the pair suite checks.
+  { id: 'adea-light', background: '#ffffff', foreground: '#1f2328' },
+  { id: 'adea-dark', background: '#0d1117', foreground: '#e6edf3' },
 
-  // Adea's retained Slate and High Contrast variants, asserted against the
-  // product-owned source palette rather than attributed to an upstream terminal theme.
-  { id: 'slate-light', background: '#f8fafc', foreground: '#0f172a' },
-  { id: 'slate-dark', background: '#0f172a', foreground: '#f1f5f9' },
-  { id: 'contrast-light', background: '#ffffff', foreground: '#000000' },
-  { id: 'contrast-dark', background: '#000000', foreground: '#ffffff' },
+  // The Aardvark pair — the canvases the original Adea Dark was drawn from.
+  { id: 'aardvark-ink', background: '#0f141f', foreground: '#b4bcca' },
+  { id: 'aardvark-blue', background: '#102040', foreground: '#dddddd' },
+
+  // Nord Light, the snow variant of the arctic palette.
+  { id: 'nord-light', background: '#e5e9f0', foreground: '#414858' },
+
+  // GitHub's interface palette, plus the accessible pair.
+  { id: 'github-light-default', background: '#ffffff', foreground: '#1f2328' },
+  { id: 'github-dark-high-contrast', background: '#0a0c10', foreground: '#f0f3f6' },
+  { id: 'github-light-high-contrast', background: '#ffffff', foreground: '#0e1116' },
 ])
 
 /** A theme role as hex, which is how upstream palettes are published. */
@@ -248,15 +253,15 @@ describe('upstream fidelity', () => {
  * GitHub Dark Default.
  */
 describe('adea-dark composition', () => {
-  const AARDVARK = {
-    background: '#0f141f',
-    foreground: '#b4bcca',
-    black: '#222734',
-    brightBlack: '#3a4152',
-    white: '#5a6377',
-    brightWhite: '#dfe5ee',
-    cursor: '#b4bcca',
-    selection: '#2a3645',
+  const GITHUB_CANVAS = {
+    background: '#0d1117',
+    foreground: '#e6edf3',
+    black: '#484f58',
+    brightBlack: '#6e7681',
+    white: '#b1bac4',
+    brightWhite: '#ffffff',
+    cursor: '#2f81f7',
+    selection: '#e6edf3',
   } as const
 
   const GITHUB = {
@@ -274,17 +279,17 @@ describe('adea-dark composition', () => {
     brightCyan: '#56d4dd',
   } as const
 
-  test('the structure comes from Aardvark Ink', () => {
+  test('the structure comes from GitHub Dark Default', () => {
     const theme = getTheme('adea-dark')!
 
-    expect(hex(theme.colors.background), 'canvas').toBe(AARDVARK.background)
-    expect(hex(theme.colors.foreground), 'foreground').toBe(AARDVARK.foreground)
-    expect(hex(theme.cursor), 'cursor').toBe(AARDVARK.cursor)
-    expect(hex(theme.selection), 'selection').toBe(AARDVARK.selection)
-    expect(hex(theme.ansi.black), 'ansi black').toBe(AARDVARK.black)
-    expect(hex(theme.ansi.brightBlack), 'ansi bright black').toBe(AARDVARK.brightBlack)
-    expect(hex(theme.ansi.white), 'ansi white').toBe(AARDVARK.white)
-    expect(hex(theme.ansi.brightWhite), 'ansi bright white').toBe(AARDVARK.brightWhite)
+    expect(hex(theme.colors.background), 'canvas').toBe(GITHUB_CANVAS.background)
+    expect(hex(theme.colors.foreground), 'foreground').toBe(GITHUB_CANVAS.foreground)
+    expect(hex(theme.cursor), 'cursor').toBe(GITHUB_CANVAS.cursor)
+    expect(hex(theme.selection), 'selection').toBe(GITHUB_CANVAS.selection)
+    expect(hex(theme.ansi.black), 'ansi black').toBe(GITHUB_CANVAS.black)
+    expect(hex(theme.ansi.brightBlack), 'ansi bright black').toBe(GITHUB_CANVAS.brightBlack)
+    expect(hex(theme.ansi.white), 'ansi white').toBe(GITHUB_CANVAS.white)
+    expect(hex(theme.ansi.brightWhite), 'ansi bright white').toBe(GITHUB_CANVAS.brightWhite)
   })
 
   test('the hues come from GitHub Dark Default, unmodified', () => {
@@ -299,9 +304,10 @@ describe('adea-dark composition', () => {
     }
   })
 
-  test('the vibrant hues clear the floor on the borrowed canvas', () => {
-    // The premise of the composition: Aardvark Ink's canvas is darker and less
-    // saturated than GitHub's, so GitHub's hues have *more* contrast here, not less.
+  test('the vibrant hues clear the floor on their own canvas', () => {
+    // The hues are on the canvas they were drawn for, so this is the cheapest of
+    // the fidelity checks: if it fails, the normalizer repaired a hue the palette
+    // owns.
     const theme = getTheme('adea-dark')!
     const background = parseColor(theme.colors.background)!
     for (const role of ['success', 'warning', 'error', 'info', 'accent'] as const) {
@@ -312,10 +318,9 @@ describe('adea-dark composition', () => {
     }
   })
 
-  test('the composition names both donors', () => {
+  test('the composition names its donor', () => {
     const theme = getTheme('adea-dark')!
     const sources = theme.provenance.bootstrappedFrom ?? []
-    expect(sources.join(' ')).toContain('Aardvark Ink')
     expect(sources.join(' ')).toContain('GitHub Dark Default')
   })
 })
@@ -355,28 +360,30 @@ describe('the adea pair', () => {
     expect(dark.appearance).toBe('dark')
   })
 
-  test('their canvases are in the same hue family', () => {
-    const lightHue = parseColor(light.colors.background)!.h
-    const darkHue = parseColor(dark.colors.background)!.h
-    const delta = Math.abs(lightHue - darkHue)
-
-    expect(
-      delta,
-      `the canvases are ${delta.toFixed(1)}° apart in hue, so switching appearance shifts the theme's colour rather than its exposure`
-    ).toBeLessThanOrEqual(8)
+  test('their canvases are the palette GitHub ships', () => {
+    // The defaults are meant to read as GitHub's two appearances, so each canvas is
+    // asserted against the published hex rather than against the other: a drift
+    // here means the default stopped looking like the thing it is named for.
+    expect(hex(light.colors.background), 'light canvas').toBe('#ffffff')
+    expect(hex(dark.colors.background), 'dark canvas').toBe('#0d1117')
   })
 
-  test('both canvases are tinted rather than neutral', () => {
-    // A neutral grey beside a tinted one reads as two different design systems — the
-    // light theme was exactly that before this composition, and it is why the light
-    // canvas carries a recorded chroma correction.
-    for (const theme of [light, dark]) {
-      const chroma = parseColor(theme.colors.background)!.c
-      expect(
-        chroma,
-        `${theme.id}'s canvas carries ${chroma.toFixed(3)} of chroma, which is too close to neutral to read as tinted`
-      ).toBeGreaterThanOrEqual(0.012)
-    }
+  test('the dark canvas keeps its tint, and the light one is paper', () => {
+    // GitHub's dark canvas is faintly blue, not neutral grey, and the default
+    // should keep that character. The light canvas is the same palette's paper: no
+    // tint correction is applied to it, and one creeping in would mean the light
+    // default had stopped being GitHub Light.
+    const darkChroma = parseColor(dark.colors.background)!.c
+    expect(
+      darkChroma,
+      `the dark canvas carries ${darkChroma.toFixed(3)} of chroma, which is too close to neutral to read as tinted`
+    ).toBeGreaterThanOrEqual(0.012)
+
+    const lightChroma = parseColor(light.colors.background)!.c
+    expect(
+      lightChroma,
+      `the light canvas carries ${lightChroma.toFixed(3)} of chroma; the default should be GitHub's plain paper`
+    ).toBeLessThanOrEqual(0.003)
   })
 
   test('a red is the same red in both, and so is every other hue', () => {
@@ -429,9 +436,8 @@ describe('the adea pair', () => {
     const lightSources = (light.provenance.bootstrappedFrom ?? []).join(' ')
     const darkSources = (dark.provenance.bootstrappedFrom ?? []).join(' ')
 
-    expect(lightSources).toContain('Nord Light')
+    expect(lightSources).toContain('GitHub Light Default')
     expect(lightSources).toContain('GitHub Dark Default')
-    expect(darkSources).toContain('Aardvark Ink')
     expect(darkSources).toContain('GitHub Dark Default')
   })
 })
@@ -475,94 +481,6 @@ describe('provenance', () => {
         theme.provenance.bootstrappedFrom?.length ?? 0,
         `${theme.id} does not record where its values came from`
       ).toBeGreaterThan(0)
-    }
-  })
-
-  test('legacy Slate and High Contrast records keep their Adea family identity and source', () => {
-    const expected = [
-      ['slate-light', 'slate', 'Slate', 'Light', 'light'],
-      ['slate-dark', 'slate', 'Slate', 'Dark', 'dark'],
-      ['contrast-light', 'contrast', 'High Contrast', 'Light', 'light'],
-      ['contrast-dark', 'contrast', 'High Contrast', 'Dark', 'dark'],
-    ] as const
-
-    for (const [id, family, familyLabel, label, appearance] of expected) {
-      const theme = getTheme(id)
-      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
-      if (!theme) continue
-      expect(theme.family).toBe(family)
-      expect(theme.familyLabel).toBe(familyLabel)
-      expect(theme.label).toBe(label)
-      expect(theme.name).toBe(`${familyLabel} ${label}`)
-      expect(theme.appearance).toBe(appearance)
-      expect(theme.provenance.project).toBe('Adea')
-      expect(theme.provenance.url).toBe('https://github.com/adea-ai/adea')
-      expect(theme.provenance.license).toBe('Apache-2.0')
-    }
-  })
-
-  test('legacy themes do not claim an unsupported external source for their ANSI values', () => {
-    for (const id of ['slate-light', 'slate-dark', 'contrast-light', 'contrast-dark']) {
-      const theme = getTheme(id)
-      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
-      expect(
-        theme?.provenance.bootstrappedFrom,
-        `${id} must not attribute Adea's existing ANSI constants to an unrelated GitHub palette`
-      ).toBeUndefined()
-    }
-  })
-
-  test('legacy terminal roles preserve the product-approved per-appearance values', () => {
-    const light = {
-      black: '#1b1f24',
-      red: '#b91c1c',
-      green: '#116a2e',
-      yellow: '#8a5a1b',
-      blue: '#0b57d0',
-      magenta: '#a0186f',
-      cyan: '#0e7490',
-      white: '#57606a',
-      brightBlack: '#57606a',
-      brightRed: '#c94d4d',
-      brightGreen: '#1f9d4f',
-      brightYellow: '#a9752c',
-      brightBlue: '#3b82f6',
-      brightMagenta: '#c04a92',
-      brightCyan: '#0891b2',
-      brightWhite: '#24292f',
-    }
-    const dark = {
-      black: '#2f3742',
-      red: '#ff8183',
-      green: '#56d364',
-      yellow: '#e3b341',
-      blue: '#6ca4f8',
-      magenta: '#db61a2',
-      cyan: '#39c5cf',
-      white: '#d5dde5',
-      brightBlack: '#57606a',
-      brightRed: '#ff9494',
-      brightGreen: '#79dd8a',
-      brightYellow: '#f0c264',
-      brightBlue: '#8db9ff',
-      brightMagenta: '#e87cb4',
-      brightCyan: '#66d3dc',
-      brightWhite: '#eef2f6',
-    }
-    const expected = {
-      'slate-light': light,
-      'contrast-light': light,
-      'slate-dark': dark,
-      'contrast-dark': dark,
-    }
-
-    for (const [id, ansi] of Object.entries(expected)) {
-      const theme = getTheme(id)
-      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
-      const actual = Object.fromEntries(
-        Object.entries(ansi).map(([role]) => [role, hex(theme!.ansi[role as keyof typeof ansi])])
-      )
-      expect(actual, `${id} ANSI values differ from the retained appearance set`).toEqual(ansi)
     }
   })
 

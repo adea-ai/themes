@@ -11,40 +11,41 @@ bun add @adea-ai/themes
 
 ## The catalogue
 
-| Family                                                        | Variants                        |
-| ------------------------------------------------------------- | ------------------------------- |
-| **Adea**                                                      | Light, Dark                     |
-| **Slate**                                                     | Light, Dark                     |
-| **High Contrast**                                             | Light, Dark                     |
-| **Catppuccin**                                                | Latte, Frappé, Macchiato, Mocha |
-| **Tokyo Night**                                               | Day, Storm, Night               |
-| **Rosé Pine**                                                 | Dawn, Moon, Main                |
-| **Gruvbox**                                                   | Light, Dark                     |
-| **Everforest**                                                | Light, Dark                     |
-| **Ayu**                                                       | Light, Mirage, Dark             |
-| **Solarized**                                                 | Light, Dark                     |
-| **Monokai**                                                   | Classic                         |
-| **Nord**, **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each                        |
+| Family                                              | Variants                                               |
+| --------------------------------------------------- | ------------------------------------------------------ |
+| **Adea**                                            | Light, Dark                                            |
+| **Aardvark**                                        | Ink, Blue                                              |
+| **GitHub**                                          | Light Default, Dark High Contrast, Light High Contrast |
+| **Catppuccin**                                      | Latte, Frappé, Macchiato, Mocha                        |
+| **Tokyo Night**                                     | Day, Storm, Night                                      |
+| **Rosé Pine**                                       | Dawn, Moon, Main                                       |
+| **Gruvbox**                                         | Light, Dark                                            |
+| **Everforest**                                      | Light, Dark                                            |
+| **Ayu**                                             | Light, Mirage, Dark                                    |
+| **Solarized**                                       | Light, Dark                                            |
+| **Monokai**                                         | Classic                                                |
+| **Nord**                                            | Nord, Light                                            |
+| **Dracula**, **One Dark**, **Kanagawa**, **Vesper** | one each                                               |
 
 `adea-light` and `adea-dark` are the defaults, and both are **composed** from two
 upstream palettes rather than authored or copied:
 
-|            | canvas                 | canvas hue | hues                |
-| ---------- | ---------------------- | ---------- | ------------------- |
-| Adea Dark  | Aardvark Ink `#0f141f` | 265°       | GitHub Dark Default |
-| Adea Light | Nord Light `#e3e9f4`   | 262°       | GitHub Dark Default |
+|            | canvas                         | hues                            |
+| ---------- | ------------------------------ | ------------------------------- |
+| Adea Dark  | GitHub Dark Default `#0d1117`  | GitHub Dark Default             |
+| Adea Light | GitHub Light Default `#ffffff` | GitHub Dark Default, transposed |
 
-They share a hue donor, so a red is the same red in both and only the canvas changes;
-the canvases are three degrees apart in hue and both are tinted rather than neutral,
-which is what makes them one theme seen at two exposures instead of two themes that
-happen to ship together. `tests/provenance.test.ts` asserts that partnership — identical
-hue and chroma for every chromatic role, canvases in one hue family — because the two
-halves are built from different donors and could otherwise drift apart without either
-becoming wrong on its own.
+The defaults are GitHub's two appearances: the dark theme is GitHub Dark Default
+entire, and the light theme is GitHub's own white canvas carrying the dark theme's
+hues, transposed down one lightness step so they clear the contrast floors on paper.
+They share a hue donor, so a red is the same red in both and only the lightness
+changes. `tests/provenance.test.ts` asserts that partnership — identical hue and
+chroma for every chromatic role, canvases matching GitHub's published palette —
+because the two halves are built from different donors and could otherwise drift
+apart without either becoming wrong on its own.
 
-The Slate and High Contrast variants are first-party Adea palettes retained from the
-product's appearance registry. The other twenty-five themes reproduce somebody else's
-palette from a named revision and are credited in [NOTICE](NOTICE).
+The other themes reproduce somebody else's palette from a named revision and are
+credited in [NOTICE](NOTICE).
 
 ## Using it
 
@@ -105,8 +106,7 @@ Shiki) convert, gamut-mapping rather than clipping.
 
 **Adea owns the schema and the transformation.** The seventeen surface roles in
 `src/schema.ts` are the contract. No upstream project is asked to satisfy it.
-`palettes/` holds Base24 schemes reproduced from a pinned revision; the Slate and
-High Contrast families are first-party authored semantic palettes; and
+`palettes/` holds Base24 schemes reproduced from a pinned revision; and
 `src/normalize.ts` is the single place an input becomes a canonical application theme.
 Adding a theme is a line in `src/sources.ts` plus a rebuild.
 

@@ -88,7 +88,7 @@ describe('packed package in a native ESM consumer', () => {
       }
       console.log(theme.id + ':' + themeMetadata.length);
     `)
-    ).toBe('adea-dark:31')
+    ).toBe('adea-dark:33')
   })
   test('root and renderer adapters resolve without a bundler or source alias', () => {
     expect(
@@ -102,7 +102,7 @@ describe('packed package in a native ESM consumer', () => {
           || !themeCssVariables(theme)['--adea-background']) throw new Error('empty adapter');
       console.log(themeCount());
     `)
-    ).toBe('31')
+    ).toBe('33')
   })
 
   test('the documented shadcn adapter has a public subpath', () => {

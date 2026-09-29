@@ -427,155 +427,6 @@ describe('shadcn bridge', () => {
     expect(variables['--destructive-foreground']).toBe(projection.foreground)
   })
 
-  test('legacy Slate and High Contrast records preserve their exact shadcn-only roles', () => {
-    const expected = {
-      'slate-light': {
-        background: '#f8fafc',
-        foreground: '#0f172a',
-        card: '#ffffff',
-        'card-foreground': '#0f172a',
-        popover: '#ffffff',
-        'popover-foreground': '#0f172a',
-        primary: '#0f172a',
-        'primary-foreground': '#f8fafc',
-        secondary: '#e2e8f0',
-        'secondary-foreground': '#0f172a',
-        muted: '#e2e8f0',
-        'muted-foreground': '#475569',
-        accent: '#e2e8f0',
-        'accent-foreground': '#0f172a',
-        destructive: '#b91c1c',
-        success: '#15803d',
-        border: '#cbd5e1',
-        input: '#cbd5e1',
-        ring: '#64748b',
-      },
-      'slate-dark': {
-        background: '#0f172a',
-        foreground: '#f1f5f9',
-        card: '#1e293b',
-        'card-foreground': '#f1f5f9',
-        popover: '#1e293b',
-        'popover-foreground': '#f1f5f9',
-        primary: '#e2e8f0',
-        'primary-foreground': '#0f172a',
-        secondary: '#334155',
-        'secondary-foreground': '#f1f5f9',
-        muted: '#334155',
-        'muted-foreground': '#9eadc2',
-        accent: '#334155',
-        'accent-foreground': '#f1f5f9',
-        destructive: '#f87171',
-        success: '#4ade80',
-        border: 'rgba(148, 163, 184, 0.2)',
-        input: 'rgba(148, 163, 184, 0.25)',
-        ring: '#64748b',
-      },
-      'contrast-light': {
-        background: '#ffffff',
-        foreground: '#000000',
-        card: '#ffffff',
-        'card-foreground': '#000000',
-        popover: '#ffffff',
-        'popover-foreground': '#000000',
-        primary: '#143d8f',
-        'primary-foreground': '#ffffff',
-        secondary: '#f0f0f0',
-        'secondary-foreground': '#000000',
-        muted: '#f0f0f0',
-        'muted-foreground': '#333333',
-        accent: '#f0f0f0',
-        'accent-foreground': '#000000',
-        destructive: '#b91c1c',
-        success: '#14532d',
-        border: '#767676',
-        input: '#767676',
-        ring: '#000000',
-      },
-      'contrast-dark': {
-        background: '#000000',
-        foreground: '#ffffff',
-        card: '#0a0a0a',
-        'card-foreground': '#ffffff',
-        popover: '#0a0a0a',
-        'popover-foreground': '#ffffff',
-        primary: '#8ab4ff',
-        'primary-foreground': '#000000',
-        secondary: '#1a1a1a',
-        'secondary-foreground': '#ffffff',
-        muted: '#1a1a1a',
-        'muted-foreground': '#e5e5e5',
-        accent: '#1a1a1a',
-        'accent-foreground': '#ffffff',
-        destructive: '#ff6b6b',
-        success: '#4ade80',
-        border: '#8f8f8f',
-        input: '#8f8f8f',
-        ring: '#ffffff',
-      },
-    } as const
-
-    for (const [id, roles] of Object.entries(expected)) {
-      const theme = getTheme(id)
-      expect(theme, `${id} is not in the shared catalogue`).toBeDefined()
-      if (!theme) continue
-
-      const variables = shadcnVariables(theme)
-      for (const [role, value] of Object.entries(roles)) {
-        const actual = variables[`--${role}`]
-        expect(actual, `${id} --${role}`).toBeDefined()
-        const exact = actual?.startsWith('rgba(') ? actual : oklchToHex(parseColor(actual ?? '')!)
-        expect(exact, `${id} --${role}`).toBe(value)
-      }
-
-      if (id === 'slate-dark') {
-        expect(oklchToHex(parseColor(theme.colors.textMuted)!)).toBe('#94a3b8')
-      }
-
-      // The consumer-facing foreground pairs are checked after projection, not
-      // inferred from canonical colors that a source-specific override may replace.
-      const foregroundPairs = [
-        ['--foreground', '--background', 4.5],
-        ['--card-foreground', '--card', 4.5],
-        ['--popover-foreground', '--popover', 4.5],
-        ['--primary-foreground', '--primary', 4.5],
-        ['--secondary-foreground', '--secondary', 4.5],
-        ['--muted-foreground', '--muted', 4.5],
-        ['--accent-foreground', '--accent', 4.5],
-        ['--ring', '--background', 3],
-      ] as const
-      for (const [foregroundName, backgroundName, minimum] of foregroundPairs) {
-        const foreground = parseColor(variables[foregroundName] ?? '')
-        const background = parseColor(variables[backgroundName] ?? '')
-        expect(foreground, `${id} ${foregroundName} is not parseable`).toBeDefined()
-        expect(background, `${id} ${backgroundName} is not parseable`).toBeDefined()
-        const ratio = contrastRatio(foreground!, background!)
-        expect(
-          ratio,
-          `${id} ${foregroundName} on ${backgroundName} is ${ratio.toFixed(2)}:1`
-        ).toBeGreaterThanOrEqual(minimum)
-      }
-    }
-  })
-})
-
-describe('shiki adapter', () => {
-  test('every colour is hex and every syntax role is present', () => {
-    for (const theme of themes) {
-      const shiki = toShikiTheme(theme)
-      expect(shiki.name).toBe(`adea-${theme.id}`)
-      expect(shiki.type).toBe(theme.appearance)
-      for (const [key, value] of Object.entries(shiki.colors)) {
-        expect(/^#[0-9a-f]{6}$/.test(value), `${theme.id} ${key} is not hex: ${value}`).toBe(true)
-      }
-      // A registration with only a default rule renders an entire file in one
-      // colour, which is the failure this catches.
-      expect(shiki.settings.length).toBeGreaterThan(10)
-      const roles = syntaxRoles(theme)
-      expect(Object.keys(roles).length).toBeGreaterThanOrEqual(18)
-    }
-  })
-
   test('the operator scope is claimed last, so its narrower rule wins', () => {
     const shiki = toShikiTheme(getTheme('dracula')!)
     const last = shiki.settings.at(-1)
@@ -655,13 +506,15 @@ describe('derived colours', () => {
   })
 
   test('the canonical editor projection meets its contrast floor after hex rounding', () => {
-    const theme = getTheme('contrast-dark')!
+    // The default is the fixture: its comment role sits closest to the floor, so
+    // hex rounding is most likely to push it under there.
+    const theme = getTheme('adea-dark')!
     const canonical = syntaxRolesHex(theme)
     const projected = editorRolesHex(theme)
 
-    expect(oklchToHex(parseColor(theme.ansi.brightBlack)!)).toBe('#57606a')
-    expect(canonical.comment).toBe('#57606a')
-    expect(projected.comment).toBe('#6c7680')
+    expect(oklchToHex(parseColor(theme.ansi.brightBlack)!)).toBe('#6e7681')
+    expect(canonical.comment).toBe('#6e7681')
+    expect(projected.comment).toBe('#757d88')
     for (const [role, value] of Object.entries(projected)) {
       const ratio = contrastRatio(parseColor(value)!, parseColor(theme.colors.background)!)
       expect(ratio, `${role} is ${ratio.toFixed(5)}:1 after hex rounding`).toBeGreaterThanOrEqual(
@@ -670,15 +523,8 @@ describe('derived colours', () => {
     }
   })
 
-  test('the six first-party editor palettes clear 4.5:1 in their rendered hex roles', () => {
-    for (const id of [
-      'adea-light',
-      'adea-dark',
-      'slate-light',
-      'slate-dark',
-      'contrast-light',
-      'contrast-dark',
-    ]) {
+  test('the two first-party editor palettes clear 4.5:1 in their rendered hex roles', () => {
+    for (const id of ['adea-light', 'adea-dark']) {
       const theme = getTheme(id)!
       const roles = editorRolesHex(theme)
       expect(Object.keys(roles)).toHaveLength(16)

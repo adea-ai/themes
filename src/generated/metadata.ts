@@ -17,18 +17,17 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "family": "adea",
     "familyLabel": "Adea",
     "label": "Dark",
-    "description": "The default dark theme. Aardvark Ink's quiet canvas, with GitHub's vivid hues on it.",
+    "description": "The default dark theme: GitHub Dark Default's canvas and hues, kept as a composition so the default can diverge from it one slot at a time.",
     "tags": [
       "dark",
       "default",
-      "vivid"
+      "neutral"
     ],
     "provenance": {
       "project": "Adea",
       "url": "https://github.com/adea-ai/themes",
       "license": "Apache-2.0",
       "bootstrappedFrom": [
-        "Aardvark Ink (iTerm2-Color-Schemes)",
         "GitHub Dark Default (iTerm2-Color-Schemes)"
       ]
     }
@@ -40,19 +39,63 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "family": "adea",
     "familyLabel": "Adea",
     "label": "Light",
-    "description": "The default light theme. Nord Light's cool canvas, with the same hues as Adea Dark.",
+    "description": "The default light theme: GitHub's own white canvas carrying the dark theme's hues, transposed to survive on paper.",
     "tags": [
       "light",
       "default",
-      "cool"
+      "neutral"
     ],
     "provenance": {
       "project": "Adea",
       "url": "https://github.com/adea-ai/themes",
       "license": "Apache-2.0",
       "bootstrappedFrom": [
-        "Nord Light (iTerm2-Color-Schemes)",
+        "GitHub Light Default (iTerm2-Color-Schemes)",
         "GitHub Dark Default (iTerm2-Color-Schemes)"
+      ]
+    }
+  },
+  {
+    "id": "aardvark-blue",
+    "name": "Aardvark Blue",
+    "appearance": "dark",
+    "family": "aardvark",
+    "familyLabel": "Aardvark",
+    "label": "Blue",
+    "description": "Ink's louder sibling: a deep blue ground under bright, cool text.",
+    "tags": [
+      "dark",
+      "blue",
+      "vivid"
+    ],
+    "provenance": {
+      "project": "iTerm2-Color-Schemes",
+      "url": "https://github.com/mbadolato/iTerm2-Color-Schemes",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      ]
+    }
+  },
+  {
+    "id": "aardvark-ink",
+    "name": "Aardvark Ink",
+    "appearance": "dark",
+    "family": "aardvark",
+    "familyLabel": "Aardvark",
+    "label": "Ink",
+    "description": "Near-black navy with muted blue-grey text — the canvas the original Adea Dark was drawn on.",
+    "tags": [
+      "dark",
+      "ink",
+      "muted"
+    ],
+    "provenance": {
+      "project": "iTerm2-Color-Schemes",
+      "url": "https://github.com/mbadolato/iTerm2-Color-Schemes",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
       ]
     }
   },
@@ -207,42 +250,6 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     }
   },
   {
-    "id": "contrast-dark",
-    "name": "High Contrast Dark",
-    "appearance": "dark",
-    "family": "contrast",
-    "familyLabel": "High Contrast",
-    "label": "Dark",
-    "description": "Adea’s high-contrast palette for dark appearance.",
-    "tags": [
-      "dark",
-      "high-contrast"
-    ],
-    "provenance": {
-      "project": "Adea",
-      "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
-    }
-  },
-  {
-    "id": "contrast-light",
-    "name": "High Contrast Light",
-    "appearance": "light",
-    "family": "contrast",
-    "familyLabel": "High Contrast",
-    "label": "Light",
-    "description": "Adea’s high-contrast palette for light appearance.",
-    "tags": [
-      "light",
-      "high-contrast"
-    ],
-    "provenance": {
-      "project": "Adea",
-      "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
-    }
-  },
-  {
     "id": "dracula",
     "name": "Dracula",
     "appearance": "dark",
@@ -304,6 +311,70 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     "provenance": {
       "project": "Everforest",
       "url": "https://github.com/sainnhe/everforest",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      ]
+    }
+  },
+  {
+    "id": "github-dark-high-contrast",
+    "name": "GitHub Dark High Contrast",
+    "appearance": "dark",
+    "family": "github",
+    "familyLabel": "GitHub",
+    "label": "Dark High Contrast",
+    "description": "GitHub's dark palette with its contrast floors pushed up, for accessibility needs.",
+    "tags": [
+      "dark",
+      "high-contrast"
+    ],
+    "provenance": {
+      "project": "GitHub Primer",
+      "url": "https://github.com/primer/primitives",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      ]
+    }
+  },
+  {
+    "id": "github-light-default",
+    "name": "GitHub Light Default",
+    "appearance": "light",
+    "family": "github",
+    "familyLabel": "GitHub",
+    "label": "Light Default",
+    "description": "GitHub's own light interface palette: white ground, grey steps, familiar syntax hues.",
+    "tags": [
+      "light",
+      "neutral",
+      "popular"
+    ],
+    "provenance": {
+      "project": "GitHub Primer",
+      "url": "https://github.com/primer/primitives",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      ]
+    }
+  },
+  {
+    "id": "github-light-high-contrast",
+    "name": "GitHub Light High Contrast",
+    "appearance": "light",
+    "family": "github",
+    "familyLabel": "GitHub",
+    "label": "Light High Contrast",
+    "description": "GitHub's light palette with its contrast floors pushed up, for accessibility needs.",
+    "tags": [
+      "light",
+      "high-contrast"
+    ],
+    "provenance": {
+      "project": "GitHub Primer",
+      "url": "https://github.com/primer/primitives",
       "license": "MIT",
       "bootstrappedFrom": [
         "https://github.com/mbadolato/iTerm2-Color-Schemes"
@@ -425,6 +496,28 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
     }
   },
   {
+    "id": "nord-light",
+    "name": "Nord Light",
+    "appearance": "light",
+    "family": "nord",
+    "familyLabel": "Nord",
+    "label": "Light",
+    "description": "Nord's snow variant: the same cool palette for a light canvas.",
+    "tags": [
+      "light",
+      "cool",
+      "muted"
+    ],
+    "provenance": {
+      "project": "Nord",
+      "url": "https://github.com/nordtheme/nord",
+      "license": "MIT",
+      "bootstrappedFrom": [
+        "https://github.com/mbadolato/iTerm2-Color-Schemes"
+      ]
+    }
+  },
+  {
     "id": "one-dark",
     "name": "One Dark",
     "appearance": "dark",
@@ -508,44 +601,6 @@ export const themeMetadata: readonly ThemeMetadata[] = Object.freeze([
       "bootstrappedFrom": [
         "https://github.com/mbadolato/iTerm2-Color-Schemes"
       ]
-    }
-  },
-  {
-    "id": "slate-dark",
-    "name": "Slate Dark",
-    "appearance": "dark",
-    "family": "slate",
-    "familyLabel": "Slate",
-    "label": "Dark",
-    "description": "Adea’s slate neutral palette for dark appearance.",
-    "tags": [
-      "dark",
-      "slate",
-      "neutral"
-    ],
-    "provenance": {
-      "project": "Adea",
-      "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
-    }
-  },
-  {
-    "id": "slate-light",
-    "name": "Slate Light",
-    "appearance": "light",
-    "family": "slate",
-    "familyLabel": "Slate",
-    "label": "Light",
-    "description": "Adea’s slate neutral palette for light appearance.",
-    "tags": [
-      "light",
-      "slate",
-      "neutral"
-    ],
-    "provenance": {
-      "project": "Adea",
-      "url": "https://github.com/adea-ai/adea",
-      "license": "Apache-2.0"
     }
   },
   {

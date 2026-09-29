@@ -13,61 +13,60 @@ const theme: AdeaThemeRecord = {
   "name": "Adea Dark",
   "appearance": "dark",
   "colors": {
-    "background": "oklch(0.1918 0.0238 265.37)",
-    "foreground": "oklch(0.7933 0.0217 261.76)",
-    "surface": "oklch(0.2268 0.0288 265.37)",
-    "surfaceElevated": "oklch(0.2568 0.033 265.37)",
-    "surfaceHover": "oklch(0.2918 0.038 265.37)",
-    "surfaceActive": "oklch(0.3268 0.038 265.37)",
-    "border": "oklch(0.3418 0.0214 265.37)",
-    "borderMuted": "oklch(0.2868 0.0143 265.37)",
-    "text": "oklch(0.7933 0.0217 261.76)",
-    "textMuted": "oklch(0.6308 0.0224 262.91)",
-    "textSubtle": "oklch(0.5339 0.0307 267.4)",
+    "background": "oklch(0.1763 0.014 258.36)",
+    "foreground": "oklch(0.9425 0.0111 243.66)",
+    "surface": "oklch(0.2113 0.0169 258.36)",
+    "surfaceElevated": "oklch(0.2413 0.0195 258.36)",
+    "surfaceHover": "oklch(0.2763 0.0224 258.36)",
+    "surfaceActive": "oklch(0.3113 0.0224 258.36)",
+    "border": "oklch(0.3263 0.0126 258.36)",
+    "borderMuted": "oklch(0.2713 0.0084 258.36)",
+    "text": "oklch(0.9425 0.0111 243.66)",
+    "textMuted": "oklch(0.6973 0.012 248.36)",
+    "textSubtle": "oklch(0.5629 0.0196 256.33)",
     "accent": "oklch(0.7153 0.1518 253.31)",
-    "accentForeground": "oklch(0.1918 0.0238 265.37)",
+    "accentForeground": "oklch(0.1763 0.014 258.36)",
     "success": "oklch(0.6951 0.1809 145.62)",
     "warning": "oklch(0.7196 0.1401 79.91)",
     "error": "oklch(0.7345 0.1626 25.78)",
     "info": "oklch(0.7555 0.1155 202.14)"
   },
   "ansi": {
-    "black": "oklch(0.2737 0.0253 268.32)",
+    "black": "oklch(0.4247 0.0175 254.72)",
     "red": "oklch(0.7345 0.1626 25.78)",
     "green": "oklch(0.6951 0.1809 145.62)",
     "yellow": "oklch(0.7196 0.1401 79.91)",
     "blue": "oklch(0.7153 0.1518 253.31)",
     "magenta": "oklch(0.7323 0.1668 301.69)",
     "cyan": "oklch(0.7555 0.1155 202.14)",
-    "white": "oklch(0.4995 0.0339 266.07)",
-    "brightBlack": "oklch(0.3759 0.0307 267.4)",
+    "white": "oklch(0.7849 0.0174 250.88)",
+    "brightBlack": "oklch(0.5629 0.0196 256.33)",
     "brightRed": "oklch(0.8014 0.1134 25.81)",
     "brightGreen": "oklch(0.7717 0.188 145.48)",
     "brightYellow": "oklch(0.7904 0.1386 85.24)",
     "brightBlue": "oklch(0.7857 0.1153 246.66)",
     "brightMagenta": "oklch(0.8005 0.1275 305.86)",
     "brightCyan": "oklch(0.8036 0.1107 201.78)",
-    "brightWhite": "oklch(0.92 0.0138 258.35)"
+    "brightWhite": "oklch(1 0 0)"
   },
-  "cursor": "oklch(0.7933 0.0217 261.76)",
-  "selection": "oklch(0.3286 0.0313 254.25)",
+  "cursor": "oklch(0.6182 0.1935 258.33)",
+  "selection": "oklch(0.9425 0.0111 243.66)",
   "family": "adea",
   "familyLabel": "Adea",
   "label": "Dark",
-  "description": "The default dark theme. Aardvark Ink's quiet canvas, with GitHub's vivid hues on it.",
+  "description": "The default dark theme: GitHub Dark Default's canvas and hues, kept as a composition so the default can diverge from it one slot at a time.",
   "provenance": {
     "project": "Adea",
     "url": "https://github.com/adea-ai/themes",
     "license": "Apache-2.0",
     "bootstrappedFrom": [
-      "Aardvark Ink (iTerm2-Color-Schemes)",
       "GitHub Dark Default (iTerm2-Color-Schemes)"
     ]
   },
   "tags": [
     "dark",
     "default",
-    "vivid"
+    "neutral"
   ]
 }
 export default theme
