@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.3](https://github.com/adea-ai/themes/compare/v0.8.2...v0.8.3) (2026-09-30)
+
+
+### Maintenance
+
+* **deps:** update dependency bun-types to ^1.4.2 ([#29](https://github.com/adea-ai/themes/issues/29)) ([e793730](https://github.com/adea-ai/themes/commit/e793730be16bac1eb2534c9e9e5432d48ce94e86))
+* **deps:** update dependency oxlint to ^1.86.0 ([#32](https://github.com/adea-ai/themes/issues/32)) ([0bcc656](https://github.com/adea-ai/themes/commit/0bcc656311c86416b966eb912dd0d07938c5ae46))
+
 ## [0.8.2](https://github.com/adea-ai/themes/compare/v0.8.1...v0.8.2) (2026-09-30)
 
 
