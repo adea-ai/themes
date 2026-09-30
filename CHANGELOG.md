@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/adea-ai/themes/compare/v0.8.0...v0.8.1) (2026-09-30)
+
+
+### Maintenance
+
+* add Renovate for external dependency updates ([#27](https://github.com/adea-ai/themes/issues/27)) ([7296d42](https://github.com/adea-ai/themes/commit/7296d42fa85515c4e33395c50b73950f5b0431bb))
+
 ## [0.8.0](https://github.com/adea-ai/themes/compare/v0.7.1...v0.8.0) (2026-09-29)
 
 
