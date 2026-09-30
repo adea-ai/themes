@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.2](https://github.com/adea-ai/themes/compare/v0.8.1...v0.8.2) (2026-09-30)
+
+
+### Maintenance
+
+* **deps:** update dependency oxfmt to ^0.71.0 ([#30](https://github.com/adea-ai/themes/issues/30)) ([50db182](https://github.com/adea-ai/themes/commit/50db182a11d13e9317a2fa0deeae2b22ae039446))
+* **deps:** update node.js to v24.21.0 ([#33](https://github.com/adea-ai/themes/issues/33)) ([b8aeef4](https://github.com/adea-ai/themes/commit/b8aeef44be1e71fa7bb7afd21ad4bf90fdb2f416))
+
 ## [0.8.1](https://github.com/adea-ai/themes/compare/v0.8.0...v0.8.1) (2026-09-30)
 
 
