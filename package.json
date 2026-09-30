@@ -109,14 +109,14 @@
     "verify": "bun run format:check && bun run typecheck && bun run lint && bun run catalogue:check && bun run test && bun run build"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.19.0",
     "bun-types": "^1.4.0",
     "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",
     "typescript": "^6.0.3"
   },
   "engines": {
-    "node": "24.18.0"
+    "node": "24.21.0"
   },
   "packageManager": "bun@1.4.0"
 }
