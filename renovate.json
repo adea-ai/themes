@@ -1,54 +1,32 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":semanticCommits",
-    ":semanticPrefixFixDepsChoreOthers"
-  ],
+  "extends": ["config:recommended", ":semanticCommits", ":semanticPrefixFixDepsChoreOthers"],
   "timezone": "America/New_York",
-  "labels": [
-    "dependencies"
-  ],
+  "labels": ["dependencies"],
   "rangeStrategy": "bump",
   "rebaseWhen": "behind-base-branch",
   "pruneStaleBranches": true,
+  "dependencyDashboard": false,
+  "draftPR": true,
   "vulnerabilityAlerts": {
-    "labels": [
-      "security"
-    ]
+    "labels": ["security"]
   },
   "packageRules": [
     {
       "description": "This repository is the source of the @adea-ai/themes package: never self-update an internal package.",
-      "matchPackagePatterns": [
-        "^@adea-ai/"
-      ],
+      "matchPackageNames": ["/^@adea-ai//"],
       "enabled": false
     },
     {
-      "description": "GitHub Actions version bumps automerge once validation passes.",
-      "matchDepTypes": [
-        "action"
-      ],
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
+      "description": "GitHub Actions version bumps ride one grouped draft PR per cycle instead of one PR per action.",
+      "matchDepTypes": ["action"],
+      "groupName": "github actions"
     },
     {
-      "description": "External dependency updates (majors included) ride ONE branch and automerge once this repository's validation gates pass \u2014 the gates are the review for every version bump; there is no faster iteration loop worth preserving.",
-      "matchUpdateTypes": [
-        "patch",
-        "minor",
-        "major",
-        "pin",
-        "digest"
-      ],
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true,
-      "schedule": [
-        "after 8am and before 8pm every weekday"
-      ]
+      "description": "External dependency updates (majors included) ride ONE draft branch per cycle. No auto-merge: GitHub refuses to attach it to a draft PR, and every PR must open as a draft because the code-foundry gates only run on the ready-for-review transition — a human marks each batch ready and merges it once the gates pass.",
+      "matchUpdateTypes": ["patch", "minor", "major", "pin", "digest"],
+      "groupName": "external dependencies",
+      "schedule": ["after 8am and before 8pm every weekday"]
     }
   ]
 }
