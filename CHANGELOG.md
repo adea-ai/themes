@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.6](https://github.com/adea-ai/themes/compare/v0.8.5...v0.8.6) (2026-10-01)
+
+
+### Maintenance
+
+* **code-foundry:** upgrade runtime to v1.38.1 ([#43](https://github.com/adea-ai/themes/issues/43)) ([d179976](https://github.com/adea-ai/themes/commit/d17997629928bac0f793efe2292d5e1cc060cc7b))
+* open Renovate PRs as drafts and repair release qualification ([#42](https://github.com/adea-ai/themes/issues/42)) ([3d3746f](https://github.com/adea-ai/themes/commit/3d3746f264e8ccca532ae35f9ca2fd3aba32fe16))
+
 ## [0.8.5](https://github.com/adea-ai/themes/compare/v0.8.4...v0.8.5) (2026-10-01)
 
 
