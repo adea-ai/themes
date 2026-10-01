@@ -109,7 +109,7 @@
     "verify": "bun run format:check && bun run typecheck && bun run lint && bun run catalogue:check && bun run test && bun run build"
   },
   "devDependencies": {
-    "@types/node": "^24.19.0",
+    "@types/node": "^26.6.3",
     "bun-types": "^1.4.2",
     "oxfmt": "^0.71.0",
     "oxlint": "^1.86.0",
