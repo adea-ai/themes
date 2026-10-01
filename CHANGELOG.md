@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.5](https://github.com/adea-ai/themes/compare/v0.8.4...v0.8.5) (2026-10-01)
+
+
+### Maintenance
+
+* **deps:** update dependency typescript to v7 ([#36](https://github.com/adea-ai/themes/issues/36)) ([13a5394](https://github.com/adea-ai/themes/commit/13a5394a3bf22ef3b33dffdd7abc274acc3cdc3a))
+
 ## [0.8.4](https://github.com/adea-ai/themes/compare/v0.8.3...v0.8.4) (2026-10-01)
 
 
