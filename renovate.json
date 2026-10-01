@@ -1,34 +1,54 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommits", ":semanticPrefixFixDepsChoreOthers"],
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticPrefixFixDepsChoreOthers"
+  ],
   "timezone": "America/New_York",
-  "labels": ["dependencies"],
+  "labels": [
+    "dependencies"
+  ],
   "rangeStrategy": "bump",
   "rebaseWhen": "behind-base-branch",
   "pruneStaleBranches": true,
   "vulnerabilityAlerts": {
-    "labels": ["security"]
+    "labels": [
+      "security"
+    ]
   },
   "packageRules": [
     {
       "description": "This repository is the source of the @adea-ai/themes package: never self-update an internal package.",
-      "matchPackagePatterns": ["^@adea-ai/"],
+      "matchPackagePatterns": [
+        "^@adea-ai/"
+      ],
       "enabled": false
     },
     {
       "description": "GitHub Actions version bumps automerge once validation passes.",
-      "matchDepTypes": ["action"],
+      "matchDepTypes": [
+        "action"
+      ],
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": true
     },
     {
-      "description": "Non-major external dependency updates automerge once the validation gates pass.",
-      "matchUpdateTypes": ["patch", "minor", "pin", "digest"],
+      "description": "External dependency updates (majors included) ride ONE branch and automerge once this repository's validation gates pass \u2014 the gates are the review for every version bump; there is no faster iteration loop worth preserving.",
+      "matchUpdateTypes": [
+        "patch",
+        "minor",
+        "major",
+        "pin",
+        "digest"
+      ],
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": true,
-      "schedule": ["after 8am and before 8pm every weekday"]
+      "schedule": [
+        "after 8am and before 8pm every weekday"
+      ]
     }
   ]
 }
