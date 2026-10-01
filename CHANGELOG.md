@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.4](https://github.com/adea-ai/themes/compare/v0.8.3...v0.8.4) (2026-10-01)
+
+
+### Maintenance
+
+* **deps:** update dependency @types/node to v26 ([#35](https://github.com/adea-ai/themes/issues/35)) ([2a32fcf](https://github.com/adea-ai/themes/commit/2a32fcf1adfd62859e7603b75b54a6a6e2167663))
+
 ## [0.8.3](https://github.com/adea-ai/themes/compare/v0.8.2...v0.8.3) (2026-09-30)
 
 
