@@ -5,6 +5,7 @@
     ":semanticCommits",
     ":semanticPrefixFixDepsChoreOthers"
   ],
+  "dependencyDashboard": false,
   "timezone": "America/New_York",
   "labels": [
     "dependencies"
