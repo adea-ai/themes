@@ -72,6 +72,7 @@ export {
   getAccent,
   primaryHover,
   primarySubtleCss,
+  themeAccentPresets,
 } from './accents.js'
 
 /* --- The catalogue ------------------------------------------------------ */
