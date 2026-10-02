@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/adea-ai/themes/compare/v0.8.9...v0.9.0) (2026-10-02)
+
+
+### Features
+
+* **accents:** offer the accents a theme carries ([#54](https://github.com/adea-ai/themes/issues/54)) ([bbb4825](https://github.com/adea-ai/themes/commit/bbb482543aa03ed910fd8d122fc15ad6fe140e53))
+
 ## [0.8.9](https://github.com/adea-ai/themes/compare/v0.8.8...v0.8.9) (2026-10-02)
 
 
