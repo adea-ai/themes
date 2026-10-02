@@ -3,9 +3,12 @@ import { describe, expect, test } from 'bun:test'
 import {
   ACCENTS,
   ACCENT_HOVER_STEP,
+  CONTRAST_FLOORS,
   accentForegroundContrast,
   accentRoles,
   getAccent,
+  themeAccentPresets,
+  themes,
 } from '../src'
 import { contrastRatio, parseColor, shiftLightness } from '../src/oklch'
 
@@ -169,5 +172,65 @@ describe('the accent tint', () => {
     const light = accentRoles(getAccent('violet')!, 'light')
     const dark = accentRoles(getAccent('violet')!, 'dark')
     expect(tintAlpha(dark.primarySubtle)).toBeGreaterThan(tintAlpha(light.primarySubtle))
+  })
+})
+
+describe('the theme-derived accents', () => {
+  const lightThemes = themes.filter((theme) => theme.appearance === 'light')
+  const darkThemes = themes.filter((theme) => theme.appearance === 'dark')
+
+  test('every theme pair offers at least one accent with role-shaped ids', () => {
+    for (const light of lightThemes) {
+      for (const dark of darkThemes) {
+        const presets = themeAccentPresets(light, dark)
+        expect(
+          presets.length,
+          `${light.id} × ${dark.id} must offer at least one theme accent`
+        ).toBeGreaterThan(0)
+        for (const preset of presets) {
+          expect(preset.id).toMatch(/^ansi-(blue|magenta|cyan|green)$/)
+          expect(parseColor(preset.light), `${preset.id} light is unreadable`).toBeDefined()
+          expect(parseColor(preset.dark), `${preset.id} dark is unreadable`).toBeDefined()
+        }
+      }
+    }
+  })
+
+  test('a pair that clears the floors unoffered is handed over verbatim', () => {
+    // The adea pair passes every floor as published, so the derivation has
+    // nothing to repair and the palette leaves in its own words.
+    const light = themes.find((theme) => theme.id === 'adea-light')!
+    const dark = themes.find((theme) => theme.id === 'adea-dark')!
+    expect(themeAccentPresets(light, dark).length).toBeGreaterThan(0)
+    for (const preset of themeAccentPresets(light, dark)) {
+      const slot = preset.id.slice('ansi-'.length) as keyof typeof dark.ansi
+      expect(preset.light).toBe(light.ansi[slot])
+      expect(preset.dark).toBe(dark.ansi[slot])
+    }
+  })
+
+  test('every offered slot clears the accent floors on its own theme, both appearances', () => {
+    for (const light of lightThemes) {
+      for (const dark of darkThemes) {
+        for (const preset of themeAccentPresets(light, dark)) {
+          for (const [appearance, theme] of [
+            ['light', light],
+            ['dark', dark],
+          ] as const) {
+            const offered = appearance === 'light' ? preset.light : preset.dark
+            const value = parseColor(offered)!
+            const background = parseColor(theme.colors.background)!
+            expect(
+              contrastRatio(value, background),
+              `${preset.id} ${appearance} on ${theme.id} canvas`
+            ).toBeGreaterThanOrEqual(CONTRAST_FLOORS.accentRaised)
+            expect(
+              accentForegroundContrast(offered),
+              `${preset.id} label on ${theme.id} ${appearance}`
+            ).toBeGreaterThanOrEqual(CONTRAST_FLOORS.accentForeground)
+          }
+        }
+      }
+    }
   })
 })
