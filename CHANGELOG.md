@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.7](https://github.com/adea-ai/themes/compare/v0.8.6...v0.8.7) (2026-10-02)
+
+
+### Maintenance
+
+* declare Renovate as the managed dependency updater ([#47](https://github.com/adea-ai/themes/issues/47)) ([419be80](https://github.com/adea-ai/themes/commit/419be801115d7ff15b6ddb464034f6fb9df343d0))
+* **deps:** update dependency @types/node to ^26.6.4 ([#46](https://github.com/adea-ai/themes/issues/46)) ([b6e64f5](https://github.com/adea-ai/themes/commit/b6e64f52d30361b759bdc6b57db4f02e7cc252af))
+
 ## [0.8.6](https://github.com/adea-ai/themes/compare/v0.8.5...v0.8.6) (2026-10-01)
 
 
