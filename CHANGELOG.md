@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.8](https://github.com/adea-ai/themes/compare/v0.8.7...v0.8.8) (2026-10-02)
+
+
+### Bug Fixes
+
+* measure contrast against the eight-bit colour a browser draws ([#49](https://github.com/adea-ai/themes/issues/49)) ([251c42d](https://github.com/adea-ai/themes/commit/251c42d4ff780ef7bf885f145000ebce6a7b6205))
+
 ## [0.8.7](https://github.com/adea-ai/themes/compare/v0.8.6...v0.8.7) (2026-10-02)
 
 
