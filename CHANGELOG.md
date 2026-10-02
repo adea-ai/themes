@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.3](https://github.com/adea-ai/themes/compare/v0.9.2...v0.9.3) (2026-10-02)
+
+
+### Maintenance
+
+* **deps:** update dependency code-foundry to v1.41.0 ([#53](https://github.com/adea-ai/themes/issues/53)) ([f88c22e](https://github.com/adea-ai/themes/commit/f88c22e1253941975ca8f3cca51c601703a20ef0))
+
 ## [0.9.2](https://github.com/adea-ai/themes/compare/v0.9.1...v0.9.2) (2026-10-02)
 
 
