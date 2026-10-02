@@ -41,6 +41,18 @@ describe('catalogue contrast', () => {
     expect(CONTRAST_FLOORS.accent).toBe(4.5)
     expect(CONTRAST_FLOORS.status).toBe(4.5)
   })
+
+  test('a pairing is measured as the eight-bit colour a browser will draw', () => {
+    // Ayu's muted-on-popover pair before its repair: the unrounded oklch maths
+    // puts it at 4.51:1 — over the floor — but a browser stores three integer
+    // channels and axe reads those, at 4.48:1. The floors are guarantees about
+    // what is drawn, so the rounding is part of the colour being measured.
+    const muted = parseColor('oklch(0.6109 0.0111 148.15)')
+    const popover = parseColor('oklch(0.2285 0.0189 264.09)')
+    if (!muted || !popover) throw new Error('fixture colour failed to parse')
+    expect(contrastRatio(muted, popover).toFixed(2)).toBe('4.48')
+    expect(contrastRatio(muted, popover)).toBeLessThan(CONTRAST_FLOORS.textMuted)
+  })
 })
 
 /** Reads the lightness out of a canonical `oklch()` string. */

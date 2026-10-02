@@ -199,6 +199,22 @@ export function formatOklch(color: Oklch): string {
 }
 
 /**
+ * A linear channel as a renderer stores it: encoded, rounded to eight bits,
+ * then back to linear light.
+ *
+ * Contrast is read off the drawing, and the drawing is three integer channels —
+ * axe takes `rgb(127, 133, 128)` off the computed style, not the `oklch()` the
+ * catalogue committed. The rounding is up to half a step per channel, and on a
+ * dark canvas — where the denominator of a ratio is small — it moves a pairing
+ * by a few hundredths: Ayu's muted text measured 4.51:1 unrounded and drew at
+ * 4.48:1, under the floor it had been repaired to. This is {@link canonical}'s
+ * guarantee one scale out: what is measured is what is rendered.
+ */
+function rendered(channel: number): number {
+  return SRGB_TO_LINEAR(Math.round(LINEAR_TO_SRGB(unit(channel)) * 255) / 255)
+}
+
+/**
  * Relative luminance of an sRGB colour, per WCAG 2.1.
  *
  * Computed from linear-light channels, which is why this goes through OKLab
@@ -208,7 +224,7 @@ export function formatOklch(color: Oklch): string {
  */
 export function relativeLuminance(color: Oklch): number {
   const { r, g, b } = oklabToLinearRgb(oklchToOklab(gamutMap(color)))
-  return 0.2126 * unit(r) + 0.7152 * unit(g) + 0.0722 * unit(b)
+  return 0.2126 * rendered(r) + 0.7152 * rendered(g) + 0.0722 * rendered(b)
 }
 
 /** The WCAG 2.1 contrast ratio, 1–21. Order-independent. */

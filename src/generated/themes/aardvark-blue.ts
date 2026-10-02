@@ -24,12 +24,12 @@ const theme: AdeaThemeRecord = {
     "text": "oklch(0.8975 0 0)",
     "textMuted": "oklch(0.6901 0.0207 262.64)",
     "textSubtle": "oklch(0.5786 0 0)",
-    "accent": "oklch(0.6179 0.1114 222.58)",
+    "accent": "oklch(0.6159 0.1114 222.58)",
     "accentForeground": "oklch(0.2493 0.0645 262.64)",
     "success": "oklch(0.6122 0.1613 134.76)",
     "warning": "oklch(0.7939 0.1634 96.15)",
-    "error": "oklch(0.6424 0.1551 27.16)",
-    "info": "oklch(0.6179 0.1114 222.58)"
+    "error": "oklch(0.6444 0.1551 27.16)",
+    "info": "oklch(0.6159 0.1114 222.58)"
   },
   "ansi": {
     "black": "oklch(0.4386 0 0)",

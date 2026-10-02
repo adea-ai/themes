@@ -50,7 +50,7 @@ const theme: AdeaThemeRecord = {
     "brightWhite": "oklch(0.7621 0.0202 262.99)"
   },
   "cursor": "oklch(0.7621 0.0202 262.99)",
-  "selection": "oklch(0.344 0.0227 264.21)",
+  "selection": "oklch(0.342 0.0227 264.21)",
   "family": "onedark",
   "familyLabel": "One Dark",
   "label": "One Dark",

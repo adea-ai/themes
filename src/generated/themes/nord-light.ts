@@ -22,14 +22,14 @@ const theme: AdeaThemeRecord = {
     "border": "oklch(0.783 0.0094 261.79)",
     "borderMuted": "oklch(0.838 0.0062 261.79)",
     "text": "oklch(0.4017 0.0285 266.52)",
-    "textMuted": "oklch(0.4737 0.0227 265.01)",
-    "textSubtle": "oklch(0.5679 0.0186 263.92)",
+    "textMuted": "oklch(0.4757 0.0227 265.01)",
+    "textSubtle": "oklch(0.5699 0.0186 263.92)",
     "accent": "oklch(0.5281 0.0625 332.66)",
     "accentForeground": "oklch(0.9513 0.0074 260.73)",
     "success": "oklch(0.5129 0.0758 131.14)",
-    "warning": "oklch(0.5224 0.0907 83.72)",
-    "error": "oklch(0.5361 0.1206 15.34)",
-    "info": "oklch(0.5157 0.0627 217.58)"
+    "warning": "oklch(0.5204 0.0907 83.72)",
+    "error": "oklch(0.5341 0.1206 15.34)",
+    "info": "oklch(0.5137 0.0627 217.58)"
   },
   "ansi": {
     "black": "oklch(0.4017 0.0285 266.52)",
@@ -50,7 +50,7 @@ const theme: AdeaThemeRecord = {
     "brightWhite": "oklch(0.9965 0.0017 247.84)"
   },
   "cursor": "oklch(0.4017 0.0285 266.52)",
-  "selection": "oklch(0.8733 0.0164 262.75)",
+  "selection": "oklch(0.8713 0.0164 262.75)",
   "family": "nord",
   "familyLabel": "Nord",
   "label": "Light",

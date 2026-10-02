@@ -26,10 +26,10 @@ const theme: AdeaThemeRecord = {
     "textSubtle": "oklch(0.5173 0 0)",
     "accent": "oklch(0.5674 0.1265 306.14)",
     "accentForeground": "oklch(0.9816 0.0017 247.84)",
-    "success": "oklch(0.5402 0.1786 136.92)",
+    "success": "oklch(0.5422 0.1786 136.92)",
     "warning": "oklch(0.5591 0.1385 73.98)",
     "error": "oklch(0.5731 0.1566 21.62)",
-    "info": "oklch(0.541 0.119 167.92)"
+    "info": "oklch(0.543 0.119 167.92)"
   },
   "ansi": {
     "black": "oklch(0.4899 0.0102 248.04)",

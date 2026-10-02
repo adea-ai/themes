@@ -23,7 +23,7 @@ const theme: AdeaThemeRecord = {
     "borderMuted": "oklch(0.3738 0.0212 276.94)",
     "text": "oklch(0.8708 0.0481 273.67)",
     "textMuted": "oklch(0.7094 0.044 274.71)",
-    "textSubtle": "oklch(0.6059 0.0389 275.68)",
+    "textSubtle": "oklch(0.6039 0.0389 275.68)",
     "accent": "oklch(0.7497 0.1101 263.81)",
     "accentForeground": "oklch(0.2788 0.0353 276.94)",
     "success": "oklch(0.835 0.1079 138.15)",
