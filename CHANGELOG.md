@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/adea-ai/themes/compare/v0.9.1...v0.9.2) (2026-10-02)
+
+
+### Documentation
+
+* the catalogue is thirty-four themes ([#58](https://github.com/adea-ai/themes/issues/58)) ([87c0476](https://github.com/adea-ai/themes/commit/87c0476c93790df75a33d4dee393f7fc92e1835a))
+
 ## [0.9.1](https://github.com/adea-ai/themes/compare/v0.9.0...v0.9.1) (2026-10-02)
 
 
