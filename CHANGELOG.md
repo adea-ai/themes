@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.1](https://github.com/adea-ai/themes/compare/v0.9.0...v0.9.1) (2026-10-02)
+
+
+### Maintenance
+
+* **code-foundry:** upgrade to v1.42.0 ([#56](https://github.com/adea-ai/themes/issues/56)) ([5e9f6a7](https://github.com/adea-ai/themes/commit/5e9f6a724e2dda414ed25af0e60cc9e742c720de))
+
+## [0.9.0](https://github.com/adea-ai/themes/compare/v0.8.9...v0.9.0) (2026-10-02)
+
+
+### Features
+
+* **accents:** offer the accents a theme carries ([#54](https://github.com/adea-ai/themes/issues/54)) ([bbb4825](https://github.com/adea-ai/themes/commit/bbb482543aa03ed910fd8d122fc15ad6fe140e53))
+
 ## [0.8.9](https://github.com/adea-ai/themes/compare/v0.8.8...v0.8.9) (2026-10-02)
 
 

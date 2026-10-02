@@ -44,9 +44,15 @@
  * the step uniform *and* the hue intact — a mix toward a neutral cannot do both.
  */
 
-import type { ThemeAppearance } from './schema.js'
+import type { AdeaTheme, AnsiKey, ThemeAppearance } from './schema.js'
 import type { Oklch } from './oklch.js'
 import { contrastRatio, formatOklch, parseColor, shiftLightness } from './oklch.js'
+import {
+  ACCENT_PREFERENCE,
+  CONTRAST_FLOORS,
+  MINIMUM_ACCENT_CHROMA,
+  REPAIR_BUDGET,
+} from './normalize.js'
 
 /** One accent preset: a named primary, per appearance. */
 export type AccentPreset = {
@@ -214,6 +220,92 @@ export function primarySubtleCss(
   primaryVariable = '--primary'
 ): string {
   return `color-mix(in oklch, var(${primaryVariable}) ${ACCENT_SUBTLE_ALPHA[appearance]}%, transparent)`
+}
+
+/**
+ * ## The accents a theme offers
+ *
+ * The {@link ACCENTS} presets are brand colours: the same six everywhere, chosen
+ * once. They read as visitors on a theme whose palette disagrees with them — a
+ * Gruvbox canvas with a cool cyan primary is two palettes sharing one window. A
+ * theme also carries colours of its *own* that are accent-shaped: its ANSI row is
+ * full of vivid, hue-distinct colours that the palette's authors already tuned to
+ * sit on that theme's surfaces.
+ *
+ * `themeAccentPresets` offers those. It pairs the two appearances on the accent
+ * slots {@link ACCENT_PREFERENCE} ranks, keeps a slot only when it clears the
+ * same floors a catalogue accent must clear — chroma, the raised-surface floor
+ * against the theme's own canvas, and a legible label — and returns the theme's
+ * values verbatim. Nothing here authors a colour: the slots are the palette's, the
+ * floors are the catalogue's, and the pairing is the only new decision.
+ *
+ * The ids are role-shaped (`ansi-blue`), not value-shaped, so a stored accent
+ * survives switching themes: the blue stays the blue, of whichever theme is
+ * active. That is what "pulled from the selected theme" means — the offering
+ * follows the theme, and so does the resolved colour.
+ */
+export type ThemeAccentSlot = (typeof ACCENT_PREFERENCE)[number]
+
+const REPAIR_STEP = 0.002
+
+/**
+ * A slot's offerable value on one theme: the palette's own colour when it already
+ * clears the accent floors on that theme's canvas, otherwise the catalogue's
+ * contrast repair — lightness moved, hue and chroma kept, direction away from the
+ * canvas, within the accent budget — applied to reach the raised-surface floor
+ * with a legible label. `undefined` when even the budget cannot get there, which
+ * is the one case where the theme honestly cannot offer the slot.
+ */
+function offeredSlotValue(theme: AdeaTheme, slot: ThemeAccentSlot): string | undefined {
+  const original = theme.ansi[slot as AnsiKey]
+  const value = parseColor(original)
+  const background = parseColor(theme.colors.background)
+  if (!value || !background) return undefined
+  if (value.c < MINIMUM_ACCENT_CHROMA) return undefined
+
+  // Measured in the canonical form the offer commits, so a repair cannot
+  // converge on a value that rounding then pushes back below the floor.
+  const clearsFloors = (candidate: Oklch): boolean => {
+    const canonical = parseColor(formatOklch(candidate))
+    if (!canonical) return false
+    return (
+      contrastRatio(canonical, background) >= CONTRAST_FLOORS.accentRaised &&
+      accentForegroundContrast(formatOklch(canonical)) >= CONTRAST_FLOORS.accentForeground
+    )
+  }
+
+  if (clearsFloors(value)) return original
+
+  const direction = value.l >= background.l ? 1 : -1
+  const maximumSteps = Math.floor(REPAIR_BUDGET.accent / REPAIR_STEP)
+  for (let index = 1; index <= maximumSteps; index += 1) {
+    const candidate = { ...value, l: value.l + direction * REPAIR_STEP * index }
+    if (candidate.l <= 0 || candidate.l >= 1) break
+    if (clearsFloors(candidate)) return formatOklch(candidate)
+  }
+  return undefined
+}
+
+/**
+ * The accent slots the theme pair offers, ordered by preference, floors enforced.
+ * A slot survives only when both appearances can offer it.
+ */
+export function themeAccentPresets(light: AdeaTheme, dark: AdeaTheme): AccentPreset[] {
+  const offered = new Map<ThemeAccentSlot, { light: string; dark: string }>()
+  for (const slot of ACCENT_PREFERENCE) {
+    const lightValue = offeredSlotValue(light, slot)
+    if (lightValue === undefined) continue
+    const darkValue = offeredSlotValue(dark, slot)
+    if (darkValue === undefined) continue
+    offered.set(slot, { light: lightValue, dark: darkValue })
+  }
+  return [...offered].map(([slot, value]) => ({
+    id: `ansi-${slot}`,
+    label: slot.charAt(0).toUpperCase() + slot.slice(1),
+    description: `The theme's own ${slot} colour.`,
+    light: value.light,
+    dark: value.dark,
+  }))
 }
 
 /**

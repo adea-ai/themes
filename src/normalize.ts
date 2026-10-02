@@ -141,7 +141,7 @@ function distortionOf(attempt: { repair: ContrastRepair; blended: boolean }): nu
   return attempt.blended ? attempt.repair.delta * 3 : attempt.repair.delta
 }
 
-const REPAIR_BUDGET = Object.freeze({
+export const REPAIR_BUDGET = Object.freeze({
   /** Body text: some palettes publish a foreground that fails on their own canvas. */
   text: 0.2,
   status: 0.24,
@@ -149,7 +149,12 @@ const REPAIR_BUDGET = Object.freeze({
 })
 
 /** The accent preference order, best first. */
-const ACCENT_PREFERENCE = ['blue', 'magenta', 'cyan', 'green'] as const satisfies readonly AnsiKey[]
+export const ACCENT_PREFERENCE = [
+  'blue',
+  'magenta',
+  'cyan',
+  'green',
+] as const satisfies readonly AnsiKey[]
 
 /**
  * How much stronger body text must be than the secondary rung.
@@ -161,7 +166,7 @@ const ACCENT_PREFERENCE = ['blue', 'magenta', 'cyan', 'green'] as const satisfie
 const MINIMUM_LADDER_GAP = 0.4
 
 /** The smallest chroma a colour needs before it reads as "a colour" rather than grey. */
-const MINIMUM_ACCENT_CHROMA = 0.035
+export const MINIMUM_ACCENT_CHROMA = 0.035
 
 /** A theme's source description, as the catalogue declares it. */
 export interface ThemeSourceSpec {
