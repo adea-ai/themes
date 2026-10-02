@@ -14,22 +14,22 @@ const theme: AdeaThemeRecord = {
   "appearance": "light",
   "colors": {
     "background": "oklch(0.9135 0.0068 277.16)",
-    "foreground": "oklch(0.4021 0.1563 264.1)",
+    "foreground": "oklch(0.4001 0.1563 264.1)",
     "surface": "oklch(0.8785 0.0053 277.16)",
     "surfaceElevated": "oklch(0.8485 0.0072 277.16)",
     "surfaceHover": "oklch(0.8135 0.0098 277.16)",
     "surfaceActive": "oklch(0.7785 0.0109 277.16)",
     "border": "oklch(0.7635 0.0062 277.16)",
     "borderMuted": "oklch(0.8185 0.0041 277.16)",
-    "text": "oklch(0.4021 0.1563 264.1)",
-    "textMuted": "oklch(0.4633 0.1085 268.28)",
+    "text": "oklch(0.4001 0.1563 264.1)",
+    "textMuted": "oklch(0.4613 0.1085 268.28)",
     "textSubtle": "oklch(0.5556 0.0451 278.01)",
-    "accent": "oklch(0.5001 0.1031 230.51)",
+    "accent": "oklch(0.5021 0.1031 230.51)",
     "accentForeground": "oklch(0.9135 0.0068 277.16)",
     "success": "oklch(0.4989 0.0929 130.28)",
     "warning": "oklch(0.5087 0.0749 75.19)",
     "error": "oklch(0.5337 0.2326 11.57)",
-    "info": "oklch(0.5001 0.1031 230.51)"
+    "info": "oklch(0.5021 0.1031 230.51)"
   },
   "ansi": {
     "black": "oklch(0.5121 0.1563 264.1)",
