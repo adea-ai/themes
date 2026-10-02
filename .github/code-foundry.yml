@@ -7,6 +7,10 @@ version: 1
 profile: auto
 languages: typescript
 features: validation,release
+# Dependency updates are Renovate-only: grouped draft PRs from the org
+# runner in adea-ai/ui. The updater key stops sync from re-rendering
+# .github/dependabot.yml regardless of the features selection.
+dependency_updater: renovate
 codeql: auto
 dependency_review: auto
 package_manager: bun
