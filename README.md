@@ -1,6 +1,6 @@
 # @adea-ai/themes
 
-The Adea theme catalogue. Thirty-one themes — every one an OKLCH theme with the
+The Adea theme catalogue. Thirty-four themes — every one an OKLCH theme with the
 full set of semantic surface roles, sixteen ANSI colours, a cursor and a selection —
 including first-party Adea palettes and mature upstream palettes normalized through
 the same adapters.
@@ -117,7 +117,7 @@ Shiki) convert, gamut-mapping rather than clipping.
 Adding a theme is a line in `src/sources.ts` plus a rebuild.
 
 A theme may also be **composed from two donors** — one supplying the structure, another
-the hues — which is how both of Adea's own themes are built. The composition is a slot
+the hues — which is how all six of Adea's own themes are built. The composition is a slot
 map in `COMPOSED_SOURCES`, so both parents stay named and freshening either one is a
 one-line diff rather than a re-transcription. A composition can also declare
 `hueTranspose`, which moves a borrowed hue set onto a different kind of canvas as a
