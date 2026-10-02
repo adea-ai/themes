@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.9](https://github.com/adea-ai/themes/compare/v0.8.8...v0.8.9) (2026-10-02)
+
+
+### Maintenance
+
+* **code-foundry:** upgrade to v1.41.0 ([#51](https://github.com/adea-ai/themes/issues/51)) ([3bf8e27](https://github.com/adea-ai/themes/commit/3bf8e2721548003e72a41718357c216c4a15a0a9))
+
 ## [0.8.8](https://github.com/adea-ai/themes/compare/v0.8.7...v0.8.8) (2026-10-02)
 
 
