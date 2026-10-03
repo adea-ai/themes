@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.5](https://github.com/adea-ai/themes/compare/v0.9.4...v0.9.5) (2026-10-03)
+
+
+### Maintenance
+
+* **deps:** sync Code Foundry 1.44.2 ([#63](https://github.com/adea-ai/themes/issues/63)) ([18b534b](https://github.com/adea-ai/themes/commit/18b534bcad6b15c6e72640687d22ec91b7450a04))
+
 ## [0.9.4](https://github.com/adea-ai/themes/compare/v0.9.3...v0.9.4) (2026-10-03)
 
 
