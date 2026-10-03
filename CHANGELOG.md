@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.7](https://github.com/adea-ai/themes/compare/v0.9.6...v0.9.7) (2026-10-03)
+
+
+### Maintenance
+
+* **deps:** track code-foundry runtime_ref v1.44.3 ([#67](https://github.com/adea-ai/themes/issues/67)) ([38e9939](https://github.com/adea-ai/themes/commit/38e9939c661046f70e636f03c07004aa7629381e))
+
 ## [0.9.6](https://github.com/adea-ai/themes/compare/v0.9.5...v0.9.6) (2026-10-03)
 
 
