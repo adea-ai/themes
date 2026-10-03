@@ -111,7 +111,7 @@
   "devDependencies": {
     "@types/node": "^26.6.4",
     "bun-types": "^1.4.2",
-    "code-foundry": "1.41.0",
+    "code-foundry": "1.44.0",
     "oxfmt": "^0.71.0",
     "oxlint": "^1.86.0",
     "typescript": "^7.0.2"
