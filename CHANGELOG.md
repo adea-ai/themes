@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.8](https://github.com/adea-ai/themes/compare/v0.9.7...v0.9.8) (2026-10-06)
+
+
+### Bug Fixes
+
+* exclude sync-managed code-foundry refs from the Renovate group ([#69](https://github.com/adea-ai/themes/issues/69)) ([05e4de2](https://github.com/adea-ai/themes/commit/05e4de2359cc222d08908b11d4b4be1518b2aa06))
+
 ## [0.9.7](https://github.com/adea-ai/themes/compare/v0.9.6...v0.9.7) (2026-10-03)
 
 
