@@ -18,6 +18,11 @@
       "enabled": false
     },
     {
+      "description": "Code Foundry runtime pins are sync-managed (runtime_ref in code-foundry.yml) and must not be independently upgraded; a bump branched before a sync can resurrect legacy caller files when merged. Workflow-file edits also abort the whole grouped branch: the runner's token cannot push workflow files, so GitHub rejects the ref and Renovate silently discards every update riding with it.",
+      "matchPackageNames": ["/^0xPlayerOne\\/code-foundry/"],
+      "enabled": false
+    },
+    {
       "description": "GitHub Actions version bumps ride one grouped draft PR per cycle instead of one PR per action.",
       "matchDepTypes": ["action"],
       "groupName": "github actions"
