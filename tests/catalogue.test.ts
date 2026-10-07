@@ -1,9 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  ACCENT_SUBTLE_MINIMUM_ALPHA,
   ANSI_KEYS,
   THEME_COLOR_KEYS,
   contrastRatio,
+  hexToOklch,
+  oklchToHex,
+  primaryTintClears,
   formatFindings,
   parseColor,
   themes,
@@ -156,6 +160,64 @@ describe('catalogue shape', () => {
           ratio,
           `${theme.id} ${role} is indistinguishable from the canvas`
         ).toBeGreaterThanOrEqual(CONTRAST_FLOORS.surface * 0.7)
+      }
+    }
+  })
+})
+
+function rendered(value: string) {
+  return hexToOklch(oklchToHex(parseColor(value)!))!
+}
+
+describe('the interaction rungs', () => {
+  const FIXED_STEPS = { surfaceHover: 0.1, surfaceActive: 0.135 } as const
+
+  /** A hovered or pressed row keeps its label, so WCAG's body floor applies there too. */
+  test('body text clears 4.5:1 on the hover and active rungs of every theme', () => {
+    const failures: string[] = []
+    for (const theme of themes) {
+      for (const role of ['surfaceHover', 'surfaceActive'] as const) {
+        for (const text of ['text', 'foreground'] as const) {
+          const ratio = contrastRatio(rendered(theme.colors[text]), rendered(theme.colors[role]))
+          if (ratio < CONTRAST_FLOORS.text) {
+            failures.push(`${theme.id}: ${text} on ${role} is ${ratio.toFixed(2)}:1`)
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([])
+  })
+
+  test('each rung stays distinct: hover beyond the elevated rung, active beyond hover', () => {
+    for (const theme of themes) {
+      const direction = theme.appearance === 'dark' ? 1 : -1
+      const elevated = lightness(theme.colors.surfaceElevated)
+      const hover = lightness(theme.colors.surfaceHover)
+      const active = lightness(theme.colors.surfaceActive)
+      expect((hover - elevated) * direction, `${theme.id} hover vs elevated`).toBeGreaterThan(0.005)
+      expect((active - hover) * direction, `${theme.id} active vs hover`).toBeGreaterThan(0.005)
+    }
+  })
+
+  /**
+   * A shrunk rung is shrunk only as far as it must be: one more thousandth of the
+   * step would fail the floor it was fitted to. Hover is fitted to body text bare
+   * and under the minimum primary tint; active to body text bare.
+   */
+  test('a rung is shrunk only as far as the floor needs', () => {
+    for (const theme of themes) {
+      const background = parseColor(theme.colors.background)!
+      const direction = theme.appearance === 'dark' ? 1 : -1
+      for (const role of ['surfaceHover', 'surfaceActive'] as const) {
+        const rung = parseColor(theme.colors[role])!
+        const step = (rung.l - background.l) * direction
+        if (step >= FIXED_STEPS[role] - 1e-4) continue
+        const further = `oklch(${(rung.l + 0.001 * direction).toFixed(4)} ${rung.c} ${rung.h})`
+        const holds =
+          primaryTintClears(theme, further, 0) &&
+          (role === 'surfaceActive' ||
+            primaryTintClears(theme, further, ACCENT_SUBTLE_MINIMUM_ALPHA))
+        expect(holds, `${theme.id} ${role} at step ${step.toFixed(3)} could go further`).toBe(false)
       }
     }
   })

@@ -42,17 +42,45 @@
  * A uniform step needs a resolved value, which is why {@link primaryHover} returns
  * one and why the tint below can stay an expression. `shiftLightness` is what keeps
  * the step uniform *and* the hue intact — a mix toward a neutral cannot do both.
+ *
+ * ## The tint rule
+ *
+ * The tint is the selected state across the component library — `bg-primary-subtle
+ * text-foreground` on an active nav row, a pressed toggle, the highlighted command
+ * row, a selected tab — so body text on it is held to the body floor, on every
+ * surface body text is held to it on, for every accent the theme offers.
+ *
+ * It stays a translucent `color-mix()` rather than becoming an opaque value, and
+ * that is a measured choice rather than a habit. An opaque tint mixed into the
+ * canvas is legible everywhere by construction — the status `-subtle` fills work
+ * that way — but it is a wash *of the canvas*: on a dark theme's popover, which is
+ * already lighter than the canvas, a selected command row resolved that way lands
+ * within ΔE 0.01 of the popover and disappears. A translucent tint is a wash of
+ * whatever it sits on, so it reads as selected on every rung.
+ *
+ * What moves instead is the **strength**, per theme. {@link ACCENT_SUBTLE_ALPHA} is
+ * the ceiling, and {@link primarySubtleAlpha} lowers it — only as far as a theme
+ * needs — until the composite clears the floor everywhere. The palettes whose body
+ * text sits closest to the floor get a lighter wash, and the colour, the
+ * foreground and the surfaces stay exactly as their authors wrote them.
  */
 
-import type { AdeaTheme, AnsiKey, ThemeAppearance } from './schema.js'
+import type { AdeaTheme, AnsiKey, ShadcnThemeProjection, ThemeAppearance } from './schema.js'
 import type { Oklch } from './oklch.js'
-import { contrastRatio, formatOklch, parseColor, shiftLightness } from './oklch.js'
+import {
+  contrastRatio,
+  formatOklch,
+  hexToOklch,
+  oklchToHex,
+  parseColor,
+  shiftLightness,
+} from './oklch.js'
 import {
   ACCENT_PREFERENCE,
   CONTRAST_FLOORS,
   MINIMUM_ACCENT_CHROMA,
   REPAIR_BUDGET,
-} from './normalize.js'
+} from './policy.js'
 
 /** One accent preset: a named primary, per appearance. */
 export type AccentPreset = {
@@ -195,11 +223,15 @@ export function primaryHover(primary: string, appearance: ThemeAppearance): stri
 }
 
 /**
- * How much of the primary a tint carries, per appearance.
+ * How much of the primary a tint carries at most, per appearance.
  *
  * Not one value, because a tint's visibility depends on what it is tinted onto: the
  * same alpha over a near-black surface reads as nothing, and over a near-white one
  * reads as a wash. The dark value is the larger for exactly that reason.
+ *
+ * A **ceiling**, not the value every theme gets: {@link primarySubtleAlpha} lowers
+ * it for a theme whose body text cannot hold the floor on a tint this strong. Most
+ * themes keep it.
  *
  * This one *is* a `color-mix()`, because a tint is a share of the primary by nature
  * and follows `--primary` correctly at runtime.
@@ -209,17 +241,180 @@ export const ACCENT_SUBTLE_ALPHA: Readonly<Record<ThemeAppearance, number>> = Ob
   dark: 16,
 })
 
+/** A theme, with the presentation surfaces the shadcn bridge may substitute. */
+type TintedTheme = Pick<AdeaTheme, 'appearance' | 'colors' | 'ansi'> & {
+  shadcn?: ShadcnThemeProjection
+}
+
+/**
+ * The weakest tint the catalogue will ship, as a whole percentage.
+ *
+ * {@link primarySubtleAlpha} lowers a theme's strength for legibility, and this is
+ * how far it may go: below it the selected state stops reading as a state at all.
+ * The normalizer reserves it — it fits a theme's hover rung so body text still
+ * clears the floor under a tint this strong — so every theme in the catalogue can
+ * carry at least this much. At 4% the tint over One Dark's popover measures ΔE 0.018
+ * against the popover, about the same as its hover rung's feedback there.
+ */
+export const ACCENT_SUBTLE_MINIMUM_ALPHA = 4
+
+/**
+ * Every surface the tint is guaranteed on: every surface body text is guaranteed
+ * on.
+ *
+ * The canvas, the two raised rungs and the hover rung, plus whatever a source
+ * substitutes for them in the shadcn bridge — `--card`, `--popover`, `--muted` and
+ * `--secondary`; `--sidebar` is the first rung and `--accent` the hover rung. The
+ * hover rung is here because a selected item that is also hovered paints the tint
+ * over it in some components. The active rung is not: it is the pressed state of an
+ * item, not a surface an item sits on.
+ */
+function tintSurfaces(theme: TintedTheme): string[] {
+  const shadcn = theme.shadcn ?? {}
+  return [
+    ...new Set([
+      theme.colors.background,
+      theme.colors.surface,
+      theme.colors.surfaceElevated,
+      theme.colors.surfaceHover,
+      ...[shadcn.card, shadcn.popover, shadcn.muted, shadcn.secondary].filter(
+        (value): value is string => value !== undefined
+      ),
+    ]),
+  ]
+}
+
+/**
+ * The primaries a theme offers: its own accent, the {@link ACCENTS} presets in its
+ * appearance, and every palette slot {@link themeAccentPresets} could offer from it
+ * whatever theme it is paired with.
+ */
+function offeredPrimaries(theme: TintedTheme): string[] {
+  const slots = ACCENT_PREFERENCE.map((slot) => offeredSlotValue(theme, slot)).filter(
+    (value): value is string => value !== undefined
+  )
+  return [
+    ...new Set([
+      theme.colors.accent,
+      ...ACCENTS.map((preset) => accentValue(preset, theme.appearance)),
+      ...slots,
+    ]),
+  ]
+}
+
+/** A colour as the screen draws it: through eight-bit sRGB. */
+function rendered(value: string): Oklch | undefined {
+  const parsed = parseColor(value)
+  return parsed ? hexToOklch(oklchToHex(parsed)) : undefined
+}
+
+/**
+ * A translucent fill painted over an opaque one, the way a browser paints
+ * `color-mix(in oklch, <tint> N%, transparent)`: the mix keeps the tint's colour and
+ * takes the share as alpha, and the alpha is composited in gamma-encoded sRGB.
+ * Rounded to the eight-bit value that reaches the screen, which is the colour an
+ * accessibility audit samples.
+ */
+function compositeTint(tint: string, surface: string, alpha: number): Oklch | undefined {
+  const tintColor = parseColor(tint)
+  const surfaceColor = parseColor(surface)
+  if (!tintColor || !surfaceColor) return undefined
+  const front = oklchToHex(tintColor)
+  const back = oklchToHex(surfaceColor)
+  const channels = [1, 3, 5].map((offset) => {
+    const top = Number.parseInt(front.slice(offset, offset + 2), 16)
+    const bottom = Number.parseInt(back.slice(offset, offset + 2), 16)
+    return Math.round(top * alpha + bottom * (1 - alpha))
+      .toString(16)
+      .padStart(2, '0')
+  })
+  return hexToOklch(`#${channels.join('')}`)
+}
+
+/**
+ * Whether body text holds the floor on a surface under the primary tint.
+ *
+ * True when `text` and `foreground` both clear `CONTRAST_FLOORS.text` on the tint
+ * at `alpha` percent composited over `surface`, for every primary the theme offers
+ * and every one in `primaries`. At `alpha` 0 it is the bare surface. The
+ * normalizer calls this to fit the hover rung, and {@link primarySubtleAlpha} to
+ * fit the strength, so the two are measured by one rule.
+ */
+export function primaryTintClears(
+  theme: TintedTheme,
+  surface: string,
+  alpha: number,
+  primaries: readonly string[] = []
+): boolean {
+  const foregrounds = [...new Set([theme.colors.text, theme.colors.foreground])].map(rendered)
+  if (foregrounds.some((value) => value === undefined)) return false
+  const tints = alpha === 0 ? [surface] : [...new Set([...offeredPrimaries(theme), ...primaries])]
+  return tints.every((tint) => {
+    const fill = compositeTint(tint, surface, alpha / 100)
+    return (
+      fill !== undefined &&
+      foregrounds.every((foreground) => contrastRatio(foreground!, fill) >= CONTRAST_FLOORS.text)
+    )
+  })
+}
+
+const subtleAlphaCache = new WeakMap<object, number>()
+
+/**
+ * The tint strength a theme can carry, as a whole percentage.
+ *
+ * The appearance's {@link ACCENT_SUBTLE_ALPHA} ceiling, lowered one point at a time
+ * until body text clears `CONTRAST_FLOORS.text` on the tint over every floored
+ * surface, hover rung included, for every primary the theme offers. One value per
+ * theme rather than one per accent, so switching between offered accents at runtime
+ * needs no new tint: the expression follows `--primary` and the strength already
+ * holds for all of them. Every catalogue theme lands at or above
+ * {@link ACCENT_SUBTLE_MINIMUM_ALPHA}, because the normalizer fits its hover rung to
+ * leave room for it.
+ *
+ * Pass `primaries` to hold the strength for colours outside the offered set too —
+ * a product's own brand primary, say. The offered set is always included.
+ */
+export function primarySubtleAlpha(theme: TintedTheme, primaries: readonly string[] = []): number {
+  const cached = primaries.length === 0 ? subtleAlphaCache.get(theme) : undefined
+  if (cached !== undefined) return cached
+
+  const surfaces = tintSurfaces(theme)
+  const clears = (alpha: number): boolean =>
+    surfaces.every((surface) => primaryTintClears(theme, surface, alpha, primaries))
+
+  let alpha = ACCENT_SUBTLE_ALPHA[theme.appearance]
+  while (alpha > 0 && !clears(alpha)) alpha -= 1
+
+  if (primaries.length === 0) subtleAlphaCache.set(theme, alpha)
+  return alpha
+}
+
 /**
  * The tint expression, for any primary.
  *
- * Takes the appearance because the alpha is appearance-dependent — see
- * {@link ACCENT_SUBTLE_ALPHA}.
+ * Pass the **theme**: the expression then carries that theme's measured strength
+ * ({@link primarySubtleAlpha}) and body text on it is held to the floor for every
+ * accent the theme offers. It still reads `var(--primary)`, so it follows a runtime
+ * accent switch — but the strength is the theme's, so a consumer that applies
+ * themes at runtime has to write this token per theme, as it already does for
+ * {@link primaryHover}. A consumer whose primary is not one the theme offers passes
+ * it as `primaries` to have the strength measured for it as well.
+ *
+ * Passing only an **appearance** gives the {@link ACCENT_SUBTLE_ALPHA} ceiling for
+ * that appearance, unmeasured. That is the old behaviour and it is not legible on
+ * every theme — One Dark's body text on its own primary's tint over a card measures
+ * 4.34:1 at the dark ceiling — so it is kept for a consumer without a theme object
+ * in hand, not as the default to reach for.
  */
 export function primarySubtleCss(
-  appearance: ThemeAppearance,
-  primaryVariable = '--primary'
+  target: ThemeAppearance | TintedTheme,
+  primaryVariable = '--primary',
+  primaries: readonly string[] = []
 ): string {
-  return `color-mix(in oklch, var(${primaryVariable}) ${ACCENT_SUBTLE_ALPHA[appearance]}%, transparent)`
+  const alpha =
+    typeof target === 'string' ? ACCENT_SUBTLE_ALPHA[target] : primarySubtleAlpha(target, primaries)
+  return `color-mix(in oklch, var(${primaryVariable}) ${alpha}%, transparent)`
 }
 
 /**
@@ -256,7 +451,10 @@ const REPAIR_STEP = 0.002
  * with a legible label. `undefined` when even the budget cannot get there, which
  * is the one case where the theme honestly cannot offer the slot.
  */
-function offeredSlotValue(theme: AdeaTheme, slot: ThemeAccentSlot): string | undefined {
+function offeredSlotValue(
+  theme: Pick<AdeaTheme, 'colors' | 'ansi'>,
+  slot: ThemeAccentSlot
+): string | undefined {
   const original = theme.ansi[slot as AnsiKey]
   const value = parseColor(original)
   const background = parseColor(theme.colors.background)
@@ -311,10 +509,10 @@ export function themeAccentPresets(light: AdeaTheme, dark: AdeaTheme): AccentPre
 /**
  * The five declarations an accent sets, as CSS values.
  *
- * `primary`, `primaryForeground` and `ring` are resolved colours; `primaryHover` and
- * `primarySubtle` are expressions, for the reason in the module comment. A consumer
- * writes them as custom properties and the rules hold for every theme and every
- * accent at once.
+ * `primary`, `primaryForeground`, `primaryHover` and `ring` are resolved colours;
+ * `primarySubtle` is an expression, for the reason in the module comment. A
+ * consumer writes them as custom properties and the rules hold for every theme and
+ * every accent at once.
  */
 export type AccentRoles = {
   primary: string
@@ -326,10 +524,16 @@ export type AccentRoles = {
 
 export function accentRoles(
   preset: AccentPreset,
-  appearance: ThemeAppearance,
+  /**
+   * The theme the accent is applied to, or only its appearance. A theme gives the
+   * tint that theme's measured strength — see {@link primarySubtleCss}; an
+   * appearance gives the unmeasured ceiling.
+   */
+  target: ThemeAppearance | TintedTheme,
   /** The property the subtle tint is built from. A consumer may pass its own alias. */
   primaryVariable = '--primary'
 ): AccentRoles {
+  const appearance = typeof target === 'string' ? target : target.appearance
   const value = accentValue(preset, appearance)
   const parsed = parseColor(value)
   const primary = parsed ? formatOklch(parsed) : value
@@ -338,7 +542,7 @@ export function accentRoles(
     primary,
     primaryForeground: accentForeground(value),
     primaryHover: primaryHover(value, appearance),
-    primarySubtle: primarySubtleCss(appearance, primaryVariable),
+    primarySubtle: primarySubtleCss(target, primaryVariable),
     ring: primary,
   }
 }

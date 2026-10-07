@@ -58,8 +58,27 @@ The bridge also emits the primary's two state values from the shared accent
 derivations in `src/accents.ts`. `--primary-hover` applies the same fixed lightness
 step as `primaryHover`, moving away from the canvas (darker in light themes, lighter
 in dark themes) while retaining the primary hue. `--primary-subtle` uses
-`primarySubtleCss`, a `color-mix()` over `var(--primary)` with the appearance-specific
-tint strength, so it follows a runtime override of `--primary`. The hover value is
+`primarySubtleCss(theme)`, a translucent `color-mix()` over `var(--primary)`, so it
+follows a runtime override of `--primary`. Its strength is measured per theme by
+`primarySubtleAlpha`: the appearance ceiling (`ACCENT_SUBTLE_ALPHA`, 10% light and 16%
+dark), lowered only as far as needed for `--foreground` to clear 4.5:1 on the tint over
+`--background`, `--card`, `--popover`, `--muted`, `--secondary`, `--sidebar` and the hover
+rung (`--accent`, `--surface-hover`, `--sidebar-accent`, where a selected row that is also
+hovered paints it), for every accent the theme offers. It never drops below
+`ACCENT_SUBTLE_MINIMUM_ALPHA` (4%): the normalizer fits each theme's hover rung to leave
+room for that much. Most themes keep the ceiling; One Dark and Ayu Light (4%), Rosé Pine
+Dawn (5%), Solarized Dark (8%), Catppuccin Frappé and Latte (9%), Everforest Dark (13%) and
+Tokyo Night Storm (15%) carry a lighter wash.
+
+Body text itself is held to 4.5:1 on `--surface-hover` and `--surface-active` (and so on
+`--accent` and `--sidebar-accent`) in every theme. Where the ladder's fixed step was too
+far for a palette's body text, the normalizer shrinks the step by lightness alone, only as
+far as needed: One Dark's hover and active rungs, Ayu Light's hover and active rungs, and
+Rosé Pine Dawn's active rung.
+
+Because the tint strength belongs to the theme, a consumer that applies
+themes at runtime writes `--primary-subtle` per theme, exactly as it does `--primary-hover`;
+`primarySubtleCss(appearance)` still returns the unmeasured ceiling. The hover value is
 resolved from the theme's canonical accent, so a consumer overriding `--primary` at
 runtime must also recompute `--primary-hover` with `primaryHover(customPrimary,
 appearance)`; otherwise the hover retains the theme accent. A custom primary also
@@ -77,7 +96,8 @@ for (const [name, value] of Object.entries({
   '--primary': customPrimary,
   '--primary-foreground': primaryForeground,
   '--primary-hover': primaryHover(customPrimary, appearance),
-  '--primary-subtle': primarySubtleCss(appearance),
+  // The theme's measured strength, also held for this custom primary.
+  '--primary-subtle': primarySubtleCss(theme, '--primary', [customPrimary]),
   '--ring': customPrimary,
   '--sidebar-primary': customPrimary,
   '--sidebar-primary-foreground': primaryForeground,
@@ -86,7 +106,8 @@ for (const [name, value] of Object.entries({
   root.style.setProperty(name, value)
 ```
 
-The subtle expression reads `var(--primary)`, so it follows the custom token. Keep
+The subtle expression reads `var(--primary)`, so it follows the custom token; passing the
+custom primary to `primarySubtleCss` measures the theme's tint strength for it as well. Keep
 the resolved foreground, hover, ring, and sidebar values in sync with the primary as
 the example does. Adapter tests check helper parity and the theme primary
 foreground's 4.5:1 contrast on the hover fill for every exported theme.

@@ -65,13 +65,16 @@ export {
   ACCENT_HOVER_STEP,
   ACCENT_IDS,
   ACCENT_SUBTLE_ALPHA,
+  ACCENT_SUBTLE_MINIMUM_ALPHA,
   accentForeground,
   accentForegroundContrast,
   accentRoles,
   accentValue,
   getAccent,
   primaryHover,
+  primarySubtleAlpha,
   primarySubtleCss,
+  primaryTintClears,
   themeAccentPresets,
 } from './accents.js'
 

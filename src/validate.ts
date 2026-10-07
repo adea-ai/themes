@@ -15,10 +15,11 @@
  * than a legibility one.
  *
  * Not measured: a colour against itself, and the surface ladder against anything
- * but the canvas. A rung's job is to be distinguishable from the canvas, not to
- * carry text — components put text on `background`, and the ladder is decoration on
- * top of it. Measuring the ladder against every foreground would produce failures
- * no theme could pass and no component would care about.
+ * but the canvas and body text. A rung's job is to be distinguishable from the
+ * canvas, and measuring it against every foreground would produce failures no theme
+ * could pass and no component would care about. Body text is the exception: it is
+ * drawn on every rung, the hover and active rungs included, because a hovered or
+ * pressed row keeps its label.
  *
  * ## Why the validator is exported
  *
@@ -77,6 +78,10 @@ export const REQUIRED_PAIRINGS: readonly Pairing[] = Object.freeze([
   { role: 'textMuted', against: ['background'], minimum: CONTRAST_FLOORS.textMuted },
   { role: 'text', against: ['surface'], minimum: CONTRAST_FLOORS.text },
   { role: 'text', against: ['surfaceElevated'], minimum: CONTRAST_FLOORS.text },
+  // A hovered or pressed row keeps its label, so the interaction rungs carry the
+  // body floor too. The normalizer fits the rungs to it; see `fitInteractionRungs`.
+  { role: 'text', against: ['surfaceHover'], minimum: CONTRAST_FLOORS.text },
+  { role: 'text', against: ['surfaceActive'], minimum: CONTRAST_FLOORS.text },
   { role: 'textMuted', against: ['surface'], minimum: CONTRAST_FLOORS.textMuted },
   { role: 'textSubtle', against: ['background'], minimum: CONTRAST_FLOORS.textSubtle },
   { role: 'accent', against: ['background'], minimum: CONTRAST_FLOORS.accent },
