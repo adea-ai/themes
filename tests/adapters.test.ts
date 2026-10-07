@@ -1,11 +1,15 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
+  ACCENTS,
+  ACCENT_SUBTLE_ALPHA,
+  accentValue,
   editorRolesHex,
   getBase24Scheme,
   getTheme,
   primaryHover,
   primarySubtleCss,
+  themeAccentPresets,
   themes,
 } from '../src'
 import {
@@ -317,7 +321,7 @@ describe('shadcn bridge', () => {
         primaryHover(theme.colors.accent, theme.appearance)
       )
       expect(variables['--primary-subtle'], `${theme.id} primary subtle`).toBe(
-        primarySubtleCss(theme.appearance)
+        primarySubtleCss(theme)
       )
       expect(hoverForeground, `${theme.id} primary foreground is invalid`).toBeDefined()
       expect(hoverFill, `${theme.id} primary hover is invalid`).toBeDefined()
@@ -328,6 +332,66 @@ describe('shadcn bridge', () => {
         `${theme.id} primary foreground on hover is ${ratio.toFixed(2)}:1`
       ).toBeGreaterThanOrEqual(4.5)
     }
+  })
+
+  /**
+   * The selected rung — `bg-primary-subtle text-foreground` — on every surface body
+   * text is guaranteed on, for every accent a user can pick on that theme: the
+   * theme's own primary, the brand presets, and each palette slot the theme offers
+   * when paired with any theme of the other appearance. The tint is translucent, so
+   * it is measured the way it is painted: composited over the surface it sits on.
+   */
+  test('body text stays legible on the primary tint, every theme × accent × surface', () => {
+    const failures: string[] = []
+    for (const theme of themes) {
+      const variables = shadcnVariables(theme)
+      const subtle = variables['--primary-subtle'] ?? ''
+      const match = /^color-mix\(in oklch, var\(--primary\) (\d+)%, transparent\)$/.exec(subtle)
+      expect(match, `${theme.id} --primary-subtle is ${subtle}`).not.toBeNull()
+      const alpha = Number(match![1])
+
+      // Still a wash: lowered only as far as legibility needs, never to nothing.
+      expect(alpha, `${theme.id} tint strength`).toBeLessThanOrEqual(
+        ACCENT_SUBTLE_ALPHA[theme.appearance]
+      )
+      expect(alpha, `${theme.id} tint strength`).toBeGreaterThanOrEqual(5)
+
+      const primaries = new Map<string, string>([['theme primary', variables['--primary']!]])
+      for (const preset of ACCENTS) primaries.set(preset.id, accentValue(preset, theme.appearance))
+      for (const other of themes) {
+        if (other.appearance === theme.appearance) continue
+        const [light, dark] = theme.appearance === 'light' ? [theme, other] : [other, theme]
+        for (const preset of themeAccentPresets(light, dark)) {
+          const value = accentValue(preset, theme.appearance)
+          primaries.set(`${preset.id} ${value}`, value)
+        }
+      }
+
+      const surfaces = [
+        ['--background', '--foreground'],
+        ['--card', '--card-foreground'],
+        ['--popover', '--popover-foreground'],
+        ['--muted', '--foreground'],
+        ['--secondary', '--secondary-foreground'],
+        ['--sidebar', '--sidebar-foreground'],
+      ] as const
+
+      for (const [primaryName, primary] of primaries) {
+        for (const [surface, foregroundName] of surfaces) {
+          for (const foregroundToken of new Set([foregroundName, '--foreground'])) {
+            const foreground = parseColor(oklchToHex(parseColor(variables[foregroundToken]!)!))!
+            const fill = compositeSrgb(primary, variables[surface]!, alpha / 100)
+            const ratio = contrastRatio(foreground, fill)
+            if (ratio < 4.5) {
+              failures.push(
+                `${theme.id}: ${foregroundToken} on ${primaryName} ${alpha}% over ${surface} is ${ratio.toFixed(2)}:1`
+              )
+            }
+          }
+        }
+      }
+    }
+    expect(failures).toEqual([])
   })
 
   test('status aliases are opaque and keep the small-text pairing readable in every theme', () => {

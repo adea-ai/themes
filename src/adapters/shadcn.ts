@@ -201,9 +201,10 @@ export function shadcnVariables(theme: ShadcnTheme): Record<string, string> {
 
   // Keep primary states on the shared appearance-aware accent derivation. Hover is
   // resolved because its uniform lightness step cannot be expressed as a mix; the
-  // subtle tint stays tied to --primary so it follows runtime primary overrides.
+  // subtle tint stays tied to --primary so it follows runtime primary overrides, at
+  // the strength measured for this theme so body text stays legible on it.
   variables['--primary-hover'] = primaryHover(theme.colors.accent, theme.appearance)
-  variables['--primary-subtle'] = primarySubtleCss(theme.appearance)
+  variables['--primary-subtle'] = primarySubtleCss(theme)
 
   variables['--accent'] = theme.colors.surfaceHover
   variables['--accent-foreground'] = theme.colors.text

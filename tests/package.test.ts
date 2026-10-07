@@ -118,7 +118,7 @@ describe('packed package in a native ESM consumer', () => {
         throw new Error('destructive projection differs from the shadcn adapter');
       }
       if (variables['--primary-hover'] !== primaryHover(theme.colors.accent, theme.appearance)
-          || variables['--primary-subtle'] !== primarySubtleCss(theme.appearance)) {
+          || variables['--primary-subtle'] !== primarySubtleCss(theme)) {
         throw new Error('primary state derivation differs from the shadcn adapter');
       }
       console.log(variables['--primary']);

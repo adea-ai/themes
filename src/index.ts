@@ -71,6 +71,7 @@ export {
   accentValue,
   getAccent,
   primaryHover,
+  primarySubtleAlpha,
   primarySubtleCss,
   themeAccentPresets,
 } from './accents.js'
