@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/adea-ai/themes/compare/v0.9.10...v0.10.0) (2026-10-07)
+
+
+### Features
+
+* **shadcn:** stop emitting the dead --border-muted and --subtle-foreground ([#76](https://github.com/adea-ai/themes/issues/76)) ([08cd07a](https://github.com/adea-ai/themes/commit/08cd07a2636b331f930e0ec04720c38a502c6555))
+
 ## [0.9.10](https://github.com/adea-ai/themes/compare/v0.9.9...v0.9.10) (2026-10-07)
 
 
