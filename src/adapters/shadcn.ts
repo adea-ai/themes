@@ -144,31 +144,39 @@ export function shadcnDestructiveProjection(theme: ShadcnTheme): ShadcnDestructi
  * Canonical role → shadcn custom-property name.
  *
  * Every entry is a deliberate correspondence, and the ones that are not a plain
- * rename carry the reason here rather than in the output.
+ * rename carry the reason here rather than in the output. A `null` destination
+ * is a deliberate "not emitted": the role has no shadcn consumer, and the
+ * compiler still refuses a new role until it makes that choice.
  */
-export const SHADCN_MAPPING: Readonly<Record<keyof AdeaThemeColors, string>> = Object.freeze({
-  background: 'background',
-  foreground: 'foreground',
-  // The first two rungs are the two surfaces shadcn names.
-  surface: 'card',
-  surfaceElevated: 'popover',
-  surfaceHover: 'surface-hover',
-  surfaceActive: 'surface-active',
-  border: 'border',
-  borderMuted: 'border-muted',
-  // `text` is `foreground` in shadcn; `--foreground` is what body text reads.
-  text: 'foreground',
-  textMuted: 'muted-foreground',
-  textSubtle: 'subtle-foreground',
-  // See the header: the interactive colour is shadcn's `primary`.
-  accent: 'primary',
-  accentForeground: 'primary-foreground',
-  success: 'success',
-  warning: 'warning',
-  // shadcn's destructive slot is in the same position as Adea's error.
-  error: 'destructive',
-  info: 'info',
-})
+export const SHADCN_MAPPING: Readonly<Record<keyof AdeaThemeColors, string | null>> = Object.freeze(
+  {
+    background: 'background',
+    foreground: 'foreground',
+    // The first two rungs are the two surfaces shadcn names.
+    surface: 'card',
+    surfaceElevated: 'popover',
+    surfaceHover: 'surface-hover',
+    surfaceActive: 'surface-active',
+    border: 'border',
+    // Nothing reads `--border-muted`. A consumer that wants the quieter rule
+    // reads the record's `borderMuted` or the CSS adapter's `--adea-border-muted`.
+    borderMuted: null,
+    // `text` is `foreground` in shadcn; `--foreground` is what body text reads.
+    text: 'foreground',
+    textMuted: 'muted-foreground',
+    // shadcn has no tertiary text slot and nothing reads `--subtle-foreground`;
+    // `textSubtle` stays a canonical role (the shiki adapter's indent guides).
+    textSubtle: null,
+    // See the header: the interactive colour is shadcn's `primary`.
+    accent: 'primary',
+    accentForeground: 'primary-foreground',
+    success: 'success',
+    warning: 'warning',
+    // shadcn's destructive slot is in the same position as Adea's error.
+    error: 'destructive',
+    info: 'info',
+  }
+)
 
 /**
  * The shadcn roles as an object, keyed by role name without the `--` prefix.
@@ -195,7 +203,11 @@ export function shadcnVariables(theme: ShadcnTheme): Record<string, string> {
   const variables: Record<string, string> = {}
   const destructive = shadcnDestructiveProjection(theme)
 
-  for (const [role, name] of Object.entries(SHADCN_MAPPING) as [keyof AdeaThemeColors, string][]) {
+  for (const [role, name] of Object.entries(SHADCN_MAPPING) as [
+    keyof AdeaThemeColors,
+    string | null,
+  ][]) {
+    if (name === null) continue
     variables[`--${name}`] = role === 'error' ? destructive.fill : theme.colors[role]
   }
 

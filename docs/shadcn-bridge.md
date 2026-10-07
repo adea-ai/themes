@@ -21,10 +21,8 @@ are not a plain rename.
 | `surfaceHover`        | `--surface-hover`, **`--accent`**                                                   | see below                                               |
 | `surfaceActive`       | `--surface-active`                                                                  |                                                         |
 | `border`              | `--border`, `--input`                                                               | shadcn separates input outlines; the catalogue does not |
-| `borderMuted`         | `--border-muted`                                                                    |                                                         |
 | `text`                | `--foreground`                                                                      |                                                         |
 | `textMuted`           | `--muted-foreground`                                                                |                                                         |
-| `textSubtle`          | `--subtle-foreground`                                                               |                                                         |
 | `accent`              | **`--primary`**, `--primary-hover`, `--primary-subtle`, `--ring`                    | see below                                               |
 | `accentForeground`    | `--primary-foreground`                                                              |                                                         |
 | `success`             | `--success`                                                                         |                                                         |
@@ -33,6 +31,12 @@ are not a plain rename.
 | `info`                | `--info`                                                                            |                                                         |
 | `cursor`, `selection` | `--cursor`, `--selection`                                                           |                                                         |
 | —                     | `--card-foreground`, `--popover-foreground`, `--secondary`, `--muted`, `--sidebar*` | filled from existing roles; see below                   |
+
+Two canonical roles have no shadcn destination and the bridge does not emit them:
+`borderMuted` and `textSubtle`. Nothing reads `--border-muted` or
+`--subtle-foreground`; the quieter rule and the tertiary text are the canonical
+record's, and the CSS adapter's `--adea-border-muted` carries the former for
+stylesheets built from the catalogue.
 
 ## The two entries that are not renames
 
@@ -117,8 +121,9 @@ foreground's 4.5:1 contrast on the hover fill for every exported theme.
 The canonical schema has one border role and a muted variant; shadcn distinguishes a
 divider from an input outline. The catalogue's `border` is the stronger of the two
 roles and is the correct choice for both — an input outline is a divider that happens
-to have a text cursor in it. A consumer that wants the quieter rule has
-`--border-muted`, which is the catalogue's `borderMuted`.
+to have a text cursor in it. A consumer that wants the quieter rule reads the
+catalogue's `borderMuted` from the record, or `--adea-border-muted` from the CSS
+adapter; the shadcn bridge emits no muted border property.
 
 ## Status fills
 
@@ -198,8 +203,9 @@ syntax data that is already in the schema.
 ## Adding a role to the schema
 
 `SHADCN_MAPPING` in `src/adapters/shadcn.ts` is exhaustive over the schema's roles, so
-the compiler will refuse a new role until it has a destination. Add the entry, add it
-to this table, and add it to the assertions in `tests/adapters.test.ts`.
+the compiler will refuse a new role until it has a destination. Add the entry — a
+shadcn name, or `null` when nothing in shadcn's vocabulary reads the role — add it to
+this table, and add it to the assertions in `tests/adapters.test.ts`.
 
 ## Consuming it
 
