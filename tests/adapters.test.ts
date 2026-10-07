@@ -306,6 +306,17 @@ describe('shadcn bridge', () => {
     }
   })
 
+  test('the roles with no shadcn destination are not emitted', () => {
+    // `borderMuted` and `textSubtle` have no shadcn consumer; their `null`
+    // destinations keep the mapping exhaustive without emitting dead custom
+    // properties. Nothing may reintroduce them silently.
+    for (const theme of themes) {
+      const variables = shadcnVariables(theme)
+      expect(variables['--border-muted'], `${theme.id} --border-muted`).toBeUndefined()
+      expect(variables['--subtle-foreground'], `${theme.id} --subtle-foreground`).toBeUndefined()
+    }
+  })
+
   test('primary state tokens use the canonical appearance-aware derivation for every theme', () => {
     for (const theme of themes) {
       const variables = shadcnVariables(theme)
