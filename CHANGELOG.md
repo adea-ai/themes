@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.10](https://github.com/adea-ai/themes/compare/v0.9.9...v0.9.10) (2026-10-07)
+
+
+### Bug Fixes
+
+* keep body text at 4.5:1 on the accent tint and the hover and active rungs ([#74](https://github.com/adea-ai/themes/issues/74)) ([ea3a987](https://github.com/adea-ai/themes/commit/ea3a9878c374a382c5d0133f8cd24140c5da6dca))
+
 ## [0.9.9](https://github.com/adea-ai/themes/compare/v0.9.8...v0.9.9) (2026-10-06)
 
 
