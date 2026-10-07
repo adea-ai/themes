@@ -62,11 +62,21 @@ in dark themes) while retaining the primary hue. `--primary-subtle` uses
 follows a runtime override of `--primary`. Its strength is measured per theme by
 `primarySubtleAlpha`: the appearance ceiling (`ACCENT_SUBTLE_ALPHA`, 10% light and 16%
 dark), lowered only as far as needed for `--foreground` to clear 4.5:1 on the tint over
-`--background`, `--card`, `--popover`, `--muted`, `--secondary` and `--sidebar`, for every
-accent the theme offers. Most themes keep the ceiling; One Dark (6%), Ayu Light (5%),
-Solarized Dark (14%) and Catppuccin Frappé (15%) carry a lighter wash. The tint is not
-guaranteed over the interaction rungs (`--surface-hover`, `--surface-active`), which are not
-floored for body text. Because the strength belongs to the theme, a consumer that applies
+`--background`, `--card`, `--popover`, `--muted`, `--secondary`, `--sidebar` and the hover
+rung (`--accent`, `--surface-hover`, `--sidebar-accent`, where a selected row that is also
+hovered paints it), for every accent the theme offers. It never drops below
+`ACCENT_SUBTLE_MINIMUM_ALPHA` (4%): the normalizer fits each theme's hover rung to leave
+room for that much. Most themes keep the ceiling; One Dark and Ayu Light (4%), Rosé Pine
+Dawn (5%), Solarized Dark (8%), Catppuccin Frappé and Latte (9%), Everforest Dark (13%) and
+Tokyo Night Storm (15%) carry a lighter wash.
+
+Body text itself is held to 4.5:1 on `--surface-hover` and `--surface-active` (and so on
+`--accent` and `--sidebar-accent`) in every theme. Where the ladder's fixed step was too
+far for a palette's body text, the normalizer shrinks the step by lightness alone, only as
+far as needed: One Dark's hover and active rungs, Ayu Light's hover and active rungs, and
+Rosé Pine Dawn's active rung.
+
+Because the tint strength belongs to the theme, a consumer that applies
 themes at runtime writes `--primary-subtle` per theme, exactly as it does `--primary-hover`;
 `primarySubtleCss(appearance)` still returns the unmeasured ceiling. The hover value is
 resolved from the theme's canonical accent, so a consumer overriding `--primary` at

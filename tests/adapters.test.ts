@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   ACCENTS,
   ACCENT_SUBTLE_ALPHA,
+  ACCENT_SUBTLE_MINIMUM_ALPHA,
   accentValue,
   editorRolesHex,
   getBase24Scheme,
@@ -336,7 +337,7 @@ describe('shadcn bridge', () => {
 
   /**
    * The selected rung — `bg-primary-subtle text-foreground` — on every surface body
-   * text is guaranteed on, for every accent a user can pick on that theme: the
+   * text is guaranteed on, the hover rung included, for every accent a user can pick on that theme: the
    * theme's own primary, the brand presets, and each palette slot the theme offers
    * when paired with any theme of the other appearance. The tint is translucent, so
    * it is measured the way it is painted: composited over the surface it sits on.
@@ -354,7 +355,7 @@ describe('shadcn bridge', () => {
       expect(alpha, `${theme.id} tint strength`).toBeLessThanOrEqual(
         ACCENT_SUBTLE_ALPHA[theme.appearance]
       )
-      expect(alpha, `${theme.id} tint strength`).toBeGreaterThanOrEqual(5)
+      expect(alpha, `${theme.id} tint strength`).toBeGreaterThanOrEqual(ACCENT_SUBTLE_MINIMUM_ALPHA)
 
       const primaries = new Map<string, string>([['theme primary', variables['--primary']!]])
       for (const preset of ACCENTS) primaries.set(preset.id, accentValue(preset, theme.appearance))
@@ -374,6 +375,10 @@ describe('shadcn bridge', () => {
         ['--muted', '--foreground'],
         ['--secondary', '--secondary-foreground'],
         ['--sidebar', '--sidebar-foreground'],
+        // Selected and hovered: the tint over the hover rung, under both its names.
+        ['--accent', '--accent-foreground'],
+        ['--surface-hover', '--foreground'],
+        ['--sidebar-accent', '--sidebar-foreground'],
       ] as const
 
       for (const [primaryName, primary] of primaries) {

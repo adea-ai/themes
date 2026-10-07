@@ -18,7 +18,7 @@ const theme: AdeaThemeRecord = {
     "surface": "oklch(0.9349 0.0056 71.9)",
     "surfaceElevated": "oklch(0.9049 0.0083 71.9)",
     "surfaceHover": "oklch(0.8699 0.0121 71.9)",
-    "surfaceActive": "oklch(0.8349 0.0147 71.9)",
+    "surfaceActive": "oklch(0.8449 0.0147 71.9)",
     "border": "oklch(0.8199 0.0102 71.9)",
     "borderMuted": "oklch(0.8749 0.0068 71.9)",
     "text": "oklch(0.4597 0.0629 289.56)",

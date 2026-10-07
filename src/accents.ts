@@ -80,7 +80,7 @@ import {
   CONTRAST_FLOORS,
   MINIMUM_ACCENT_CHROMA,
   REPAIR_BUDGET,
-} from './normalize.js'
+} from './policy.js'
 
 /** One accent preset: a named primary, per appearance. */
 export type AccentPreset = {
@@ -242,19 +242,32 @@ export const ACCENT_SUBTLE_ALPHA: Readonly<Record<ThemeAppearance, number>> = Ob
 })
 
 /** A theme, with the presentation surfaces the shadcn bridge may substitute. */
-type TintedTheme = AdeaTheme & { shadcn?: ShadcnThemeProjection }
+type TintedTheme = Pick<AdeaTheme, 'appearance' | 'colors' | 'ansi'> & {
+  shadcn?: ShadcnThemeProjection
+}
 
 /**
- * Every surface the tint is guaranteed on: the surfaces body text is guaranteed
+ * The weakest tint the catalogue will ship, as a whole percentage.
+ *
+ * {@link primarySubtleAlpha} lowers a theme's strength for legibility, and this is
+ * how far it may go: below it the selected state stops reading as a state at all.
+ * The normalizer reserves it — it fits a theme's hover rung so body text still
+ * clears the floor under a tint this strong — so every theme in the catalogue can
+ * carry at least this much. At 4% the tint over One Dark's popover measures ΔE 0.018
+ * against the popover, about the same as its hover rung's feedback there.
+ */
+export const ACCENT_SUBTLE_MINIMUM_ALPHA = 4
+
+/**
+ * Every surface the tint is guaranteed on: every surface body text is guaranteed
  * on.
  *
- * That is the canvas and the two raised rungs, plus whatever a source substitutes
- * for them in the shadcn bridge — `--card`, `--popover`, `--muted` and
- * `--secondary`, and `--sidebar`, which is the first rung. The interaction rungs
- * are left out for the reason the normalizer leaves them out of the text floor:
- * they are not a floored surface to begin with, and in One Dark and Ayu Light body
- * text on the bare hover rung already measures under 4.5:1, so no tint over it can
- * clear the floor. A selected item belongs on a floored surface.
+ * The canvas, the two raised rungs and the hover rung, plus whatever a source
+ * substitutes for them in the shadcn bridge — `--card`, `--popover`, `--muted` and
+ * `--secondary`; `--sidebar` is the first rung and `--accent` the hover rung. The
+ * hover rung is here because a selected item that is also hovered paints the tint
+ * over it in some components. The active rung is not: it is the pressed state of an
+ * item, not a surface an item sits on.
  */
 function tintSurfaces(theme: TintedTheme): string[] {
   const shadcn = theme.shadcn ?? {}
@@ -263,6 +276,7 @@ function tintSurfaces(theme: TintedTheme): string[] {
       theme.colors.background,
       theme.colors.surface,
       theme.colors.surfaceElevated,
+      theme.colors.surfaceHover,
       ...[shadcn.card, shadcn.popover, shadcn.muted, shadcn.secondary].filter(
         (value): value is string => value !== undefined
       ),
@@ -275,7 +289,7 @@ function tintSurfaces(theme: TintedTheme): string[] {
  * appearance, and every palette slot {@link themeAccentPresets} could offer from it
  * whatever theme it is paired with.
  */
-function offeredPrimaries(theme: AdeaTheme): string[] {
+function offeredPrimaries(theme: TintedTheme): string[] {
   const slots = ACCENT_PREFERENCE.map((slot) => offeredSlotValue(theme, slot)).filter(
     (value): value is string => value !== undefined
   )
@@ -317,6 +331,33 @@ function compositeTint(tint: string, surface: string, alpha: number): Oklch | un
   return hexToOklch(`#${channels.join('')}`)
 }
 
+/**
+ * Whether body text holds the floor on a surface under the primary tint.
+ *
+ * True when `text` and `foreground` both clear `CONTRAST_FLOORS.text` on the tint
+ * at `alpha` percent composited over `surface`, for every primary the theme offers
+ * and every one in `primaries`. At `alpha` 0 it is the bare surface. The
+ * normalizer calls this to fit the hover rung, and {@link primarySubtleAlpha} to
+ * fit the strength, so the two are measured by one rule.
+ */
+export function primaryTintClears(
+  theme: TintedTheme,
+  surface: string,
+  alpha: number,
+  primaries: readonly string[] = []
+): boolean {
+  const foregrounds = [...new Set([theme.colors.text, theme.colors.foreground])].map(rendered)
+  if (foregrounds.some((value) => value === undefined)) return false
+  const tints = alpha === 0 ? [surface] : [...new Set([...offeredPrimaries(theme), ...primaries])]
+  return tints.every((tint) => {
+    const fill = compositeTint(tint, surface, alpha / 100)
+    return (
+      fill !== undefined &&
+      foregrounds.every((foreground) => contrastRatio(foreground!, fill) >= CONTRAST_FLOORS.text)
+    )
+  })
+}
+
 const subtleAlphaCache = new WeakMap<object, number>()
 
 /**
@@ -324,9 +365,12 @@ const subtleAlphaCache = new WeakMap<object, number>()
  *
  * The appearance's {@link ACCENT_SUBTLE_ALPHA} ceiling, lowered one point at a time
  * until body text clears `CONTRAST_FLOORS.text` on the tint over every floored
- * surface, for every primary the theme offers. One value per theme rather than one
- * per accent, so switching between offered accents at runtime needs no new tint:
- * the expression follows `--primary` and the strength already holds for all of them.
+ * surface, hover rung included, for every primary the theme offers. One value per
+ * theme rather than one per accent, so switching between offered accents at runtime
+ * needs no new tint: the expression follows `--primary` and the strength already
+ * holds for all of them. Every catalogue theme lands at or above
+ * {@link ACCENT_SUBTLE_MINIMUM_ALPHA}, because the normalizer fits its hover rung to
+ * leave room for it.
  *
  * Pass `primaries` to hold the strength for colours outside the offered set too —
  * a product's own brand primary, say. The offered set is always included.
@@ -335,22 +379,9 @@ export function primarySubtleAlpha(theme: TintedTheme, primaries: readonly strin
   const cached = primaries.length === 0 ? subtleAlphaCache.get(theme) : undefined
   if (cached !== undefined) return cached
 
-  const foregrounds = [...new Set([theme.colors.text, theme.colors.foreground])]
-    .map(rendered)
-    .filter((value): value is Oklch => value !== undefined)
   const surfaces = tintSurfaces(theme)
-  const tints = [...new Set([...offeredPrimaries(theme), ...primaries])]
-
   const clears = (alpha: number): boolean =>
-    tints.every((tint) =>
-      surfaces.every((surface) => {
-        const fill = compositeTint(tint, surface, alpha / 100)
-        return (
-          fill !== undefined &&
-          foregrounds.every((foreground) => contrastRatio(foreground, fill) >= CONTRAST_FLOORS.text)
-        )
-      })
-    )
+    surfaces.every((surface) => primaryTintClears(theme, surface, alpha, primaries))
 
   let alpha = ACCENT_SUBTLE_ALPHA[theme.appearance]
   while (alpha > 0 && !clears(alpha)) alpha -= 1
@@ -420,7 +451,10 @@ const REPAIR_STEP = 0.002
  * with a legible label. `undefined` when even the budget cannot get there, which
  * is the one case where the theme honestly cannot offer the slot.
  */
-function offeredSlotValue(theme: AdeaTheme, slot: ThemeAccentSlot): string | undefined {
+function offeredSlotValue(
+  theme: Pick<AdeaTheme, 'colors' | 'ansi'>,
+  slot: ThemeAccentSlot
+): string | undefined {
   const original = theme.ansi[slot as AnsiKey]
   const value = parseColor(original)
   const background = parseColor(theme.colors.background)

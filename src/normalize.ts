@@ -69,64 +69,18 @@ import {
 } from './oklch.js'
 import type { ContrastRepair } from './oklch.js'
 import { repairContrast } from './oklch.js'
+import { ACCENT_SUBTLE_MINIMUM_ALPHA, primaryTintClears } from './accents.js'
+import {
+  ACCENT_PREFERENCE,
+  CONTRAST_FLOORS,
+  MINIMUM_ACCENT_CHROMA,
+  REPAIR_BUDGET,
+} from './policy.js'
 
-/**
- * The contrast floors.
- *
- * These are the catalogue's policy, and they are the reason an external palette
- * can be admitted at all: nothing enters the catalogue on taste. `text` sits at
- * the WCAG AA body-text floor; `border` is measured on the non-text scale, where
- * the requirement is perceptibility rather than legibility.
- */
-export const CONTRAST_FLOORS = Object.freeze({
-  text: 4.5,
-  textMuted: 4.5,
-  /** Large or non-essential text, per WCAG 1.4.3. */
-  textSubtle: 3,
-  accent: 4.5,
-  /**
-   * The accent on a raised surface, where it is a fill rather than a label.
-   *
-   * The same two-tier reasoning as `statusRaised`: a button or a selected tab is a
-   * user-interface component, which WCAG holds to 3:1, and the pairing that
-   * actually carries text — the accent's own label — is measured separately at 4.5
-   * against the accent itself. Holding the accent to 4.5 on every surface instead
-   * made Everforest Light's every hue collapse into its body text, because that
-   * palette's colours are all around 2:1 on its own canvas.
-   */
-  accentRaised: 3,
-  accentForeground: 4.5,
-  /**
-   * Status colours drawn on the canvas, where they are read as small text.
-   */
-  status: 4.5,
-  /**
-   * Status colours drawn on a raised surface, where they are an indicator.
-   *
-   * The two-tier policy is deliberate and it is not a relaxation for convenience.
-   * A status role on a card is nearly always a dot, an icon or a chip's own fill —
-   * a graphical object, which WCAG holds to 3:1 — and it is that way because the
-   * alternative does not exist: Ayu Light and Everforest Light are muted palettes
-   * built for a near-white canvas and neither contains a yellow that is legible as
-   * small text on one. Forcing 4.5:1 there required blending the warning colour
-   * 94% of the way to the body text, which produces a warning that is the same
-   * colour as the text beside it and is therefore not a warning at all.
-   *
-   * A component that renders small status *text* on a raised surface should put it
-   * on the role's `-subtle` fill, which is a tint of the canvas and is measured at
-   * the body floor.
-   */
-  statusRaised: 3,
-  /** A divider is decorative; it must be seen, not read. */
-  border: 1.15,
-  borderMuted: 1.08,
-  /** A raised surface must be distinguishable from the canvas it sits on. */
-  surface: 1.03,
-  /** A selection must be visible under the text it selects. */
-  selection: 1.2,
-} as const)
+// The catalogue's policy lives in its own module so the accent axis can read it
+// without importing the normalizer; it is re-exported here, where it has always been.
+export { ACCENT_PREFERENCE, CONTRAST_FLOORS, MINIMUM_ACCENT_CHROMA, REPAIR_BUDGET }
 
-/** How far the normalizer may move a colour's lightness before it gives up. */
 /**
  * How much a repair changed the palette's colour.
  *
@@ -141,21 +95,6 @@ function distortionOf(attempt: { repair: ContrastRepair; blended: boolean }): nu
   return attempt.blended ? attempt.repair.delta * 3 : attempt.repair.delta
 }
 
-export const REPAIR_BUDGET = Object.freeze({
-  /** Body text: some palettes publish a foreground that fails on their own canvas. */
-  text: 0.2,
-  status: 0.24,
-  accent: 0.24,
-})
-
-/** The accent preference order, best first. */
-export const ACCENT_PREFERENCE = [
-  'blue',
-  'magenta',
-  'cyan',
-  'green',
-] as const satisfies readonly AnsiKey[]
-
 /**
  * How much stronger body text must be than the secondary rung.
  *
@@ -164,9 +103,6 @@ export const ACCENT_PREFERENCE = [
  * making secondary text unnecessarily faint.
  */
 const MINIMUM_LADDER_GAP = 0.4
-
-/** The smallest chroma a colour needs before it reads as "a colour" rather than grey. */
-export const MINIMUM_ACCENT_CHROMA = 0.035
 
 /** A theme's source description, as the catalogue declares it. */
 export interface ThemeSourceSpec {
@@ -883,9 +819,11 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
   /**
    * Every surface a foreground role can be drawn on.
    *
-   * The interaction rungs are excluded: text is not placed on a hover fill without
-   * the component also choosing a foreground for it, and holding every role to the
-   * furthest rung would compress the whole palette for a case that does not occur.
+   * The interaction rungs are excluded: holding every role to the furthest rung would
+   * compress the whole palette for a case that does not occur. Body text *is* drawn
+   * on them — a hovered or pressed row keeps its label — so once the text and the
+   * accent are settled the rungs are fitted to the text instead, in
+   * {@link fitInteractionRungs}.
    */
   const surfaces = [background, surface, surfaceElevated]
 
@@ -1185,6 +1123,8 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
     }
   }
 
+  fitInteractionRungs(source, { appearance, colors, ansi }, background, direction, findings)
+
   return {
     record: {
       id: source.id,
@@ -1208,6 +1148,92 @@ export function normalizeTheme(source: ThemeSourceSpec): NormalizedTheme {
     },
     findings,
   }
+}
+
+/** The resolution the interaction rungs are fitted at. */
+const RUNG_FIT_STEP = 0.001
+
+/** Every fitting step from `from` down to `to`, inclusive, largest first. */
+function stepsBetween(from: number, to: number): number[] {
+  const count = Math.round((from - to) / RUNG_FIT_STEP)
+  return Array.from({ length: count + 1 }, (_, index) => from - index * RUNG_FIT_STEP)
+}
+
+/**
+ * Fits the hover and active rungs so body text stays legible on them.
+ *
+ * The ladder's fixed steps are what make a hover read the same in every theme, and
+ * most themes keep them. But a hovered or pressed row is still a row of text, which
+ * WCAG holds to the body floor like any other, and a palette whose body text sits
+ * close to that floor — One Dark's foreground is 6.6:1 on its own canvas — cannot
+ * afford the full step: its hover rung measured 4.45:1 and its active rung 3.86:1.
+ *
+ * So each rung keeps its fixed step unless body text fails on it, and then gives up
+ * only as much as it must, one thousandth of lightness at a time, in the same
+ * direction away from the canvas. Only lightness moves: the rung keeps the chroma
+ * and hue its fixed step gave it, and the text and the canvas are untouched. The hover rung also reserves room for the primary tint at
+ * `ACCENT_SUBTLE_MINIMUM_ALPHA`, because a selected row that is hovered paints the
+ * tint over it; without the reservation the tint would have to fall to nothing.
+ *
+ * The rungs never fall below the elevated rung, so the ladder still ascends, and the
+ * active rung stays beyond the hover rung wherever any step there still holds the
+ * floor. A rung that cannot be fitted above the elevated rung is reported as over
+ * budget, and the validator fails the theme. An authored rung is left as written.
+ */
+function fitInteractionRungs(
+  source: ThemeSourceSpec,
+  theme: { appearance: ThemeAppearance; colors: AdeaThemeColors; ansi: AdeaAnsi },
+  background: Oklch,
+  direction: 1 | -1,
+  findings: NormalizationFinding[]
+): void {
+  const fit = (
+    role: 'surfaceHover' | 'surfaceActive',
+    from: number,
+    floor: number,
+    holds: (rung: string) => boolean
+  ): number => {
+    if (source.colors?.[role] !== undefined) return from
+    // Lightness only: the rung keeps the chroma and hue its fixed step gave it.
+    const original = surfaceRung(background, from, direction)
+    const rungAt = (step: number): string =>
+      formatOklch({ ...original, l: background.l + step * direction })
+    const step = stepsBetween(from, floor).find((candidate) => holds(rungAt(candidate)))
+    if (step === undefined) {
+      findings.push({
+        themeId: source.id,
+        role,
+        kind: 'budget-exceeded',
+        message: `body text cannot clear ${CONTRAST_FLOORS.text}:1 on the ${role} rung at any step above the elevated rung`,
+      })
+      return from
+    }
+    if (from - step > RUNG_FIT_STEP / 2) {
+      theme.colors[role] = rungAt(step)
+      findings.push({
+        themeId: source.id,
+        role,
+        kind: 'repaired',
+        message: `step shrunk from ${from.toFixed(3)} to ${step.toFixed(3)} so body text holds ${CONTRAST_FLOORS.text}:1 on the rung${role === 'surfaceHover' ? ` and under a ${ACCENT_SUBTLE_MINIMUM_ALPHA}% primary tint` : ''}`,
+      })
+    }
+    return step
+  }
+
+  const hover = fit(
+    'surfaceHover',
+    SURFACE_STEPS.surfaceHover,
+    SURFACE_STEPS.surfaceElevated,
+    (rung) =>
+      primaryTintClears(theme, rung, 0) &&
+      primaryTintClears(theme, rung, ACCENT_SUBTLE_MINIMUM_ALPHA)
+  )
+
+  // Beyond the hover rung where any step there holds the floor; level with it, which
+  // does hold, where none does.
+  fit('surfaceActive', SURFACE_STEPS.surfaceActive, hover, (rung) =>
+    primaryTintClears(theme, rung, 0)
+  )
 }
 
 /** Parses an authored value and re-serialises it in the catalogue's notation. */
