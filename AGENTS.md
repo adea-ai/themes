@@ -20,8 +20,8 @@ is the _normalizer_: the one place a terminal palette becomes an application the
 measured against contrast floors, for every consumer at once.
 
 So when a theme looks wrong, the fix is almost never a literal in a source file. It
-is a change to how the palette is interpreted, and it lands in `normalize.ts` where
-thirty themes benefit.
+is a change to how the palette is interpreted, and it lands in `src/normalize.ts` where
+the catalogue benefits.
 
 ## Read before acting
 
@@ -30,7 +30,7 @@ thirty themes benefit.
 3. `src/normalize.ts` — the transformation, and the header comment that explains why
    each step is not the obvious one. Most "why is this colour like that" questions
    are answered there.
-4. `src/validate.ts` and `CONTRAST_FLOORS` — what the catalogue guarantees.
+4. `src/validate.ts` and `CONTRAST_FLOORS` in `src/policy.ts` — what the catalogue guarantees.
 5. The theme you are about to touch, in the six places it appears: `palettes/`,
    `src/sources.ts`, `src/generated/themes.ts`, the fidelity assertions in
    `tests/provenance.test.ts`, the palette galleries, and `NOTICE` if its family's
@@ -90,7 +90,7 @@ will be asked for in review.
 
 ```sh
 bun install
-bun run verify            # typecheck, lint, catalogue freshness, tests, build
+bun run verify            # formatting, typecheck, lint, catalogue freshness, tests, build
 bun run catalogue:build   # regenerate the committed catalogue
 bun run catalogue:check   # fail if it is stale
 bun run vendor            # refresh palettes/ from the pinned revision

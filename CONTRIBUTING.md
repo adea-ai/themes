@@ -11,7 +11,7 @@ bun install
 bun run verify
 ```
 
-`verify` runs typecheck, lint, the catalogue freshness check, the test suite and the
+`verify` runs formatting, typecheck, lint, the catalogue freshness check, the test suite and the
 build. If it is green, CI will be green.
 
 ## What a change usually looks like
@@ -27,7 +27,8 @@ catalogue makes, and a theme nobody checked is that claim unverified.
 
 ### Changing a contrast floor
 
-`CONTRAST_FLOORS` in `src/normalize.ts` carries the reasoning for every value. If you
+`CONTRAST_FLOORS` in `src/policy.ts` carries the reasoning for every value;
+`src/normalize.ts` re-exports it. If you
 change one, change its comment in the same commit and say in the pull request which
 theme it was blocking. A floor widened to make a theme pass is the one edit that makes
 the whole catalogue less trustworthy, because the floors are the only reason an
