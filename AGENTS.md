@@ -20,8 +20,8 @@ is the _normalizer_: the one place a terminal palette becomes an application the
 measured against contrast floors, for every consumer at once.
 
 So when a theme looks wrong, the fix is almost never a literal in a source file. It
-is a change to how the palette is interpreted, and it lands in `normalize.ts` where
-thirty themes benefit.
+is a change to how the palette is interpreted, and it lands in `src/normalize.ts` where
+the catalogue benefits.
 
 ## Read before acting
 
@@ -30,7 +30,7 @@ thirty themes benefit.
 3. `src/normalize.ts` — the transformation, and the header comment that explains why
    each step is not the obvious one. Most "why is this colour like that" questions
    are answered there.
-4. `src/validate.ts` and `CONTRAST_FLOORS` — what the catalogue guarantees.
+4. `src/validate.ts` and `CONTRAST_FLOORS` in `src/policy.ts` — what the catalogue guarantees.
 5. The theme you are about to touch, in the six places it appears: `palettes/`,
    `src/sources.ts`, `src/generated/themes.ts`, the fidelity assertions in
    `tests/provenance.test.ts`, the palette galleries, and `NOTICE` if its family's
@@ -90,7 +90,7 @@ will be asked for in review.
 
 ```sh
 bun install
-bun run verify            # typecheck, lint, catalogue freshness, tests, build
+bun run verify            # formatting, typecheck, lint, catalogue freshness, tests, build
 bun run catalogue:build   # regenerate the committed catalogue
 bun run catalogue:check   # fail if it is stale
 bun run vendor            # refresh palettes/ from the pinned revision
@@ -121,8 +121,9 @@ bun run build             # dist/ plus declarations
 Branch from `main` with `feat/*`, `fix/*`, `chore/*`, `docs/*`, `refactor/*` or
 `test/*`. Use Conventional Commit subjects — Release Please derives versions from
 them, and this repository publishes to npm, so a `feat` is a minor release and a
-`fix` is a patch. Open the pull request as a **draft** and mark it ready only once
-`bun run verify` is clean.
+`fix` is a patch. Open the pull request as a **draft**. After personal review of
+the exact head, mark it ready to trigger CI. Run `bun run verify` and record its
+results; applicable passing checks and protections gate merge.
 
 A change to what a role _means_ lands in the same commit as the schema, the
 normalizer, the adapters, the affected themes, and the tests.
@@ -407,3 +408,54 @@ Branch/PR:
 Use exact command names and outcomes. Mention external changes separately from local changes, and distinguish completed work from recommendations.
 
 <!-- /code-foundry-managed: completion-report -->
+
+## Repository-specific working guidance
+
+Code Foundry owns the managed blocks above. For AGENTS-only updates, preview and
+run its sync in a disposable checkout, then retain only the AGENTS.md changes.
+Leave generated workflow, configuration and hook changes in the disposable copy.
+Apply repository-specific additions outside managed blocks.
+
+The repository maps, commands and draft-WIP workflow below supplement the original
+guide above. For ordinary authorized work, the draft-WIP workflow below clarifies
+earlier boilerplate: commit and push incomplete work to the task's draft branch
+throughout the task and before handoff; report failing or skipped checks there.
+Personal review of the exact head gates readiness; mark reviewed drafts ready to
+trigger CI. Applicable passing checks and protections gate merge, rather than WIP pushes.
+
+## Repository map and consumer review
+
+- `src/schema.ts`, `src/normalize.ts`, `src/validate.ts`: semantic roles,
+  normalization and contrast guarantees.
+- `src/sources.ts`, `palettes/`, `NOTICE`: source revisions, vendored inputs and credit.
+- `src/adapters/`: terminal, CSS, Tailwind, shadcn and syntax mappings.
+- `scripts/build-catalogue.ts`, `src/generated/`: catalogue generator and committed output.
+- `tests/`: provenance, contrast, adapters and packed-package contract.
+- [README.md](README.md) and [docs/shadcn-bridge.md](docs/shadcn-bridge.md): public
+  entry points and the semantic-to-component mapping.
+
+Use `.mise.toml` when present and `package.json` for tool pins (Bun 1.4.2,
+Node 24.21.0), with the committed `bun.lock`. Single-theme modules and metadata
+entry points let consumers avoid loading the entire catalogue; `tests/package.test.ts`
+checks actual package exports and browser bundle contents.
+UI owns components and their token application; Adea and Cortana own app behavior.
+Review appearance in UI's Storybook galleries or the affected consumer, using the
+same published theme and adapter. Screenshots support appearance review; provenance
+and contrast assertions remain the evidence for palette fidelity and floors.
+A role meaning change includes schema, normalizer, adapters, affected themes and tests.
+For guidance-only edits, check Markdown formatting, links and documented commands.
+
+## Draft WIP workflow
+
+Use one focused topic branch from `main` and one draft PR targeting `main`.
+Check existing PRs before starting; reuse the suitable draft branch for the task.
+Commit and push WIP to that branch throughout the task and before stopping or
+handing off, then verify the remote SHA. Incomplete work and failing checks belong
+in the draft PR with exact results and remaining work; they do not block WIP pushes.
+Personal review of the exact head gates readiness; mark reviewed drafts ready to
+trigger CI. Applicable passing checks and protections gate merge. Use Conventional
+Commit subjects; this repository uses Code Foundry's direct, squash workflow.
+
+Proceed with ordinary authorized edits, checks, commits and draft pushes. Resolve
+routine implementation choices from repository sources. Ask only when a genuinely
+missing consequential decision or authority prevents the work.

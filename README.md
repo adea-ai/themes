@@ -128,7 +128,7 @@ surface ladder buildable by adding fixed steps, a contrast failure repairable by
 moving one axis, and a theme re-hueable without re-deriving its ramp by eye.
 
 **Contrast is measured, not assumed.** Nothing enters the catalogue without clearing
-the floors in `src/validate.ts`, and `bun run catalogue:build` fails if a theme
+the floors defined in `src/policy.ts` and checked by `src/validate.ts`, and `bun run catalogue:build` fails if a theme
 cannot be repaired within budget. The pipeline caught real defects that a
 hand-authored catalogue would have shipped:
 
@@ -181,7 +181,7 @@ The mapping is in `src/adapters/shadcn.ts`.
 
 ```sh
 bun install
-bun run verify          # typecheck, lint, catalogue freshness, tests, build
+bun run verify          # formatting, typecheck, lint, catalogue freshness, tests, build
 bun run catalogue:build # regenerate src/generated from palettes/ and sources.ts
 bun run catalogue:check # fail if the committed catalogue is stale
 bun run vendor          # refresh palettes/ from the pinned upstream revision
