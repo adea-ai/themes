@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.10](https://github.com/adea-ai/themes/compare/v0.10.9...v0.10.10) (2026-10-17)
+
+
+### Maintenance
+
+* **ci:** align Code Foundry runtime and cache support ([#97](https://github.com/adea-ai/themes/issues/97)) ([d923693](https://github.com/adea-ai/themes/commit/d923693f525a9cbe13101feb763bdfc576487896))
+
 ## [0.10.9](https://github.com/adea-ai/themes/compare/v0.10.8...v0.10.9) (2026-10-17)
 
 
