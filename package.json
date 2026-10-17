@@ -97,7 +97,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "bun run build",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "bun check -p tsconfig.json",
     "fmt": "oxfmt .",
     "format:check": "oxfmt --check .",
     "format:write": "oxfmt --write .",
