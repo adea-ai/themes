@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.8](https://github.com/adea-ai/themes/compare/v0.10.7...v0.10.8) (2026-10-17)
+
+
+### Maintenance
+
+* **tooling:** type-check with bun check ([#94](https://github.com/adea-ai/themes/issues/94)) ([e8f03b1](https://github.com/adea-ai/themes/commit/e8f03b11fafae0d7163995d3eb043136a88561e7))
+
+## [0.10.7](https://github.com/adea-ai/themes/compare/v0.10.6...v0.10.7) (2026-10-17)
+
+
+### Maintenance
+
+* **bun:** align packageManager to Bun 1.4.3 ([#92](https://github.com/adea-ai/themes/issues/92)) ([9e448bb](https://github.com/adea-ai/themes/commit/9e448bb534c894272ff2bc887c67be0a638e8954))
+
 ## [0.10.6](https://github.com/adea-ai/themes/compare/v0.10.5...v0.10.6) (2026-10-14)
 
 

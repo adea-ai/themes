@@ -1,6 +1,6 @@
 {
   "name": "@adea-ai/themes",
-  "version": "0.10.6",
+  "version": "0.10.8",
   "description": "The Adea theme catalogue: first-party and imported semantic OKLCH themes, with Base24, terminal, CSS and syntax adapters.",
   "keywords": [
     "adea",
@@ -97,7 +97,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "bun run build",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "bun check -p tsconfig.json",
     "fmt": "oxfmt .",
     "format:check": "oxfmt --check .",
     "format:write": "oxfmt --write .",
@@ -119,5 +119,5 @@
   "engines": {
     "node": "24.22.0"
   },
-  "packageManager": "bun@1.4.2"
+  "packageManager": "bun@1.4.3"
 }
