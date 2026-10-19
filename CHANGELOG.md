@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.12](https://github.com/adea-ai/themes/compare/v0.10.11...v0.10.12) (2026-10-19)
+
+
+### CI
+
+* **code-foundry:** reconcile the caller pin with the 1.48.3 manifest pin ([#101](https://github.com/adea-ai/themes/issues/101)) ([9d93bb8](https://github.com/adea-ai/themes/commit/9d93bb88e4af3484307f92d6c146b1d810d0855c))
+
 ## [0.10.11](https://github.com/adea-ai/themes/compare/v0.10.10...v0.10.11) (2026-10-19)
 
 
