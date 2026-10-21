@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.13](https://github.com/adea-ai/themes/compare/v0.10.12...v0.10.13) (2026-10-21)
+
+
+### Tests
+
+* **themes:** qualify the published package surface in a packed consumer ([fc37fb0](https://github.com/adea-ai/themes/commit/fc37fb022f59965d6629e2eb2eae135020335dbc))
+
 ## [0.10.12](https://github.com/adea-ai/themes/compare/v0.10.11...v0.10.12) (2026-10-19)
 
 
