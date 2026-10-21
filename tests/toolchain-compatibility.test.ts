@@ -9,7 +9,7 @@ const mise = readFileSync(join(root, '.mise.toml'), 'utf8')
 describe('the declared toolchain', () => {
   test('the package manager matches the repository toolchain pin', () => {
     const pinned = /bun\s*=\s*"([^"]+)"/.exec(mise)?.[1]
-    expect(pinned).toBeDefined()
+    if (pinned === undefined) throw new Error('the repository toolchain does not pin bun')
     expect(String(pkg.packageManager).replace(/^bun@/, '')).toBe(pinned)
   })
 
