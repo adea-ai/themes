@@ -1,24 +1,38 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
 const root = resolve(import.meta.dir, '..')
+const packageManifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
+  exports: Record<string, unknown>
+  files: string[]
+  name: string
+  version: string
+}
+const typescriptCli = join(root, 'node_modules/typescript/lib/tsc.js')
+
+/**
+ * One concrete member of each wildcard export, so a wildcard that no longer matches a
+ * published file is caught rather than skipped.
+ */
+const WILDCARD_MEMBERS: Record<string, string> = {
+  './palettes/*': 'palettes/aardvark-blue.json',
+  './themes/*': 'themes/adea-dark',
+}
+
 let consumer: string
+let repack: string
 
 // Building and packing the package can take longer than Bun's unit-test default.
 beforeAll(
   () => {
     consumer = mkdtempSync(join(tmpdir(), 'adea-themes-consumer-'))
+    repack = mkdtempSync(join(tmpdir(), 'adea-themes-repack-'))
     execFileSync('bun', ['run', 'build'], { cwd: root, stdio: 'pipe' })
-    const [archive] = JSON.parse(
-      execFileSync('npm', ['pack', '--json', '--pack-destination', consumer], {
-        cwd: root,
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      })
-    )
+    const archive = pack(consumer)
     const destination = join(consumer, 'node_modules', '@adea-ai', 'themes')
     mkdirSync(destination, { recursive: true })
     execFileSync('tar', [
@@ -30,12 +44,28 @@ beforeAll(
     ])
     writeFileSync(join(consumer, 'package.json'), JSON.stringify({ type: 'module' }))
   },
-  { timeout: 30_000 }
+  { timeout: 60_000 }
 )
 
 afterAll(() => {
   if (consumer) rmSync(consumer, { recursive: true, force: true })
+  if (repack) rmSync(repack, { recursive: true, force: true })
 })
+
+type PackedFile = { path: string; size: number; shasum: string }
+
+/** Packs the package into `destination` and returns the archive name and its file list. */
+function pack(destination: string): { filename: string; files: PackedFile[] } {
+  const [packed] = JSON.parse(
+    execFileSync('npm', ['pack', '--json', '--pack-destination', destination], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+  ) as { filename: string; files: PackedFile[] }[]
+  if (!packed) throw new Error('npm pack produced no archive')
+  return packed
+}
 
 function run(source: string): string {
   return execFileSync('node', ['--input-type=module', '--eval', source], {
@@ -43,6 +73,57 @@ function run(source: string): string {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   }).trim()
+}
+
+/** Runs a source file under Bun, so the Bun consumer is proved on its own runtime. */
+function runBun(source: string): string {
+  const entry = join(
+    consumer,
+    `bun-consumer-${createHash('sha256').update(source).digest('hex').slice(0, 16)}.mjs`
+  )
+  writeFileSync(entry, source)
+  try {
+    return execFileSync(process.execPath, [entry], {
+      cwd: consumer,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim()
+  } finally {
+    rmSync(entry, { force: true })
+  }
+}
+
+/** Every public subpath the published manifest declares, as a consumer specifier. */
+function publicSpecifiers(): string[] {
+  return Object.keys(packageManifest.exports).map((key) => {
+    if (key === '.') return packageManifest.name
+    const wildcard = WILDCARD_MEMBERS[key]
+    if (wildcard) return `${packageManifest.name}/${wildcard}`
+    return `${packageManifest.name}${key.slice(1)}`
+  })
+}
+
+/** Writes a consumer module that imports one specifier and nothing else. */
+function isolatedImport(specifier: string): string {
+  const entry = join(
+    consumer,
+    `isolated-${createHash('sha256').update(specifier).digest('hex').slice(0, 16)}.mjs`
+  )
+  // A JSON member of the palette export needs the JSON import attribute under Node ESM.
+  const attribute = specifier.endsWith('.json') ? " with { type: 'json' }" : ''
+  writeFileSync(
+    entry,
+    `import * as module from ${JSON.stringify(specifier)}${attribute}\nconsole.log(Object.keys(module).length);\n`
+  )
+  try {
+    return execFileSync('node', [entry], {
+      cwd: consumer,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim()
+  } finally {
+    rmSync(entry, { force: true })
+  }
 }
 
 describe('packed package in a native ESM consumer', () => {
@@ -124,5 +205,282 @@ describe('packed package in a native ESM consumer', () => {
       console.log(variables['--primary']);
     `)
     ).toStartWith('oklch(')
+  })
+})
+
+describe('public package qualification', () => {
+  test('every declared public export resolves in the packed package, under Node and Bun', () => {
+    const specifiers = publicSpecifiers()
+    const source = `
+      const specifiers = ${JSON.stringify(specifiers)};
+      const resolved = specifiers.map((specifier) => import.meta.resolve(specifier));
+      console.log(JSON.stringify(resolved));
+    `
+    for (const runtime of [run, runBun]) {
+      const resolved = JSON.parse(runtime(source)) as string[]
+      expect(resolved).toHaveLength(specifiers.length)
+      for (const url of resolved) {
+        expect(url.startsWith('file://')).toBe(true)
+        expect(url).toContain('/node_modules/@adea-ai/themes/')
+      }
+    }
+  })
+
+  test('every declared theme id resolves to its own theme record', () => {
+    const result = JSON.parse(
+      run(`
+      const { themeIds } = await import('@adea-ai/themes/catalogue');
+      const { themeMetadata } = await import('@adea-ai/themes/metadata');
+      const seen = [];
+      for (const id of themeIds()) {
+        const module = await import('@adea-ai/themes/themes/' + id);
+        if (!module.default || module.default.id !== id) {
+          throw new Error('theme id mismatch: ' + id);
+        }
+        seen.push(id);
+      }
+      console.log(JSON.stringify({
+        count: seen.length,
+        unique: new Set(seen).size,
+        metadata: themeMetadata.length,
+        first: seen[0],
+        last: seen[seen.length - 1],
+      }));
+    `)
+    ) as { count: number; unique: number; metadata: number; first: string; last: string }
+    expect(result.count).toBe(result.metadata)
+    expect(result.unique).toBe(result.count)
+    expect(result.count).toBeGreaterThan(0)
+    expect(result.first).toBe('adea-dark')
+  })
+
+  test('each public entry imports on its own', () => {
+    for (const specifier of publicSpecifiers()) {
+      if (specifier.endsWith('/package.json')) continue
+      expect(isolatedImport(specifier).length).toBeGreaterThan(0)
+    }
+  })
+
+  test('consumer types resolve from the packed declarations', () => {
+    const good = join(consumer, 'types-good')
+    mkdirSync(good, { recursive: true })
+    writeFileSync(
+      join(good, 'consumer.ts'),
+      `
+      import { getTheme, type AdeaTheme, type ThemeMetadata } from '@adea-ai/themes';
+      import { toXtermTheme } from '@adea-ai/themes/adapters/xterm';
+      import { themeMetadata } from '@adea-ai/themes/metadata';
+      const theme: AdeaTheme | undefined = getTheme('adea-dark');
+      const metadata: readonly ThemeMetadata[] = themeMetadata;
+      export const probe = { theme, metadata, xterm: theme ? toXtermTheme(theme) : undefined };
+      `
+    )
+    writeFileSync(
+      join(good, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          module: 'nodenext',
+          moduleResolution: 'nodenext',
+          target: 'es2022',
+          strict: true,
+          noEmit: true,
+          skipLibCheck: true,
+          types: [],
+        },
+        include: ['consumer.ts'],
+      })
+    )
+    const listed = execFileSync(
+      'node',
+      [typescriptCli, '--noEmit', '--listFiles', '--project', join(good, 'tsconfig.json')],
+      { cwd: good, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }
+    )
+    // The types must come from the packed declarations, not from the source tree.
+    expect(listed).toContain('/node_modules/@adea-ai/themes/dist/index.d.ts')
+    expect(listed).toContain('/node_modules/@adea-ai/themes/dist/adapters/xterm.d.ts')
+    expect(listed).toContain('/node_modules/@adea-ai/themes/dist/generated/metadata.d.ts')
+
+    // A negative control: the same consumer with a wrong type must fail, so the pass
+    // above proves the checker saw the packed types rather than skipping them.
+    const bad = join(consumer, 'types-bad')
+    mkdirSync(bad, { recursive: true })
+    writeFileSync(
+      join(bad, 'consumer.ts'),
+      `
+      import { getTheme } from '@adea-ai/themes';
+      const wrong: number = getTheme('adea-dark');
+      export const probe = wrong;
+      `
+    )
+    writeFileSync(
+      join(bad, 'tsconfig.json'),
+      JSON.stringify({
+        compilerOptions: {
+          module: 'nodenext',
+          moduleResolution: 'nodenext',
+          target: 'es2022',
+          strict: true,
+          noEmit: true,
+          skipLibCheck: true,
+          types: [],
+        },
+        include: ['consumer.ts'],
+      })
+    )
+    let failed = false
+    try {
+      execFileSync('node', [typescriptCli, '--noEmit', '--project', join(bad, 'tsconfig.json')], {
+        cwd: bad,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+    } catch {
+      failed = true
+    }
+    expect(failed).toBe(true)
+  })
+
+  test('every adapter produces its declared output shape', () => {
+    const summary = JSON.parse(
+      run(`
+      import { getTheme } from '@adea-ai/themes';
+      import { BASE24_SLOTS, toBase24, formatBase24Scheme } from '@adea-ai/themes/adapters/base24';
+      import { toXtermTheme } from '@adea-ai/themes/adapters/xterm';
+      import { themeCss, themeCssVariables } from '@adea-ai/themes/adapters/css';
+      import { toTailwindTheme } from '@adea-ai/themes/adapters/tailwind';
+      import { toShikiTheme } from '@adea-ai/themes/adapters/shiki';
+      import { shadcnDestructiveProjection, shadcnRoles, shadcnVariables } from '@adea-ai/themes/adapters/shadcn';
+      const theme = getTheme('adea-dark');
+      const base24 = toBase24(theme);
+      const xterm = toXtermTheme(theme);
+      const css = themeCssVariables(theme);
+      const shadcn = shadcnVariables(theme);
+      const shiki = toShikiTheme(theme);
+      if (Object.keys(base24.palette).length !== BASE24_SLOTS.length) {
+        throw new Error('base24 palette is not complete');
+      }
+      if (!formatBase24Scheme(base24).includes(base24.palette.base00)) {
+        throw new Error('base24 scheme text does not carry the palette');
+      }
+      if (!xterm.background || !xterm.foreground || !xterm.cursor) {
+        throw new Error('xterm theme is incomplete');
+      }
+      if (!css['--adea-background'] || !themeCss(theme).includes('--adea-background')) {
+        throw new Error('css variables are incomplete');
+      }
+      if (!toTailwindTheme().includes('@theme')) {
+        throw new Error('tailwind theme is not a theme block');
+      }
+      if (!shiki.colors || shiki.settings.length === 0) {
+        throw new Error('shiki registration is incomplete');
+      }
+      if (!shadcn['--primary'] || Object.keys(shadcnRoles(theme)).length === 0) {
+        throw new Error('shadcn variables are incomplete');
+      }
+      if (!shadcnDestructiveProjection(theme).fill) {
+        throw new Error('shadcn destructive projection is incomplete');
+      }
+      console.log(JSON.stringify({
+        base24Slots: BASE24_SLOTS.length,
+        xtermKeys: Object.keys(xterm).length,
+        cssVariables: Object.keys(css).length,
+        shikiSettings: shiki.settings.length,
+        shadcnVariables: Object.keys(shadcn).length,
+      }));
+    `)
+    ) as Record<string, number>
+    expect(summary.base24Slots).toBe(24)
+    expect(summary.xtermKeys).toBe(22)
+    expect(summary.cssVariables).toBeGreaterThan(0)
+    expect(summary.shikiSettings).toBeGreaterThan(0)
+    expect(summary.shadcnVariables).toBeGreaterThan(0)
+  })
+
+  test('the packed contents are reproducible', () => {
+    const first = pack(repack)
+    const second = pack(repack)
+    expect(second.files).toEqual(first.files)
+    const digest = (name: string) =>
+      createHash('sha256')
+        .update(readFileSync(join(repack, name)))
+        .digest('hex')
+    expect(digest(second.filename)).toBe(digest(first.filename))
+  })
+
+  test('the pack carries no tooling, and the export map exposes no source subpath', () => {
+    const packed = pack(repack)
+    const roots = new Set(packed.files.map((file) => file.path.split('/')[0]))
+    expect([...roots].toSorted()).toEqual([
+      'LICENSE',
+      'NOTICE',
+      'README.md',
+      'dist',
+      'package.json',
+      'palettes',
+      'src',
+    ])
+    for (const file of packed.files) {
+      expect(file.path).not.toMatch(
+        /(^|\/)(?:tests|scripts|\.github|docs)\/|(?:^|\/)(?:tsconfig[^/]*\.json|oxlintrc\.json|oxfmtrc\.json|bun\.lock|renovate\.json|AGENTS\.md|CONTRIBUTING\.md)$/
+      )
+    }
+
+    // The package ships its sources, so the export map is what keeps them unreachable.
+    const leaked = runBun(`
+      const specifiers = [
+        '@adea-ai/themes/src/index.ts',
+        '@adea-ai/themes/scripts/build-catalogue.ts',
+        '@adea-ai/themes/tests/package.test.ts',
+      ];
+      const resolved = [];
+      for (const specifier of specifiers) {
+        try {
+          import.meta.resolve(specifier);
+          resolved.push(specifier);
+        } catch {}
+      }
+      console.log(JSON.stringify(resolved));
+    `)
+    expect(JSON.parse(leaked)).toEqual([])
+  })
+
+  test('each public entry stays inside a bounded bundle', async () => {
+    const bounds: { entry: string; bytes: number; themeSources: number }[] = [
+      { entry: 'themes/adea-dark', bytes: 16 * 1024, themeSources: 1 },
+      { entry: 'metadata', bytes: 32 * 1024, themeSources: 0 },
+      { entry: 'adapters/xterm', bytes: 16 * 1024, themeSources: 0 },
+      { entry: 'catalogue', bytes: 128 * 1024, themeSources: 34 },
+      { entry: '', bytes: 256 * 1024, themeSources: 34 },
+    ]
+    for (const bound of bounds) {
+      const specifier = bound.entry
+        ? `${packageManifest.name}/${bound.entry}`
+        : packageManifest.name
+      const entry = join(consumer, `bundle-${bound.entry.replaceAll('/', '-') || 'root'}.ts`)
+      writeFileSync(
+        entry,
+        `import * as module from ${JSON.stringify(specifier)}\nexport default module\n`
+      )
+      const result = await Bun.build({
+        entrypoints: [entry],
+        target: 'browser',
+        minify: true,
+        sourcemap: 'external',
+      })
+      expect(result.success).toBe(true)
+      const map = result.outputs.find((output) => output.path.endsWith('.map'))
+      const { sources } = JSON.parse(await map!.text()) as { sources: string[] }
+      const themeSources = sources.filter((source) => source.includes('/generated/themes/'))
+      expect(themeSources).toHaveLength(bound.themeSources)
+      const bundle = result.outputs.find((output) => !output.path.endsWith('.map'))!
+      expect(bundle.size).toBeLessThan(bound.bytes)
+      if (bound.entry === 'themes/adea-dark' || bound.entry === 'adapters/xterm') {
+        expect(
+          sources.some((source) =>
+            /(?:catalogue|normalize|sources|generated\/schemes|generated\/themes)\.js$/.test(source)
+          )
+        ).toBe(false)
+      }
+    }
   })
 })
