@@ -6,12 +6,6 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
 const root = resolve(import.meta.dir, '..')
-const packageManifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as {
-  exports: Record<string, unknown>
-  files: string[]
-  name: string
-  version: string
-}
 const typescriptCli = join(root, 'node_modules/typescript/lib/tsc.js')
 
 /**
@@ -24,13 +18,15 @@ const WILDCARD_MEMBERS: Record<string, string> = {
 }
 
 let consumer: string
-let repack: string
+let firstPack: string
+let secondPack: string
 
 // Building and packing the package can take longer than Bun's unit-test default.
 beforeAll(
   () => {
     consumer = mkdtempSync(join(tmpdir(), 'adea-themes-consumer-'))
-    repack = mkdtempSync(join(tmpdir(), 'adea-themes-repack-'))
+    firstPack = mkdtempSync(join(tmpdir(), 'adea-themes-pack-'))
+    secondPack = mkdtempSync(join(tmpdir(), 'adea-themes-repack-'))
     execFileSync('bun', ['run', 'build'], { cwd: root, stdio: 'pipe' })
     const archive = pack(consumer)
     const destination = join(consumer, 'node_modules', '@adea-ai', 'themes')
@@ -49,22 +45,38 @@ beforeAll(
 
 afterAll(() => {
   if (consumer) rmSync(consumer, { recursive: true, force: true })
-  if (repack) rmSync(repack, { recursive: true, force: true })
+  if (firstPack) rmSync(firstPack, { recursive: true, force: true })
+  if (secondPack) rmSync(secondPack, { recursive: true, force: true })
 })
 
-type PackedFile = { path: string; size: number; shasum: string }
+/** The fields `npm pack --json` reports for one file in the archive. */
+type PackedFile = { mode: number; path: string; size: number }
+
+type PackedArchive = { filename: string; files: PackedFile[] }
 
 /** Packs the package into `destination` and returns the archive name and its file list. */
-function pack(destination: string): { filename: string; files: PackedFile[] } {
+function pack(destination: string): PackedArchive {
   const [packed] = JSON.parse(
     execFileSync('npm', ['pack', '--json', '--pack-destination', destination], {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
     })
-  ) as { filename: string; files: PackedFile[] }[]
+  ) as PackedArchive[]
   if (!packed) throw new Error('npm pack produced no archive')
   return packed
+}
+
+/** The manifest a consumer receives, read out of the packed archive. */
+function packedManifest(): {
+  exports: Record<string, unknown>
+  files: string[]
+  name: string
+  version: string
+} {
+  return JSON.parse(
+    readFileSync(join(consumer, 'node_modules', '@adea-ai', 'themes', 'package.json'), 'utf8')
+  )
 }
 
 function run(source: string): string {
@@ -93,13 +105,18 @@ function runBun(source: string): string {
   }
 }
 
-/** Every public subpath the published manifest declares, as a consumer specifier. */
+/**
+ * Every public subpath the **published** manifest declares, as a consumer specifier.
+ * The manifest is read out of the packed archive, so the test follows the contract a
+ * consumer actually receives rather than the working tree's copy.
+ */
 function publicSpecifiers(): string[] {
-  return Object.keys(packageManifest.exports).map((key) => {
-    if (key === '.') return packageManifest.name
+  const manifest = packedManifest()
+  return Object.keys(manifest.exports).map((key) => {
+    if (key === '.') return manifest.name
     const wildcard = WILDCARD_MEMBERS[key]
-    if (wildcard) return `${packageManifest.name}/${wildcard}`
-    return `${packageManifest.name}${key.slice(1)}`
+    if (wildcard) return `${manifest.name}/${wildcard}`
+    return `${manifest.name}${key.slice(1)}`
   })
 }
 
@@ -397,28 +414,33 @@ describe('public package qualification', () => {
   })
 
   test('the packed contents are reproducible', () => {
-    const first = pack(repack)
-    const second = pack(repack)
+    // Two independent destinations, so the second pack cannot overwrite the first, and
+    // the first archive's bytes are read before the second pack runs.
+    const first = pack(firstPack)
+    const firstBytes = readFileSync(join(firstPack, first.filename))
+    const firstDigest = createHash('sha256').update(firstBytes).digest('hex')
+    const second = pack(secondPack)
+    const secondBytes = readFileSync(join(secondPack, second.filename))
+
     expect(second.files).toEqual(first.files)
-    const digest = (name: string) =>
-      createHash('sha256')
-        .update(readFileSync(join(repack, name)))
-        .digest('hex')
-    expect(digest(second.filename)).toBe(digest(first.filename))
+    expect(createHash('sha256').update(secondBytes).digest('hex')).toBe(firstDigest)
+    expect(secondBytes.equals(firstBytes)).toBe(true)
+
+    // A negative control: the same length with one byte changed must not compare equal,
+    // so the equality above is about the archive bytes and not about their size.
+    const altered = Buffer.from(firstBytes)
+    altered[0] = altered[0] === 0x1f ? 0x1e : 0x1f
+    expect(altered.length).toBe(firstBytes.length)
+    expect(createHash('sha256').update(altered).digest('hex')).not.toBe(firstDigest)
   })
 
   test('the pack carries no tooling, and the export map exposes no source subpath', () => {
-    const packed = pack(repack)
+    const packed = pack(firstPack)
     const roots = new Set(packed.files.map((file) => file.path.split('/')[0]))
-    expect([...roots].toSorted()).toEqual([
-      'LICENSE',
-      'NOTICE',
-      'README.md',
-      'dist',
-      'package.json',
-      'palettes',
-      'src',
-    ])
+    // The published manifest's own `files` list, plus the files npm always includes.
+    const manifest = packedManifest()
+    const expected = new Set([...manifest.files, 'LICENSE', 'NOTICE', 'README.md', 'package.json'])
+    expect([...roots].toSorted()).toEqual([...expected].toSorted())
     for (const file of packed.files) {
       expect(file.path).not.toMatch(
         /(^|\/)(?:tests|scripts|\.github|docs)\/|(?:^|\/)(?:tsconfig[^/]*\.json|oxlintrc\.json|oxfmtrc\.json|bun\.lock|renovate\.json|AGENTS\.md|CONTRIBUTING\.md)$/
@@ -452,10 +474,9 @@ describe('public package qualification', () => {
       { entry: 'catalogue', bytes: 128 * 1024, themeSources: 34 },
       { entry: '', bytes: 256 * 1024, themeSources: 34 },
     ]
+    const manifest = packedManifest()
     for (const bound of bounds) {
-      const specifier = bound.entry
-        ? `${packageManifest.name}/${bound.entry}`
-        : packageManifest.name
+      const specifier = bound.entry ? `${manifest.name}/${bound.entry}` : manifest.name
       const entry = join(consumer, `bundle-${bound.entry.replaceAll('/', '-') || 'root'}.ts`)
       writeFileSync(
         entry,
