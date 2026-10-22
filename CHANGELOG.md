@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.15](https://github.com/adea-ai/themes/compare/v0.10.14...v0.10.15) (2026-10-22)
+
+
+### Tests
+
+* **themes:** guard toolchain compatibility ([#107](https://github.com/adea-ai/themes/issues/107)) ([492f9c2](https://github.com/adea-ai/themes/commit/492f9c28cdef797bae150740e9321d70e835ff1b))
+
 ## [0.10.14](https://github.com/adea-ai/themes/compare/v0.10.13...v0.10.14) (2026-10-22)
 
 
