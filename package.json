@@ -119,5 +119,5 @@
   "engines": {
     "node": "24.22.1"
   },
-  "packageManager": "bun@1.4.3"
+  "packageManager": "bun@1.4.4"
 }

@@ -15,7 +15,7 @@ codeql: auto
 dependency_review: auto
 package_manager: bun
 runtime_repository: 0xPlayerOne/code-foundry
-runtime_ref: v1.48.3
+runtime_ref: v1.48.4
 runner: ubuntu-latest
 ci_runner: ubuntu-latest
 test_runner: ubuntu-latest
@@ -60,3 +60,7 @@ coverage_report:
 codeql_rust_shards: '["all"]'
 codeql_rust_threads: 1
 codeql_rust_max_parallel: 1
+
+# Preserve the existing application formatter explicitly.
+formatter: oxfmt
+monorepo_tool: auto
