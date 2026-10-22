@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.16](https://github.com/adea-ai/themes/compare/v0.10.15...v0.10.16) (2026-10-22)
+
+
+### Maintenance
+
+* **deps:** update external dependencies ([#110](https://github.com/adea-ai/themes/issues/110)) ([f9546a8](https://github.com/adea-ai/themes/commit/f9546a87deebcd06c414f0c85d536959d4e841d4))
+
 ## [0.10.15](https://github.com/adea-ai/themes/compare/v0.10.14...v0.10.15) (2026-10-22)
 
 
