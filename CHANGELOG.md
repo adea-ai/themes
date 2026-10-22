@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.14](https://github.com/adea-ai/themes/compare/v0.10.13...v0.10.14) (2026-10-22)
+
+
+### Maintenance
+
+* **deps:** update node.js to v24.22.1 ([#106](https://github.com/adea-ai/themes/issues/106)) ([1491924](https://github.com/adea-ai/themes/commit/14919247d0893010190080d0ae7ad7cb30323a2f))
+
 ## [0.10.13](https://github.com/adea-ai/themes/compare/v0.10.12...v0.10.13) (2026-10-21)
 
 
